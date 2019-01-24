@@ -65,6 +65,9 @@ import java.util.Objects;
 
 /**
  * Factory for row expressions.
+ * 表达式工厂
+ *
+ * Rex -> 常量,输入...
  *
  * <p>Some common literal values (NULL, TRUE, FALSE, 0, 1, '') are cached.</p>
  */
@@ -1057,15 +1060,17 @@ public class RexBuilder {
   }
 
   /**
+   * 确保表达式被解释为指定类型
    * Ensures expression is interpreted as a specified type. The returned
    * expression may be wrapped with a cast.
    *
-   * @param type             desired type
-   * @param node             expression
+   * @param type             desired type 期望的类型
+   * @param node             expression 表达式
    * @param matchNullability whether to correct nullability of specified
    *                         type to match the expression; this usually should
    *                         be true, except for explicit casts which can
    *                         override default nullability
+   *                         是否修正指定类型的可空性以匹配表达式;这通常应该为真，但显式强制类型转换可以覆盖默认的可空性除外
    * @return a casted expression or the original expression
    */
   public RexNode ensureType(
@@ -1090,6 +1095,7 @@ public class RexBuilder {
   }
 
   /**
+   * 确保类型的可空性与值的可为空性相匹配
    * Ensures that a type's nullability matches a value's nullability.
    */
   public RelDataType matchNullability(

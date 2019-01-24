@@ -20,6 +20,7 @@ import org.slf4j.helpers.MessageFormatter;
 
 /**
  * Callback to be called when a test for validity succeeds or fails.
+ * 当有效性测试成功或失败时调用的回调。
  */
 public interface Litmus {
   /** Implementation of {@link org.apache.calcite.util.Litmus} that throws

@@ -25,6 +25,7 @@ import java.util.List;
  *
  * <p>An ordering consists of a list of one or more column ordinals and the
  * direction of the ordering.
+ * 关系表达式的物理顺序的描述。
  */
 public interface RelCollation extends RelMultipleTrait {
   //~ Methods ----------------------------------------------------------------

@@ -43,6 +43,12 @@ import org.apache.calcite.rel.RelNode;
  * would return a {@link org.apache.calcite.plan.RelTraitSet}. But for
  * simplicity, this class only allows one trait to be converted at a
  * time; all other traits are assumed to be preserved.</p>
+ *
+ * 关系表达式实现接口转换器，以指示它将关系表达式的物理属性或特征从一个值转换为另一个值。
+ * 有时这种转换是昂贵的;例如，要将非惟一的对象流转换为惟一的对象流，我们必须克隆输入中的每个对象
+ * 转换器不改变被求值的逻辑表达式;在转换之后，行数和这些行的值仍然是相同的。通过声明自己是一个转换器，关系表达式就告诉规划器这个等价性，规划器将逻辑上等价但具有不同物理特性的表达式分组为称为relset的组。
+ * 原则上，可以设计同时改变多个特征的转换器(比如改变关系表达式的排序顺序和物理位置)。在这种情况下，方法getInputTraits()将返回一个RelTraitSet。但是为了简单起见，这个类一次只允许转换一个特征;所有其他的特征都被认为是保留下来的。
+ *
  */
 public interface Converter extends RelNode {
   //~ Methods ----------------------------------------------------------------
@@ -51,6 +57,7 @@ public interface Converter extends RelNode {
    * Returns the trait of the input relational expression.
    *
    * @return input trait
+   * 返回输入关系表达式的特征。
    */
   RelTraitSet getInputTraits();
 
@@ -63,13 +70,17 @@ public interface Converter extends RelNode {
    * have one trait altered and the other orthogonal traits will be the same.
    *
    * @return trait which this converter modifies
+   *
+   * 返回此转换器所处理的特征的定义。
+   * 输入关系表达式(由规则匹配)必须具有这个特征，并且具有getInputTraits()给出的值，而RelOptNode.getTraitSet()给出的这个转换器的输出的特征将改变一个特征，而其他正交特征将相同。
    */
   RelTraitDef getTraitDef();
 
   /**
    * Returns the sole input relational expression
    *
-   * @return child relational expression
+   * @return child relational expression 孩子的关系表达式
+   * 返回唯一的输入关系表达式
    */
   RelNode getInput();
 }

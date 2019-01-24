@@ -59,6 +59,7 @@ import javax.annotation.Nonnull;
 /**
  * Contains factory interface and default implementation for creating various
  * rel nodes.
+ * 包含用于创建各种rel节点的工厂接口和默认实现
  */
 public class RelFactories {
   public static final ProjectFactory DEFAULT_PROJECT_FACTORY =

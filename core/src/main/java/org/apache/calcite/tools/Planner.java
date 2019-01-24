@@ -37,6 +37,11 @@ import java.io.Reader;
  * different queries. The consumer of this interface is responsible for calling
  * reset() after each use of Planner that corresponds to a different
  * query.
+ *
+ * 一个覆盖calcite 查询规划过程的:
+ * 解析SQL，验证解析树，将解析树转换为关系表达式，并优化关系表达式。
+ *
+ * 计划器不是线程安全的。但是，它可以用于不同的查询。该接口的使用者负责在每次使用对应于不同查询的Planner程序之后调用reset()。
  */
 public interface Planner extends AutoCloseable {
   /**
@@ -111,6 +116,8 @@ public interface Planner extends AutoCloseable {
    * @return The root of the new RelNode tree.
    * @throws org.apache.calcite.tools.RelConversionException on conversion
    *     error
+   * 根据特定规则集将一个关系表达式树转换为另一个关系表达式，并需要一组特征。
+   *
    */
   RelNode transform(int ruleSetIndex,
       RelTraitSet requiredOutputTraits, RelNode rel)

@@ -20,6 +20,8 @@ import org.apache.calcite.rel.RelNode;
 
 /**
  * Calling convention trait.
+ *
+ * 调用约定特征。
  */
 public interface Convention extends RelTrait {
   /**

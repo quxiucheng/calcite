@@ -32,6 +32,10 @@ import java.util.List;
  * a "phase".
  * The most typical program is an invocation of the volcano planner with a
  * particular {@link org.apache.calcite.tools.RuleSet}.</p>
+ *
+ * 将关系表达式转换为另一个关系表达式的程序。
+ *
+ * 计划员是一系列程序，每个程序有时被称为“阶段”。最典型的程序是使用特定规则集调用火山计划程序。
  */
 public interface Program {
   RelNode run(RelOptPlanner planner, RelNode rel,

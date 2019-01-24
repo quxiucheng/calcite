@@ -22,7 +22,12 @@ import org.apache.calcite.sql.SqlKind;
 import java.util.Collection;
 
 /**
+ * 行表达式
  * Row expression.
+ *
+ * RexLiteral 常量
+ * RexVariable 变量
+ * RexCall 操作表达式
  *
  * <p>Every row-expression has a type.
  * (Compare with {@link org.apache.calcite.sql.SqlNode}, which is created before

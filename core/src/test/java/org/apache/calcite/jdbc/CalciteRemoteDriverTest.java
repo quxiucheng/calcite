@@ -495,14 +495,28 @@ public class CalciteRemoteDriverTest {
   @Test public void testRemoteExecuteMaxRow() throws Exception {
     try (Connection remoteConnection = getRemoteConnection()) {
       Statement statement = remoteConnection.createStatement();
-      statement.setMaxRows(2);
+      // statement.setMaxRows(2);
       ResultSet resultSet = statement.executeQuery(
-          "select * from \"hr\".\"emps\"");
+          "select * from \"hr\".\"emps\" where \"empid\"=100");
       int count = 0;
+      // while (resultSet.next()) {
+      //
+      // }
+      final StringBuilder buf = new StringBuilder();
       while (resultSet.next()) {
         ++count;
+        int n = resultSet.getMetaData().getColumnCount();
+        for (int i = 1; i <= n; i++) {
+          buf.append(i > 1 ? "; " : "")
+                  .append(resultSet.getMetaData().getColumnLabel(i))
+                  .append("=")
+                  .append(resultSet.getObject(i));
+        }
+        System.out.println(buf.toString());
+        buf.setLength(0);
       }
-      assertThat(count, equalTo(2));
+      System.out.println("abcd");
+      assertThat(count, equalTo(1));
     }
   }
 

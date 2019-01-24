@@ -150,8 +150,8 @@ public abstract class SqlToRelTestBase {
   //~ Inner Interfaces -------------------------------------------------------
 
   /**
-   * Helper class which contains default implementations of methods used for
-   * running sql-to-rel conversion tests.
+   * Helper class which contains default implementations of methods used for running sql-to-rel conversion tests.
+   * Helper类，包含用于运行sql-to-rel转换测试的方法的默认实现
    */
   public interface Tester {
     /**

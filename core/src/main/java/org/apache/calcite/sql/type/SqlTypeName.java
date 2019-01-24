@@ -48,6 +48,11 @@ import java.util.Set;
  * <li>SqlTypeName provides a place to hang extra information such as whether
  * the type carries precision and scale.
  * </ul>
+ *
+ * 可用于构造SQL类型的类型名称的枚举。这个类存在的基本原理(而不是仅仅使用标准java.sql)。类型顺序):
+ * 类型不包括所有SQL2003数据类型;
+ * SqlTypeName提供了一个类型安全的枚举;
+ * SqlTypeName提供了一个挂载额外信息的位置，例如类型是否具有精度和可伸缩性。
  */
 public enum SqlTypeName {
   BOOLEAN(PrecScale.NO_NO, false, Types.BOOLEAN, SqlTypeFamily.BOOLEAN),
@@ -55,12 +60,16 @@ public enum SqlTypeName {
   SMALLINT(PrecScale.NO_NO, false, Types.SMALLINT, SqlTypeFamily.NUMERIC),
   INTEGER(PrecScale.NO_NO, false, Types.INTEGER, SqlTypeFamily.NUMERIC),
   BIGINT(PrecScale.NO_NO, false, Types.BIGINT, SqlTypeFamily.NUMERIC),
+  // 0111
   DECIMAL(PrecScale.NO_NO | PrecScale.YES_NO | PrecScale.YES_YES, false,
       Types.DECIMAL, SqlTypeFamily.NUMERIC),
+
   FLOAT(PrecScale.NO_NO, false, Types.FLOAT, SqlTypeFamily.NUMERIC),
   REAL(PrecScale.NO_NO, false, Types.REAL, SqlTypeFamily.NUMERIC),
   DOUBLE(PrecScale.NO_NO, false, Types.DOUBLE, SqlTypeFamily.NUMERIC),
   DATE(PrecScale.NO_NO, false, Types.DATE, SqlTypeFamily.DATE),
+
+  //0011 -> NO_NO YES_NO
   TIME(PrecScale.NO_NO | PrecScale.YES_NO, false, Types.TIME,
       SqlTypeFamily.TIME),
   TIME_WITH_LOCAL_TIME_ZONE(PrecScale.NO_NO | PrecScale.YES_NO, false, Types.OTHER,
@@ -69,12 +78,14 @@ public enum SqlTypeName {
       SqlTypeFamily.TIMESTAMP),
   TIMESTAMP_WITH_LOCAL_TIME_ZONE(PrecScale.NO_NO | PrecScale.YES_NO, false, Types.OTHER,
       SqlTypeFamily.TIMESTAMP),
+
   INTERVAL_YEAR(PrecScale.NO_NO, false, Types.OTHER,
       SqlTypeFamily.INTERVAL_YEAR_MONTH),
   INTERVAL_YEAR_MONTH(PrecScale.NO_NO, false, Types.OTHER,
       SqlTypeFamily.INTERVAL_YEAR_MONTH),
   INTERVAL_MONTH(PrecScale.NO_NO, false, Types.OTHER,
       SqlTypeFamily.INTERVAL_YEAR_MONTH),
+
   INTERVAL_DAY(PrecScale.NO_NO | PrecScale.YES_NO | PrecScale.YES_YES,
       false, Types.OTHER, SqlTypeFamily.INTERVAL_DAY_TIME),
   INTERVAL_DAY_HOUR(PrecScale.NO_NO | PrecScale.YES_NO | PrecScale.YES_YES,
@@ -95,6 +106,7 @@ public enum SqlTypeName {
       false, Types.OTHER, SqlTypeFamily.INTERVAL_DAY_TIME),
   INTERVAL_SECOND(PrecScale.NO_NO | PrecScale.YES_NO | PrecScale.YES_YES,
       false, Types.OTHER, SqlTypeFamily.INTERVAL_DAY_TIME),
+  //0011
   CHAR(PrecScale.NO_NO | PrecScale.YES_NO, false, Types.CHAR,
       SqlTypeFamily.CHARACTER),
   VARCHAR(PrecScale.NO_NO | PrecScale.YES_NO, false, Types.VARCHAR,
@@ -262,6 +274,13 @@ public enum SqlTypeName {
   private final int jdbcOrdinal;
   private final SqlTypeFamily family;
 
+  /**
+   *
+   * @param signatures
+   * @param special
+   * @param jdbcType jdbc类型
+   * @param family 类型组
+   */
   SqlTypeName(int signatures, boolean special, int jdbcType,
       SqlTypeFamily family) {
     this.signatures = signatures;
@@ -271,6 +290,7 @@ public enum SqlTypeName {
   }
 
   /**
+   * 根据名称获取类型
    * Looks up a type name from its name.
    *
    * @return Type name, or null if not found
@@ -324,6 +344,16 @@ public enum SqlTypeName {
    *                  specification
    * @param scale     Whether the scale field is part of the type specification
    * @return Whether this combination of precision/scale is valid
+   *
+   *
+   * 返回是否可以使用给定的精度和比例组合指定此类型。
+   * 返回是否可以使用给定的精度和比例组合指定此类型。例如,
+
+    Varchar。allowsPrecScale(true, false)返回true，因为VARCHAR类型允许一个精度参数，如VARCHAR(10)中所示。
+
+    Varchar。allowsPrecScale(true, true)返回true，因为VARCHAR类型不允许精度和scale参数，如VARCHAR(10,4)中所示。
+
+    allowsPrecScale(false, true)为每种类型返回false。
    */
   public boolean allowsPrecScale(
       boolean precision,
@@ -393,6 +423,8 @@ public enum SqlTypeName {
 
   /**
    * Gets the SqlTypeName corresponding to a JDBC type.
+   *
+   * 根据jdbc type获取名称
    *
    * @param jdbcType the JDBC type of interest
    * @return corresponding SqlTypeName, or null if the type is not known
@@ -954,6 +986,14 @@ public enum SqlTypeName {
    * <li>precision = start (leading field) precision</li>
    * <li>scale = fractional second precision</li>
    * </ul>
+   *
+   * 指示精度/比例组合的标志。
+   * 注:时间间隔:
+   *  精度=开始(前场)精度
+   *  比例=小数 秒 精度
+   * 0001
+   * 0010
+   * 0100
    */
   private interface PrecScale {
     int NO_NO = 1;

@@ -46,6 +46,28 @@
  *        org.apache.calcite.plan</a></code>
  *        provides an optimizer interface.</li>
  * </ul>
+ *
+ * 提供计划器规则的核心集。
+
+ 把这个包看作计划器规则的“标准库”。您希望在逻辑关系表达式上执行的或在任何数据源上执行的大多数常见重写都已经出现，并且经过了良好的测试。
+
+
+ 当然，图书馆永远不可能是完整的，我们欢迎您的贡献。
+
+
+ 不存在特定于特定数据源的规则:请查看该数据源的适配器。
+
+
+ 这个包的作用域之外还有支持特定操作的规则，例如反关系或识别物化视图。这些是和算法一起定义的。
+
+
+ 相关包和类
+
+ 包org.apache.calcite.sql是sql表达式的对象模型
+
+ 包org.apache.calcite.rex是关系行表达式的对象模型
+
+ 包org.apache.calcite.plan提供了一个优化器接口。
  */
 @PackageMarker
 package org.apache.calcite.rel.rules;

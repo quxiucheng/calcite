@@ -33,6 +33,7 @@ import static org.apache.calcite.avatica.ConnectionConfigImpl.PropEnv;
 
 /**
  * Properties that may be specified on the JDBC connect string.
+ * 可以在JDBC连接字符串上指定的属性。
  */
 public enum CalciteConnectionProperty implements ConnectionProperty {
   /** Whether approximate results from {@code COUNT(DISTINCT ...)} aggregate

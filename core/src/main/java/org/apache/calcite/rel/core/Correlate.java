@@ -63,6 +63,28 @@ import java.util.Set;
  *   <tr><td>HashJoinAnti</td><td>SemiJoin(A, B, anti)</td></tr>
  * </table>
  *
+ 执行嵌套循环联接的关系运算符。
+
+ 它的行为类似于Join，但其工作方式是在其环境中设置变量并重新启动其右侧输入。
+
+
+ 关联不是连接，因为:典型的规则不应该匹配关联。
+
+
+ 关联用于表示相关的查询。一种实现策略是解关联表达式。
+
+
+ 物理操作到逻辑操作的映射
+ Physical operation	Logical operation
+ NestedLoops	Correlate(A, B, regular)
+ NestedLoopsOuter	Correlate(A, B, outer)
+ NestedLoopsSemi	Correlate(A, B, semi)
+ NestedLoopsAnti	Correlate(A, B, anti)
+ HashJoin	EquiJoin(A, B)
+ HashJoinOuter	EquiJoin(A, B, outer)
+ HashJoinSemi	SemiJoin(A, B, semi)
+ HashJoinAnti	SemiJoin(A, B, anti)
+ *
  * @see CorrelationId
  */
 public abstract class Correlate extends BiRel {

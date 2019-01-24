@@ -131,7 +131,7 @@ public abstract class SqlNode implements Cloneable {
    * @param dialect     Dialect
    * @param forceParens wraps all expressions in parentheses; good for parse
    *                    test, but false by default.
-   *
+   *                    将所有表达式括在括号中;用于解析测试，但默认为false。
    *                    <p>Typical return values are:</p>
    *                    <ul>
    *                    <li>'It''s a bird!'</li>
@@ -139,6 +139,8 @@ public abstract class SqlNode implements Cloneable {
    *                    <li>12.3</li>
    *                    <li>DATE '1969-04-29'</li>
    *                    </ul>
+   *
+   *  返回此SqlNode为根节点的树的SQL文本。
    */
   public SqlString toSqlString(SqlDialect dialect, boolean forceParens) {
     if (dialect == null) {
@@ -248,6 +250,7 @@ public abstract class SqlNode implements Cloneable {
 
   /**
    * Returns whether this node is structurally equivalent to another node.
+   * 返回此节点在结构上是否等效于另一个节点。
    * Some examples:
    *
    * <ul>

@@ -29,6 +29,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A <code>RelOptQuery</code> represents a set of
  * {@link RelNode relational expressions} which derive from the same
  * <code>select</code> statement.
+ *
+ * RelOptQuery表示从相同的select语句派生的一组关系表达式
  */
 public class RelOptQuery {
   //~ Static fields/initializers ---------------------------------------------

@@ -403,7 +403,9 @@ public abstract class Prepare {
 
   protected abstract SqlValidator getSqlValidator();
 
-  /** Interface by which validator and planner can read table metadata. */
+  /** Interface by which validator and planner can read table metadata.
+   * 验证器和规划器可以读取表元数据的接口。
+   * */
   public interface CatalogReader
       extends RelOptSchema, SqlValidatorCatalogReader, SqlOperatorTable {
     PreparingTable getTableForMember(List<String> names);

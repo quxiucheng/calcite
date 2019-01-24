@@ -48,6 +48,16 @@ import com.google.common.collect.Interners;
  * registered with each new planner instantiated.</p>
  *
  * @param <T> Trait that this trait definition is based upon
+ *
+ * RelTraitDef表示一组RelTraits,RelTraitDef的实现在以下情况下可能是单例的:
+ * 如果所有可能相关的RelTraits的集合是有限且固定的(例如，这个RelTraitDef的所有RelTraits在编译时都是已知的)
+ * 例如，
+ * CallingConvention特征满足这个要求，因为CallingConvention实际上是一个枚举。
+ *  要么
+ *  canConvert(RelOptPlanner, RelTrait, RelTrait)和convert(RelOptPlanner, RelNode, RelTrait, boolean)不需要特定于计划器实例的信息
+ * RelTraitDef在内部管理独立的转换数据集。有关此示例，请参见约定的traitdef。
+  否则，必须构造RelTraitDef的新实例，并在实例化的每个新计划器中注册它。
+ *
  */
 public abstract class RelTraitDef<T extends RelTrait> {
   //~ Instance fields --------------------------------------------------------
@@ -71,6 +81,8 @@ public abstract class RelTraitDef<T extends RelTrait> {
    * this trait simultaneously.
    *
    * <p>A subset has only one instance of a trait.</p>
+   * 关系表达式是否可以同时拥有该特征的多个实例。
+   * 一个子集只有一个trait的实例。
    */
   public boolean multiple() {
     return false;
@@ -78,12 +90,14 @@ public abstract class RelTraitDef<T extends RelTrait> {
 
   /**
    * @return the specific RelTrait type associated with this RelTraitDef.
+   * 与此RelTraitDef关联的特定RelTrait类型。
    */
   public abstract Class<T> getTraitClass();
 
   /**
    * @return a simple name for this RelTraitDef (for use in
    * {@link org.apache.calcite.rel.RelNode#explain}).
+   * 这个RelTraitDef的一个简单名称(用于RelNode.explain(org.apache. calcit.relwriter))。
    */
   public abstract String getSimpleName();
 
@@ -92,12 +106,17 @@ public abstract class RelTraitDef<T extends RelTrait> {
    * that RelTrait. Canonized RelTrait objects may always be compared using
    * the equality operator (<code>==</code>).
    *
+   *
    * <p>If an equal RelTrait has already been canonized and is still in use,
    * it will be returned. Otherwise, the given RelTrait is made canonical and
    * returned.
    *
    * @param trait a possibly non-canonical RelTrait
    * @return a canonical RelTrait.
+   *
+   * 获取任意关系特征并返回该关系特征的规范表示。可以始终使用相等运算符(==)比较已被圣化的RelTrait对象。
+
+  如果一个相等的关系特征已经被圣化并且仍然在使用，它将被返回。否则，将使给定的RelTrait规范化并返回。
    */
   public final T canonize(T trait) {
     if (!(trait instanceof RelCompositeTrait)) {
@@ -118,6 +137,8 @@ public abstract class RelTraitDef<T extends RelTrait> {
    * @param allowInfiniteCostConverters flag indicating whether infinite cost
    *                                    converters are allowed
    * @return a converted RelNode or null if conversion is not possible
+   *
+   * 将给定的RelNode转换为给定的RelTrait。
    */
   public abstract RelNode convert(
       RelOptPlanner planner,
@@ -132,6 +153,8 @@ public abstract class RelTraitDef<T extends RelTrait> {
    * @param fromTrait the RelTrait to convert from
    * @param toTrait   the RelTrait to convert to
    * @return true if fromTrait can be converted to toTrait
+   *
+   * 测试给定的关系特征是否可以转换为另一个关系特征。
    */
   public abstract boolean canConvert(
       RelOptPlanner planner,

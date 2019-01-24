@@ -25,6 +25,12 @@ package org.apache.calcite.plan;
  * plugging in their own cost models with well-defined meanings for each unit.
  * Optimizers which supply their own cost models may also extend this interface
  * with additional cost metrics such as memory usage.
+ *
+ * RelOptCost根据处理的行数、CPU成本和I/O成本为优化器成本定义了一个接口。
+ * 优化器实现可能会使用所有这些信息，或者选择性地忽略其中的一部分。
+ * 所有这些量的具体单位相当模糊;
+ * 大多数关系表达式提供默认的成本计算，但是优化器可以通过插入具有定义良好的每个单元含义的成本模型来覆盖这一点。
+ * 提供自己的成本模型的优化器还可以使用额外的成本指标(如内存使用)扩展此接口。
  */
 public interface RelOptCost {
   //~ Methods ----------------------------------------------------------------
@@ -33,6 +39,7 @@ public interface RelOptCost {
    * @return number of rows processed; this should not be confused with the
    * row count produced by a relational expression
    * ({@link org.apache.calcite.rel.RelNode#estimateRowCount})
+   * 处理的行数;这与关系表达式(RelNode.estimateRowCount(org.apache.calcite.rel.metadata.RelMetadataQuery)生成的行数不应混淆)
    */
   double getRows();
 
@@ -51,6 +58,8 @@ public interface RelOptCost {
    * been implemented (e.g. a pure relational algebra expression) or can't
    * actually be implemented, e.g. a transfer of data between two disconnected
    * sites
+   *
+   * 这个代价表示一个没有实际实现的表达式(例如一个纯关系代数表达式)，或者不能实际实现的表达式(例如在两个断开连接的站点之间传输数据)
    */
   boolean isInfinite();
 
@@ -71,6 +80,8 @@ public interface RelOptCost {
    * @param cost another cost
    * @return true iff this is the same as the other cost within a roundoff
    * margin of error
+   *
+   * 将其与另一种成本进行比较，允许出现轻微的舍入错误。
    */
   boolean isEqWithEpsilon(RelOptCost cost);
 
@@ -79,6 +90,7 @@ public interface RelOptCost {
    *
    * @param cost another cost
    * @return true iff this is less than or equal to other cost
+   * 与另一种成本相比。
    */
   boolean isLe(RelOptCost cost);
 

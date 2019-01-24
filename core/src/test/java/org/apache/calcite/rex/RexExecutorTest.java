@@ -86,7 +86,9 @@ public class RexExecutorTest {
   @Test public void testVariableExecution() throws Exception {
     check((rexBuilder, executor) -> {
       Object[] values = new Object[1];
+      // 设置数据
       final DataContext testContext = new TestDataContext(values);
+      //
       final RelDataTypeFactory typeFactory = rexBuilder.getTypeFactory();
       final RelDataType varchar =
           typeFactory.createSqlType(SqlTypeName.VARCHAR);
@@ -116,6 +118,15 @@ public class RexExecutorTest {
       result = exec.execute();
       assertTrue(result[0] instanceof String);
       assertThat((String) result[0], equalTo("lcite"));
+    });
+  }
+
+  @Test public void testVariableExecution2() throws Exception {
+    check(new Action() {
+      @Override
+      public void check(RexBuilder rexBuilder, RexExecutorImpl executor) {
+
+      }
     });
   }
 

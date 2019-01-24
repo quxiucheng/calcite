@@ -18,6 +18,7 @@ package org.apache.calcite.sql.validate;
 
 /**
  * Enumeration of built-in SQL compatibility modes.
+ * 枚举内置SQL兼容模式。
  */
 public enum SqlConformanceEnum implements SqlConformance {
   /** Calcite's default SQL behavior. */

@@ -121,6 +121,27 @@ import javax.xml.parsers.ParserConfigurationException;
  * fails. The shared instance ensures that the generated
  * <code>target/surefire/com/acme/test/MyTest.xml</code>
  * file contains the actual for <em>both</em> test cases.
+ *
+ * 测试使用的资源集合。
+ * 将包含测试输入和输出的文件加载到内存中。
+ * 如果存在差异，则写出包含实际输出的日志文件。
+ * 典型用法如下。测试用例类定义了一个方法
+ *
+ package com.acme.test;
+
+ public class MyTest extends TestCase {
+   public DiffRepository getDiffRepos() {
+   return DiffRepository.lookup(MyTest.class);
+   }
+
+   @Test public void testToUpper() {
+   getDiffRepos().assertEquals("${result}", "${string}");
+   }
+
+   @Test public void testToLower() {
+   getDiffRepos().assertEquals("Multi-line\nstring", "${string}");
+ }
+ }
  */
 public class DiffRepository {
   //~ Static fields/initializers ---------------------------------------------

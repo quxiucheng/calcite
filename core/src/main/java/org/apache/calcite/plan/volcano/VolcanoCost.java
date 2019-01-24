@@ -31,6 +31,9 @@ import java.util.Objects;
 class VolcanoCost implements RelOptCost {
   //~ Static fields/initializers ---------------------------------------------
 
+  /**
+   * 正无穷
+   */
   static final VolcanoCost INFINITY =
       new VolcanoCost(
           Double.POSITIVE_INFINITY,

@@ -118,6 +118,7 @@ public class SqlParser {
 
   /**
    * Parses a SQL expression.
+   * 解析SQL表达式
    *
    * @throws SqlParseException if there is a parse error
    */
@@ -214,11 +215,40 @@ public class SqlParser {
     /** Default configuration. */
     Config DEFAULT = configBuilder().build();
 
+    /**
+     * 最大字段长度 DEFAULT_IDENTIFIER_MAX_LENGTH 默认128
+     * @return
+     */
     int identifierMaxLength();
+
+    /**
+     *
+     * @return
+     */
     Casing quotedCasing();
+
+    /**
+     * 大小写转换
+     * @return
+     */
     Casing unquotedCasing();
+
+    /**
+     * 转义字符符号
+     * @return
+     */
     Quoting quoting();
+
+    /**
+     * 大小写匹配
+     * @return
+     */
     boolean caseSensitive();
+
+    /**
+     * sql模式
+     * @return
+     */
     SqlConformance conformance();
     @Deprecated // to be removed before 2.0
     boolean allowBangEqual();

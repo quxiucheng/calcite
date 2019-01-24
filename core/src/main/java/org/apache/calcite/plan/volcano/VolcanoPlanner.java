@@ -95,6 +95,8 @@ import java.util.regex.Pattern;
 /**
  * VolcanoPlanner optimizes queries by transforming expressions selectively
  * according to a dynamic programming algorithm.
+ *
+ * VolcanoPlanner –是CBO(Cost Base Optimize)模式,基于成本的优化
  */
 public class VolcanoPlanner extends AbstractRelOptPlanner {
   //~ Static fields/initializers ---------------------------------------------

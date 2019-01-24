@@ -23,6 +23,9 @@ package org.apache.calcite.util;
  * <p>This is a tagging interface: it has no methods, and is not even required
  * in order to use reflective visitation, but serves to advise users of the
  * class of the intended use of the class and refer them to auxilliary classes.
+ *
+ * 可作为反射性探视目标的对象(参见ReflectUtil)。invokeVisitor(ReflectiveVisitor, Object, Class, String)。
+ * 这是一个标记接口:它没有方法，甚至在使用反射访问时也不是必需的，但是它用于向类的用户建议类的预期用途，并将其引用到辅助类。
  */
 public interface ReflectiveVisitor {
 }

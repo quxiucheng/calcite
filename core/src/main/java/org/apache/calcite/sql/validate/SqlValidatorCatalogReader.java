@@ -33,6 +33,9 @@ import java.util.List;
  * interest to the validator, we reduce the dependency on exact mechanism to
  * implement the repository. It is also possible to construct mock
  * implementations of this interface for testing purposes.
+ *
+ * 为SqlValidator提供目录信息。
+ * 这个接口只向底层存储库提供一个瘦API，这是有意为之的。通过只向验证器显示感兴趣的存储库信息，我们减少了对实现存储库的精确机制的依赖。为了进行测试，还可以构造此接口的模拟实现。
  */
 public interface SqlValidatorCatalogReader extends Wrapper {
   //~ Methods ----------------------------------------------------------------

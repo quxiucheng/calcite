@@ -50,11 +50,14 @@ import java.util.Map;
 /**
  * Validates the parse tree of a SQL statement, and provides semantic
  * information about the parse tree.
+ * 验证SQL语句的解析树，并提供有关解析树的语义信息。
  *
  * <p>To create an instance of the default validator implementation, call
  * {@link SqlValidatorUtil#newValidator}.
+ * 要创建默认验证器实现的实例，请调用SqlValidatorUtil.newValidator
  *
  * <h2>Visitor pattern</h2>
+ * 访问者模式
  *
  * <p>The validator interface is an instance of the
  * {@link org.apache.calcite.util.Glossary#VISITOR_PATTERN visitor pattern}.
@@ -73,14 +76,18 @@ import java.util.Map;
  * <p>The {@link SqlNode#validateExpr(SqlValidator, SqlValidatorScope)} method
  * is as {@link SqlNode#validate(SqlValidator, SqlValidatorScope)} but is called
  * when the node is known to be a scalar expression.
+ * validator接口是访问者模式的一个实例。validate(org.apache.calcite.sql. sql.validate)的实现。方法调用validateXxx方法，该方法适用于以下节点:
+ * SqlNode.validateExpr(SqlValidator, SqlValidatorScope)方法作为SqlNode。validate(SqlValidator, SqlValidatorScope)，但在节点已知为标量表达式时调用。
  *
  * <h2>Scopes and namespaces</h2>
+ * 范围和名称空间
  *
  * <p>In order to resolve names to objects, the validator builds a map of the
  * structure of the query. This map consists of two types of objects. A
  * {@link SqlValidatorScope} describes the tables and columns accessible at a
  * particular point in the query; and a {@link SqlValidatorNamespace} is a
  * description of a data source used in a query.
+ * 为了将名称解析为对象，验证器构建查询结构的映射。此映射由两种类型的对象组成。SqlValidatorScope描述在查询中的特定点可以访问的表和列;SqlValidatorNamespace是查询中使用的数据源的描述。
  *
  * <p>There are different kinds of namespace for different parts of the query.
  * for example {@link IdentifierNamespace} for table names,
@@ -101,9 +108,17 @@ import java.util.Map;
  * {@link #getOrderScope} and {@link #getJoinScope} get the correct scope
  * to resolve
  * names in a particular clause of a SQL statement.</p>
+ *
+ * 查询的不同部分有不同类型的名称空间。例如，用于表名的IdentifierNamespace，用于选择查询的SelectNamespace，用于UNION的SetopNamespace, EXCEPT和INTERSECT。验证器允许将名称空间包装在实现SqlValidatorNamespace的其他对象中，因此不要尝试强制转换名称空间或使用instanceof;改为使用SqlValidatorNamespace.unwrap(类)和SqlValidatorNamespace.isWrapperFor(类)。
+ *
+ * 验证器通过在首次提供根SqlNode时对查询进行快速扫描来构建映射。然后，在调用验证方法时，它提供正确的范围或名称空间对象。
+ * 方法getSelectScope(org.apache.calcite.sql.SqlSelect)， getFromScope(org.apache.calcite.sql.SqlSelect)， getWhereScope(org.apache.calcite.sql.SqlSelect)， getGroupScope(org.apache.calcite.sql.SqlSelect)， getHavingScope(org.apache.calcite.sql.SqlSelect)， getOrderScope(org.apache.calcite.sql.SqlSelect)和getJoinScope(org.apache.calcite.sql.SqlNode)获得正确的作用域来解析SQL语句特定子句中的名称
  */
 public interface SqlValidator {
-  /** Whether to follow the SQL standard strictly. */
+  /**
+   * Whether to follow the SQL standard strictly.
+   * 是否严格遵循SQL标准
+   **/
   boolean STRICT = Util.getBooleanProperty("calcite.strict.sql");
 
   //~ Methods ----------------------------------------------------------------
@@ -118,13 +133,14 @@ public interface SqlValidator {
 
   /**
    * Returns the catalog reader used by this validator.
-   *
+   * 返回此验证器使用的目录阅读器。
    * @return catalog reader
    */
   SqlValidatorCatalogReader getCatalogReader();
 
   /**
    * Returns the operator table used by this validator.
+   * 返回此验证器使用的运算符表。
    *
    * @return operator table
    */
@@ -170,6 +186,14 @@ public interface SqlValidator {
    * @param targetRowType Desired row type, must not be null, may be the data
    *                      type 'unknown'.
    * @throws RuntimeException if the query is not valid
+   * 检查查询是否有效。
+   * SELECT语句,
+
+  集合运算(并集、相交、除外)
+
+  标识符(例如在FROM子句中表示表的使用)
+
+  使用AS操作符别名的查询
    */
   void validateQuery(SqlNode node, SqlValidatorScope scope,
       RelDataType targetRowType);
@@ -601,7 +625,7 @@ public interface SqlValidator {
   /**
    * Enables or disables expansion of identifiers other than column
    * references.
-   *
+   * 启用或禁用列引用以外的标识符扩展
    * @param expandIdentifiers new setting
    */
   void setIdentifierExpansion(boolean expandIdentifiers);

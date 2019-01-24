@@ -38,6 +38,11 @@ import org.apache.calcite.rel.RelNode;
  * RelNode rel;
  * double rowCount = rel.metadata(RowCount.class).rowCount();
  * </code></pre></blockquote>
+ *
+ * 关系表达式的元数据
+ * 对于特定类型的元数据，子类定义了查询该元数据的多种方法之一。然后RelMetadataProvider可以为RelNode的特定子类提供这些类型的元数据。
+ * 用户代码(通常在计划器规则或RelNode.computeSelfCost(org.apache.calcite.plan.RelOptPlanner, RelMetadataQuery)的实现中)通过调用RelNode.metadata(java.lang)获取一个元数据实例。类< M >,org.apache.calcite.rel.metadata.RelMetadataQuery)。
+ * 元数据实例已经知道它所描述的是哪个特定的RelNode，因此方法不会传入RelNode。事实上，相当多的元数据方法没有额外的参数。例如，可以得到行数如下:
  */
 public interface Metadata {
   /** Returns the relational expression that this metadata is about. */

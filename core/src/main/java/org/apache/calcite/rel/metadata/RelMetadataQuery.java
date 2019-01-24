@@ -73,6 +73,17 @@ import java.util.Set;
  * instance of {@link DefaultRelMetadataProvider}, pre-pending it to the default
  * providers. Then supply that instance to the planner via the appropriate
  * plugin mechanism.
+ *
+ * RelMetadataQuery在RelMetadataProvider之上为一组关系表达式元数据查询提供了强类型facade，这些查询在calcite中定义为标准。这些方法上的Javadoc是它们的主要规范。
+ * 要向该接口添加新的标准查询Xyz，请遵循以下步骤:
+ *  向该类中添加一个静态方法getXyz规范。
+ *  向org.apache.calcite.test.RelMetadataTest中添加单元测试。
+ *  在这个包中编写一个新的provider类RelMdXyz。遵循现有类(如RelMdColumnOrigins)的模式，重载查询应用到的所有逻辑关系表达式。
+ *  添加一个类似于RelMdColumnOrigins.SOURCE的源静态成员。
+    在DefaultRelMetadataProvider中注册源对象。
+    让单元测试工作。
+ * 因为关系表达式元数据是可扩展的，所以扩展项目可以定义类似的外观，以便指定对定制元数据的访问。请不要在这里(也不要在RelNode上)添加在扩展名之外没有意义的查询。
+ * 除了添加新的元数据查询之外，扩展项目可能还需要为标准查询添加定制的提供者，以便处理额外的关系表达式(逻辑或物理)。在这两种情况下，过程都是相同的:编写一个反射提供程序并将其链接到DefaultRelMetadataProvider的实例上，将其预先挂起到默认提供程序。然后通过适当的插件机制将该实例提供给计划器。
  */
 public class RelMetadataQuery {
   /** Set of active metadata queries, and cache of previous results. */

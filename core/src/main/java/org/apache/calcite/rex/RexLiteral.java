@@ -54,6 +54,7 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 /**
+ * 常量表达式
  * Constant value in a row-expression.
  *
  * <p>There are several methods for creating literals in {@link RexBuilder}:

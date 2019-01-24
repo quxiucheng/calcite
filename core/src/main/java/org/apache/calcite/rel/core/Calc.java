@@ -39,6 +39,7 @@ import java.util.List;
 /**
  * <code>Calc</code> is an abstract base class for implementations of
  * {@link org.apache.calcite.rel.logical.LogicalCalc}.
+ * Calc是LogicalCalc实现的抽象基类
  */
 public abstract class Calc extends SingleRel {
   //~ Instance fields --------------------------------------------------------

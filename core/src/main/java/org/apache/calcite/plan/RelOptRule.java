@@ -37,6 +37,9 @@ import java.util.function.Predicate;
  *
  * <p>The optimizer figures out which rules are applicable, then calls
  * {@link #onMatch} on each of them.</p>
+ *
+ * RelOptRule将一个表达式转换为另一个表达式。它有一个RelOptRuleOperands列表，用于确定规则是否可以应用于树的特定部分。
+ * 优化器确定哪些规则是适用的，然后在每个规则上调用onMatch(org.apache.calcite.plan.RelOptRuleCall)
  */
 public abstract class RelOptRule {
   //~ Static fields/initializers ---------------------------------------------
@@ -47,21 +50,27 @@ public abstract class RelOptRule {
    * Description of rule, must be unique within planner. Default is the name
    * of the class sans package name, but derived classes are encouraged to
    * override.
+   * 规则的描述必须在计划器中是唯一的。默认值是类名sans包名，但鼓励重写派生类。
    */
   protected final String description;
 
   /**
    * Root of operand tree.
+   * 操作数树的根。
    */
   private final RelOptRuleOperand operand;
 
   /** Factory for a builder for relational expressions.
    *
-   * <p>The actual builder is available via {@link RelOptRuleCall#builder()}. */
+   * <p>The actual builder is available via {@link RelOptRuleCall#builder()}.
+   *
+   * 为关系表达式的生成器创建工厂。
+   * */
   public final RelBuilderFactory relBuilderFactory;
 
   /**
    * Flattened list of operands.
+   * 操作数的扁平列表。
    */
   public final List<RelOptRuleOperand> operands;
 
@@ -120,6 +129,7 @@ public abstract class RelOptRule {
    * @param <R> Class of relational expression to match
    * @return Operand that matches a relational expression that has no
    *   children
+   * 创建与没有子表达式的关系表达式匹配的操作数。
    */
   public static <R extends RelNode> RelOptRuleOperand operand(
       Class<R> clazz,
@@ -158,6 +168,8 @@ public abstract class RelOptRule {
    * @param <R> Class of relational expression to match
    * @return Operand that matches a relational expression that has a
    *   particular trait and predicate
+   *
+   * 创建与具有特定特征和谓词的关系表达式匹配的操作数。
    */
   public static <R extends RelNode> RelOptRuleOperand operandJ(
       Class<R> clazz,
@@ -272,6 +284,8 @@ public abstract class RelOptRule {
    * @param rest  Remaining child operands (may be empty)
    * @return List of child operands that matches child relational
    *   expressions in the order
+   *
+   *   创建一个子操作数列表，该列表根据子关系表达式的出现顺序匹配它们。
    */
   public static RelOptRuleOperandChildren some(
       RelOptRuleOperand first,
@@ -306,6 +320,25 @@ public abstract class RelOptRule {
    * @param rest  Remaining child operands (may be empty)
    * @return List of child operands that matches child relational
    *   expressions in any order
+   *
+   * 创建以任何顺序匹配子关系表达式的子操作数列表。
+
+  这在匹配关系表达式时非常有用，关系表达式可以有可变数量的子表达式。例如，消除Union的空子元素的规则将具有操作数
+
+
+  操作数(联盟,真的,操作数(空的))
+
+  给出关系式
+
+
+  联盟(LogicalFilter、空虚LogicalProject)
+
+  会用争论来触发规则吗
+
+
+  {联盟,空}
+
+  根据规则推断出其他子节点，或者实际上推断出匹配子节点的位置。
    */
   public static RelOptRuleOperandChildren unordered(
       RelOptRuleOperand first,
@@ -507,6 +540,11 @@ public abstract class RelOptRule {
    *
    * @param call Rule call
    * @see #matches(RelOptRuleCall)
+   *
+   * 从类复制的描述:RelOptRule
+   * 接收关于规则匹配的通知。在调用此方法时，调用。获得的关系表达式集将操作数与规则匹配;调用。桂冠[0]是根表达式。
+
+  通常，规则会检查节点是否有效匹配，创建一个新表达式，然后回调RelOptRuleCall.transformTo(org.apache.calcite.rel. rel)。RelNode, java.util.Map < org.apache.calcite.rel。RelNode, org.apache.calcite.rel.RelNode>)来注册表达式。
    */
   public abstract void onMatch(RelOptRuleCall call);
 
@@ -516,6 +554,7 @@ public abstract class RelOptRule {
    *
    * @return Convention of the result of firing this rule, null if
    *   not known
+   *   返回触发此规则的结果的约定，如果不知道则为空。
    */
   public Convention getOutConvention() {
     return null;
@@ -527,6 +566,7 @@ public abstract class RelOptRule {
    *
    * @return Trait which will be modified as a result of firing this rule,
    *   or null if the rule is not a converter rule
+   *   返回在触发此规则时将被修改的特征，如果该规则不是转换器规则，则返回null。
    */
   public RelTrait getOutTrait() {
     return null;

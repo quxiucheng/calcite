@@ -31,6 +31,8 @@
  * <p>In future, the actor may manage the process of updating materializations,
  * instantiating materializations from the intermediate results of queries, and
  * recognize what materializations would be useful based on actual query load.
+ *
+ * 物化查询结果的管理
  */
 @PackageMarker
 package org.apache.calcite.materialize;

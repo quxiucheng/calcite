@@ -18,7 +18,10 @@ package org.apache.calcite.rex;
 
 import java.util.List;
 
-/** Can reduce expressions, writing a literal for each into a list. */
+/**
+ * Can reduce expressions, writing a literal for each into a list.
+ * 计算表达式
+ * */
 public interface RexExecutor {
 
   /** Reduces expressions, and writes their results into {@code reducedValues}.
@@ -30,6 +33,9 @@ public interface RexExecutor {
    * @param rexBuilder Rex builder
    * @param constExps Expressions to be reduced
    * @param reducedValues List to which reduced expressions are appended
+   *
+   * 减少表达式，并将其结果写入reducedValues中。
+   * 如果表达式不能被还原，则写入原始表达式。例如，CAST('abc'为INTEGER)在执行时给出一个错误，因此执行程序忽略该错误并写入原始表达式。
    */
   void reduce(RexBuilder rexBuilder, List<RexNode> constExps, List<RexNode> reducedValues);
 }

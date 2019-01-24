@@ -32,6 +32,10 @@ import org.apache.calcite.rel.core.RelFactories;
  * and {@code DrillProject} versus {@code HiveFilter} and {@code HiveProject}.
  *
  * @see RelFactories#LOGICAL_BUILDER
+ *
+ * 当您想创建生成器时，可以添加集群和模式
+ * ProtoRelBuilder可以在查询之间共享，因此可以在RelOptRule中共享。
+ * 这是一种封装策略的好方法，这个特定的规则实例应该创建DrillFilter和DrillProject，而不是HiveFilter和HiveProject。
  */
 public interface RelBuilderFactory {
   /** Creates a RelBuilder. */

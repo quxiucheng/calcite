@@ -30,6 +30,11 @@ package org.apache.calcite.plan;
  * to the planner), you must implement {@link #hashCode()} and
  * {@link #equals(Object)} for proper {@link RelTraitDef#canonize canonization}
  * of your RelTrait objects.</p>
+ *
+ * RelTrait表示关系表达式特征在特征定义中的表现。例如，调用约定。JAVA是传统的traitdef特征定义的特征。
+ *
+ * 如果一个特定RelTraitDef的RelTrait的所有实例都在枚举中定义，并且在运行时不能引入新的RelTraits，那么您不需要覆盖hashCode()和equals(Object)。
+ * 但是，如果在运行时生成了新的RelTrait实例(例如，基于计划器外部的状态)，那么您必须实现hashCode()和equals(Object)来正确地对RelTrait对象进行规范化。
  */
 public interface RelTrait {
   //~ Methods ----------------------------------------------------------------
@@ -67,6 +72,16 @@ public interface RelTrait {
    *
    * @param trait Given trait
    * @return Whether this trait subsumes a given trait
+   *
+   * 返回该特征是否满足给定的特征。
+
+  如果一种特质与另一种特质相同或更严格，它就能满足另一种特质。例如，x的阶数，y满足x的阶数。
+
+
+  特征的满足关系必须是偏序的(反身的、反对称的、传递的)。许多特征是不能“放松”的;它们的满足是等价关系，其中只有X满足X。
+
+
+  如果一个特征有多个值(参见RelCompositeTrait)，那么集合(T0, T1，…)满足T(如果有Ti满足T)。
    */
   boolean satisfies(RelTrait trait);
 

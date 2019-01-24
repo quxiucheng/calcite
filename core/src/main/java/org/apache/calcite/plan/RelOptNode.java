@@ -22,12 +22,14 @@ import java.util.List;
 
 /**
  * Node in a planner.
+ * 规划器节点
  */
 public interface RelOptNode {
   /**
    * Returns the ID of this relational expression, unique among all relational
    * expressions created since the server was started.
    *
+   * 节点唯一ID
    * @return Unique ID
    */
   int getId();
@@ -46,6 +48,10 @@ public interface RelOptNode {
    * {@link Object#toString()}, which always returns "rel#{id}:{digest}".
    *
    * @return Digest of this {@code RelNode}
+   *
+   * 返回一个字符串，该字符串简明地描述了这个关系表达式的定义。当且仅当两个关系表达式的摘要相同时，它们是等效的。
+   * 摘要不包含关系表达式的标识——这将防止类似的关系表达式进行相等比较——但是包含子表达式的标识(假设子表达式已经被规范化)。
+   * 如果您想要一个包含标识的描述性字符串，请调用Object.toString()，它总是返回“rel#{id}:{digest}”。
    */
   String getDigest();
 
@@ -57,6 +63,10 @@ public interface RelOptNode {
    * unimplementable. If a RelNode's traits need to be modified during
    * optimization, clone the RelNode and change the clone's traits.
    *
+   * 检索此RelNode的特征。
+   * 请注意，虽然返回的RelTraitSet是可修改的，但在优化过程中不能修改它。
+   * 在优化之前或之后修改RelNode的特性是合法的，尽管这样做可能会导致RelNode树不可实现。
+   * 如果在优化过程中需要修改RelNode的特征，克隆RelNode并更改克隆的特征。
    * @return this RelNode's trait set
    */
   RelTraitSet getTraitSet();
@@ -72,12 +82,15 @@ public interface RelOptNode {
    *
    * @return String which describes the relational expression and, unlike
    *   {@link #getDigest()}, also includes the identity
+   *
+   * 返回描述关系表达式的字符串，与getDigest()不同，它还包含标识。
    */
   String getDescription();
 
   /**
    * Returns an array of this relational expression's inputs. If there are no
    * inputs, returns an empty list, not {@code null}.
+   * 返回此关系表达式的输入的数组
    *
    * @return Array of this relational expression's inputs
    */
@@ -85,7 +98,7 @@ public interface RelOptNode {
 
   /**
    * Returns the cluster this relational expression belongs to.
-   *
+   * 返回此关系表达式所属的集群。
    * @return cluster
    */
   RelOptCluster getCluster();

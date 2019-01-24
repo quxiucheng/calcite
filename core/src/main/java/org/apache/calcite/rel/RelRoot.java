@@ -71,6 +71,28 @@ import java.util.Objects;
  *   fields: [(0, "n"), (0, "n2"), (1, "n")]
  *   collation: []
  * }</code></blockquote>
+ *
+ * RelRoot存在的一个重要原因是处理类似这样的查询
+ *  SELECT name FROM emp ORDER BY empno DESC
+ * calcite 知道结果必须排序，但不能将其排序顺序表示为排序，因为empno不是结果中的字段。
+ * 我们把它表示为
+ *  RelRoot: {
+ *   rel: Sort($1 DESC)
+ *          Project(name, empno)
+ *            TableScan(EMP)
+ *   fields: [0]
+ *   collation: [1 DESC]
+ *  }
+ *  请注意，结果中存在empno字段，但是字段掩码告诉使用者将其丢弃。
+ *  另一个用例是这样的查询:
+ *  SELECT name AS n, name AS n2, empno AS n FROM emp
+ *  name字段有多种用途。有多个列别名为n，可以表示为
+ *  RelRoot: {
+ *   rel: Project(name, empno)
+ *          TableScan(EMP)
+ *   fields: [(0, "n"), (0, "n2"), (1, "n")]
+ *   collation: []
+ *  }
  */
 public class RelRoot {
   public final RelNode rel;

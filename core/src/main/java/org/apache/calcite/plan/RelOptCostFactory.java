@@ -18,30 +18,36 @@ package org.apache.calcite.plan;
 
 /**
  * Cost model for query planning.
+ * 查询计划的成本模型
  */
 public interface RelOptCostFactory {
   /**
    * Creates a cost object.
+   * 创建成本对象。
    */
   RelOptCost makeCost(double rowCount, double cpu, double io);
 
   /**
    * Creates a cost object representing an enormous non-infinite cost.
+   * 创建表示巨大的非无限成本的成本对象。
    */
   RelOptCost makeHugeCost();
 
   /**
    * Creates a cost object representing infinite cost.
+   * 创建表示无限成本的成本对象。
    */
   RelOptCost makeInfiniteCost();
 
   /**
    * Creates a cost object representing a small positive cost.
+   * 创建表示小正成本的成本对象
    */
   RelOptCost makeTinyCost();
 
   /**
    * Creates a cost object representing zero cost.
+   * 创建表示零成本的成本对象
    */
   RelOptCost makeZeroCost();
 }

@@ -56,6 +56,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Base class for every relational expression ({@link RelNode}).
+ * 每个关系表达式RelNode的基类
  */
 public abstract class AbstractRelNode implements RelNode {
   //~ Static fields/initializers ---------------------------------------------

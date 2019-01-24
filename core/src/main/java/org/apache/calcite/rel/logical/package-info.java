@@ -30,6 +30,8 @@
  * defines the relational expression API
  *
  * </ul>
+ * 定义逻辑关系表达式
+ *
  */
 @PackageMarker
 package org.apache.calcite.rel.logical;

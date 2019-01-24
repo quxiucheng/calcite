@@ -157,6 +157,7 @@ public abstract class RelOptUtil {
 
   /**
    * Whether this node is a limit without sort specification.
+   * 这个节点是否是没有排序规范的限制。
    */
   public static boolean isPureLimit(RelNode rel) {
     return isLimit(rel) && !isOrder(rel);
@@ -164,6 +165,7 @@ public abstract class RelOptUtil {
 
   /**
    * Whether this node is a sort without limit specification.
+   * 这个节点是否是一个没有限制的排序规范。
    */
   public static boolean isPureOrder(RelNode rel) {
     return !isLimit(rel) && isOrder(rel);
@@ -171,6 +173,7 @@ public abstract class RelOptUtil {
 
   /**
    * Whether this node contains a limit specification.
+   * 此节点是否包含限制规范。
    */
   public static boolean isLimit(RelNode rel) {
     if ((rel instanceof Sort) && ((Sort) rel).fetch != null) {
@@ -216,6 +219,7 @@ public abstract class RelOptUtil {
   /**
    * Returns a list of all table qualified names used by this expression
    * or its children.
+   * 返回此表达式或其子表达式使用的所有表限定名的列表。
    */
   public static List<String> findAllTableQualifiedNames(RelNode rel) {
     return Lists.transform(findAllTables(rel),
@@ -225,6 +229,7 @@ public abstract class RelOptUtil {
   /**
    * Returns a list of variables set by a relational expression or its
    * descendants.
+   * 返回由关系表达式或其后代设置的变量列表。
    */
   public static Set<CorrelationId> getVariablesSet(RelNode rel) {
     VariableSetVisitor visitor = new VariableSetVisitor();
@@ -261,6 +266,10 @@ public abstract class RelOptUtil {
    *
    * <p>The item type is the same as
    * {@link org.apache.calcite.rex.RexCorrelVariable#id}.
+   *
+   * 返回关系表达式或其后代使用的一组变量。
+   * 该集合可能包含“重复”(具有不同id的变量，解析后将引用相同的源关系表达式)。
+   * 项目类型与rexcorrelable .id相同。
    */
   public static Set<CorrelationId> getVariablesUsed(RelNode rel) {
     CorrelationCollector visitor = new CorrelationCollector();
@@ -268,8 +277,11 @@ public abstract class RelOptUtil {
     return visitor.vuv.variables;
   }
 
-  /** Finds which columns of a correlation variable are used within a
-   * relational expression. */
+  /**
+   * Finds which columns of a correlation variable are used within a
+   * relational expression.
+   * 查找关联变量的哪些列在关系表达式中使用。
+   * */
   public static ImmutableBitSet correlationColumns(CorrelationId id,
       RelNode rel) {
     final CorrelationCollector collector = new CorrelationCollector();
@@ -283,8 +295,13 @@ public abstract class RelOptUtil {
     return builder.build();
   }
 
-  /** Returns true, and calls {@link Litmus#succeed()} if a given relational
-   * expression does not contain a given correlation. */
+  /**
+   *
+   * Returns true, and calls {@link Litmus#succeed()} if a given relational
+   * expression does not contain a given correlation.
+   *
+   * 返回true，如果给定的关系表达式不包含给定的相关性，则调用litmu . success()。
+   * */
   public static boolean notContainsCorrelation(RelNode r,
       CorrelationId correlationId, Litmus litmus) {
     final Set<CorrelationId> set = getVariablesUsed(r);
@@ -2138,6 +2155,7 @@ public abstract class RelOptUtil {
 
   /**
    * Returns a condition decomposed by AND.
+   * 返回由AND分解的条件。
    *
    * <p>For example, {@code conjunctions(TRUE)} returns the empty list;
    * {@code conjunctions(FALSE)} returns list {@code {FALSE}}.</p>

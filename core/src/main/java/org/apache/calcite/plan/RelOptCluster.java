@@ -33,8 +33,8 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * An environment for related relational expressions during the
- * optimization of a query.
+ * An environment for related relational expressions during the optimization of a query.
+ * 在优化查询期间  表达式运行环境
  */
 public class RelOptCluster {
   //~ Instance fields --------------------------------------------------------

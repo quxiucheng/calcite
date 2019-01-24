@@ -31,6 +31,10 @@ import java.util.List;
  * <p>This is a somewhat "fat" interface which unions the attributes of many
  * different type classes into one. Inelegant, but since our type system was
  * defined before the advent of Java generics, it avoids a lot of typecasting.
+ *
+ * RelDataType表示从关系表达式返回的标量表达式或整个行的类型。
+ * 这是一个有点“胖 fat”的接口，它将许多不同类型类的属性合并为一个。
+ * 不优雅，但是由于我们的类型系统是在Java泛型出现之前定义的，所以它避免了大量的类型转换。
  */
 public interface RelDataType {
   int SCALE_NOT_SPECIFIED = Integer.MIN_VALUE;
@@ -43,6 +47,10 @@ public interface RelDataType {
    *
    * @return whether this type has fields; examples include rows and
    * user-defined structured types in SQL, and classes in Java
+   *
+   * 查询这是否是结构化类型。
+   *
+   * 该类型是否具有字段;示例包括SQL中的行和用户定义的结构化类型，以及Java中的类
    */
   boolean isStruct();
 
@@ -55,6 +63,8 @@ public interface RelDataType {
   /**
    * Gets the fields in a struct type. The field count is equal to the size of
    * the returned list.
+   *
+   * 获取结构类型中的字段。字段计数等于返回列表的大小。
    *
    * @return read-only list of fields
    */
@@ -81,6 +91,8 @@ public interface RelDataType {
    * or {@link StructKind#NONE} if this is not a structured type.
    *
    * @return the StructKind that determines how this type's fields are resolved
+   *
+   * 返回用于解析结构化类型或StructKind的字段的规则。如果这不是结构化类型，则为NONE。
    */
   StructKind getStructKind();
 
@@ -100,6 +112,17 @@ public interface RelDataType {
    * @param caseSensitive Whether match is case-sensitive
    * @param elideRecord Whether to find fields nested within records
    * @return named field, or null if not found
+   *
+   * 按名称查找字段。
+
+  注:在选择case - en值时要谨慎:
+
+
+  如果字段名是由最终用户提供的(例如，作为SQL中的列别名)，则使用会话的大小写敏感设置。
+
+  只有在确定字段名是内部生成的情况下，硬编码为true。
+
+  硬编码错误几乎肯定是错误的。
    */
   RelDataTypeField getField(String fieldName, boolean caseSensitive,
       boolean elideRecord);
@@ -115,6 +138,8 @@ public interface RelDataType {
    * Gets the component type if this type is a collection, otherwise null.
    *
    * @return canonical type descriptor for components
+   *
+   * 如果此类型为集合，则获取组件类型，否则为空。
    */
   RelDataType getComponentType();
 
@@ -122,6 +147,7 @@ public interface RelDataType {
    * Gets the key type if this type is a map, otherwise null.
    *
    * @return canonical type descriptor for key
+   * 如果该类型是映射，则获取键类型，否则为nul
    */
   RelDataType getKeyType();
 
@@ -145,6 +171,7 @@ public interface RelDataType {
    * or has no collation defined.
    *
    * @return collation of type
+   * 获取该类型的排序规则，如果该类型不能携带排序规则或没有定义排序规则，则为null。
    */
   SqlCollation getCollation();
 
@@ -153,6 +180,7 @@ public interface RelDataType {
    * type.
    *
    * @return interval qualifier
+   * 获取此类型的区间限定符，如果这不是区间类型则为null。
    */
   SqlIntervalQualifier getIntervalQualifier();
 
@@ -171,6 +199,14 @@ public interface RelDataType {
    * characters for character types; length in bytes for binary types; length
    * in bits for bit types; 1 for BOOLEAN; -1 if precision is not valid for
    * this type
+   * 获取此类值的jdbc定义的精度。请注意，这并不总是与用户指定的精度相同。例如，类型INTEGER没有用户指定的精度，但是该方法对于整数类型返回10。
+
+  如果精度不适用于此类型，则返回PRECISION_NOT_SPECIFIED(-1)。
+
+
+  返回:
+
+  精确数字类型的十进制位数;用于近似数字类型的尾数小数位数;datetime类型的小数秒数;字符类型的字符长度;二进制类型的字节长度;位类型的位长度;1为布尔;-1如果精度对这种类型无效
    */
   int getPrecision();
 
@@ -179,6 +215,7 @@ public interface RelDataType {
    * scale is not valid for this type.
    *
    * @return number of digits of scale
+   * 获取此类型的比例。如果scale对该类型无效，则返回SCALE_NOT_SPECIFIED(-1)。
    */
   int getScale();
 
@@ -196,6 +233,8 @@ public interface RelDataType {
    * identifier which uniquely names the type.
    *
    * @return SqlIdentifier, or null if this is not an SQL type
+   *
+   * 获取与此类型关联的SqlIdentifier。对于预定义的类型，这是一个基于getSqlTypeName()的简单标识符。对于用户定义的类型，这是唯一命名该类型的复合标识符。
    */
   SqlIdentifier getSqlIdentifier();
 

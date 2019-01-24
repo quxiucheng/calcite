@@ -130,6 +130,15 @@ import javax.annotation.Nonnull;
  *   <li>make sub-class rules static, and have them create their own
  *   de-correlator</li>
  * </ul>
+ *
+ * RelDecorrelator将关系表达式(RelNode)树中的所有相关表达式(corExp)替换为通过将产生corExp的RelNode与引用它的RelNode连接而生成的非相关表达式。
+ * 用RelNode替换CorelMap构造函数参数
+
+ 使currentRel不可变(需要为每个与装饰相关的节点提供一个新的RelDecorrelator)
+
+ 使CorelMap的字段不可变
+
+ 使子类规则静态，并让它们创建自己的反相关器
  */
 public class RelDecorrelator implements ReflectiveVisitor {
   //~ Static fields/initializers ---------------------------------------------

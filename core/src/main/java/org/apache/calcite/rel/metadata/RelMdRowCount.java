@@ -42,8 +42,11 @@ import org.apache.calcite.util.NumberUtil;
 import org.apache.calcite.util.Util;
 
 /**
+ *
  * RelMdRowCount supplies a default implementation of
- * {@link RelMetadataQuery#getRowCount} for the standard logical algebra.
+ * RelMdRowCount提供默认实现
+ *
+ * {@link RelMetadataQuery#getRowCount} for the standard logical algebra. 标准逻辑代数
  */
 public class RelMdRowCount
     implements MetadataHandler<BuiltInMetadata.RowCount> {

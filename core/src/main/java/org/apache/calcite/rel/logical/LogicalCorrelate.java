@@ -40,6 +40,9 @@ import org.apache.calcite.util.Litmus;
  * implementation strategy is to de-correlate the expression.
  *
  * @see org.apache.calcite.rel.core.CorrelationId
+ *
+ * 执行嵌套循环连接的关系运算符
+ * LogicalCorrelate用于表示相关查询。一种实现策略是将表达式去相关。
  */
 public final class LogicalCorrelate extends Correlate {
   //~ Instance fields --------------------------------------------------------

@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
+ *
  * RelDataTypeFactory is a factory for datatype descriptors. It defines methods
  * for instantiating and combining SQL, Java, and collection types. The factory
  * also provides methods for return type inference for arithmetic in cases where
@@ -41,6 +42,15 @@ import java.util.Objects;
  * objects are canonical: two types are equal if and only if they are
  * represented by the same Java object. This reduces memory consumption and
  * comparison cost.
+ *
+ * RelDataTypeFactory是数据类型描述符的工厂。
+ * 它定义了用于实例化和组合SQL、Java和集合类型的方法。
+ * 工厂还提供了一些方法，用于在SQL 2003实现定义或不切实际的情况下对算术进行返回类型推断。
+ *
+ * 这个接口是抽象工厂模式的一个例子。
+ * RelDataTypeFactory的任何实现都必须确保类型对象是规范的:
+ * 当且仅当它们由相同的Java对象表示时，两种类型是相等的。
+ * 这减少了内存消耗和比较成本。
  */
 public interface RelDataTypeFactory {
   //~ Methods ----------------------------------------------------------------

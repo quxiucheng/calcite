@@ -32,6 +32,7 @@ limitations under the License.
   <properties>
     <top.dir>${project.basedir}/..</top.dir>
     <build.timestamp>${maven.build.timestamp}</build.timestamp>
+      <kotlin.version>1.2.71</kotlin.version>
   </properties>
 
   <dependencies>
@@ -113,13 +114,15 @@ limitations under the License.
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-stdlib</artifactId>
-      <scope>test</scope>
+      <artifactId>kotlin-stdlib-jdk8</artifactId>
+        <version>${kotlin.version}</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-test</artifactId>
-      <scope>test</scope>
+        <version>${kotlin.version}</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
@@ -234,6 +237,42 @@ limitations under the License.
       <plugin>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-maven-plugin</artifactId>
+          <version>${kotlin.version}</version>
+          <executions>
+              <execution>
+                  <id>compile</id>
+                  <phase>compile</phase>
+                  <goals>
+                      <goal>compile</goal>
+                  </goals>
+                  <configuration>
+                      <sourceDirs>
+                          <source>src/main/java</source>
+                          <source>target/generated-sources/fmpp</source>
+                          <source>target/generated-sources/javacc</source>
+                          <source>target/generated-sources/resgen</source>
+                      </sourceDirs>
+                  </configuration>
+              </execution>
+              <execution>
+                  <id>test-compile</id>
+                  <phase>test-compile</phase>
+                  <goals>
+                      <goal>test-compile</goal>
+                  </goals>
+                  <configuration>
+                      <sourceDirs>
+                          <source>src/test/java</source>
+                          <source>src/test/kotlin</source>
+                          <source>target/generated-test-sources/fmpp</source>
+                          <source>target/generated-test-sources/javacc</source>
+                      </sourceDirs>
+                  </configuration>
+              </execution>
+          </executions>
+          <configuration>
+              <jvmTarget>1.8</jvmTarget>
+          </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

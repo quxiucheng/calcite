@@ -24,6 +24,7 @@ import org.apache.calcite.util.Pair;
 import java.util.List;
 
 /**
+ * 引用输入关系表达式字段的变量
  * Variable which references a field of an input relational expression.
  *
  * <p>Fields of the input are 0-based. If there is more than one input, they are

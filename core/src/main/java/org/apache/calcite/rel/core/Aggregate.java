@@ -67,6 +67,10 @@ import java.util.Set;
  * <li>{@link org.apache.calcite.rel.rules.AggregateExpandDistinctAggregatesRule}
  * <li>{@link org.apache.calcite.rel.rules.AggregateReduceFunctionsRule}.
  * </ul>
+ *
+ * 消除重复和计算总数的关系运算符
+ * 它对应于SQL查询语句中的GROUP BY操作符，以及SELECT子句中的聚合函数。
+ *
  */
 public abstract class Aggregate extends SingleRel {
   /**

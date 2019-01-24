@@ -29,6 +29,8 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 /**
+ * Sql类型接口默认实现类
+ *
  * SqlTypeFactoryImpl provides a default implementation of
  * {@link RelDataTypeFactory} which supports SQL types.
  */

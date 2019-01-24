@@ -64,6 +64,8 @@ import java.util.Set;
 /**
  * HepPlanner is a heuristic implementation of the {@link RelOptPlanner}
  * interface.
+ *
+ * 是RBO(Rule Base Optimize)模式,基于规则的优化
  */
 public class HepPlanner extends AbstractRelOptPlanner {
   //~ Instance fields --------------------------------------------------------

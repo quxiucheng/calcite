@@ -40,6 +40,8 @@ import java.util.List;
  * {@link org.apache.calcite.sql.fun.SqlMultisetValueConstructor} or to
  * {@link org.apache.calcite.sql.fun.SqlMultisetQueryConstructor}.</li>
  * </ul>
+ *
+ * 一种关系表达式，可将多行压缩为一行。
  */
 public class Collect extends SingleRel {
   //~ Instance fields --------------------------------------------------------

@@ -90,6 +90,28 @@
  * <p>A {@link org.apache.calcite.sql.SqlWriter} converts a tree of
  * {@link org.apache.calcite.sql.SqlNode}s into a SQL string. A
  * {@link org.apache.calcite.sql.SqlDialect} defines how this happens.</p>
+ *
+ * 提供一个SQL解析器和对象模型。
+ * 这个包，以及依赖的org.apache.calcite.sql。解析器包独立于其他calcite包，因此可以独立使用。
+ * Parser
+ * SqlParser将SQL字符串解析为解析树。它只执行最基本的语法验证。
+ *
+ * Object model
+ *  解析树中的每个节点都是SqlNode。子类型是:
+ *  SqlLiteral表示布尔、数字、字符串、日期常量或值NULL。
+ *  SqlIdentifier表示标识符，如EMPNO或emp.deptno
+ *  SqlCall是对操作符或函数的调用。通过特殊的运算符，我们可以使用这个构造来表示树中的每个非叶节点。例如，select语句是对“select”操作符的调用。
+ *  SqlNodeList是一个节点列表
+ *
+ * SqlOperator描述树中节点的行为，例如如何将SqlCall解析为SQL字符串。需要注意的是，操作符是元数据，而不是数据:只有一个SqlOperator实例表示'='操作符，尽管可能有许多对它的调用。
+ * SqlOperator有几个派生类，它们使定义新操作符变得很容易:SqlFunction、SqlBinaryOperator、SqlPrefixOperator、SqlPostfixOperator。对于特殊的语法结构SqlSelectOperator和SqlJoin.SqlJoinOperator也有单例类。(这些特殊的操作符甚至有它们自己的SqlCall子类型:SqlSelect和SqlJoin。)
+ * SqlOperatorTable是操作符的集合。通过提供自己的运算符表，您可以自定义SQL方言，而无需修改解析器。
+ *
+ * Validation
+ *  SqlValidator检查sqlnode树在语义上是否有效。您提供一个SqlOperatorTable来描述可用的函数和操作符，以及一个sqlvalidatorcataloggreader来访问数据库的目录。
+ * Generating SQL
+ *  SqlWriter将sqlnode树转换为SQL字符串。sql方言定义了这是如何发生的。
+ *
  */
 @PackageMarker
 package org.apache.calcite.sql;

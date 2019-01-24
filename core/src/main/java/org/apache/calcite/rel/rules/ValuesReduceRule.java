@@ -48,6 +48,7 @@ import java.util.List;
  * Planner rule that folds projections and filters into an underlying
  * {@link org.apache.calcite.rel.logical.LogicalValues}.
  *
+ * 规划器规则，将投影和过滤器折叠为基础
  * <p>Returns a simplified {@code Values}, perhaps containing zero tuples
  * if all rows are filtered away.
  *

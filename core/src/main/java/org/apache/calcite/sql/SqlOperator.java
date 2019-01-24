@@ -64,6 +64,14 @@ import static org.apache.calcite.util.Static.RESOURCE;
  *
  * <p>In many cases, the formal/actual distinction is clear from context, in
  * which case we drop these qualifiers.
+ *
+ * SqlOperator是SQL解析树中的一种节点类型(它不是SQL解析树中的节点)。它包括函数、运算符(如'=')和语法结构(如'case'语句)。运算符可以表示查询级表达式(例如SqlSelectOperator)或行级表达式(例如sqlbetween运算符)。
+ *
+ * 操作符有正式的操作数，这意味着它们操作的值有顺序的(可选命名的)占位符。例如，除法运算符取两个操作数;第一个是分子第二个是分母。在子类SqlFunction的上下文中，形式操作数称为参数。
+ *
+ * 当通过SqlCall实例化操作符时，将为其提供实际的操作数。例如，在表达式3 / 5中，字面表达式3是对应于分子的实际操作数，5是对应于分母的实际操作数。在SqlFunction上下文中，实际的操作数称为参数
+ *
+ * 在许多情况下，形式/实际的区别在上下文中是清楚的，在这种情况下，我们删除这些限定符。
  */
 public abstract class SqlOperator {
   //~ Static fields/initializers ---------------------------------------------

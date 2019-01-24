@@ -18,10 +18,15 @@ package org.apache.calcite.schema;
 
 /**
  * Mix-in interface that allows you to find sub-objects.
+ * 转换为子对象
  */
 public interface Wrapper {
   /** Finds an instance of an interface implemented by this object,
-   * or returns null if this object does not support that interface. */
+   * or returns null if this object does not support that interface.
+   *
+   * 查找此对象实现的接口实例
+   * 如果此对象不支持该接口，则返回null
+   * */
   <C> C unwrap(Class<C> aClass);
 }
 

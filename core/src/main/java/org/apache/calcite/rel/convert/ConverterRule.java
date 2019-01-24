@@ -116,6 +116,7 @@ public abstract class ConverterRule extends RelOptRule {
 
   /** Converts a relational expression to the target trait(s) of this rule.
    *
+   * 将关系表达式转换为此规则的目标特征。
    * <p>Returns null if conversion is not possible. */
   public abstract RelNode convert(RelNode rel);
 
@@ -128,6 +129,9 @@ public abstract class ConverterRule extends RelOptRule {
    *
    * @return {@code true} if this rule can convert <em>any</em> relational
    *   expression
+   * 如果该规则可以转换输入约定的任何关系表达式，则返回true。
+
+  例如，union-to-java转换器就不能得到保证，因为它只对union有效。
    */
   public boolean isGuaranteed() {
     return false;

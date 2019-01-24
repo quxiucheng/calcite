@@ -41,6 +41,12 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * {@link org.apache.calcite.rel.logical.LogicalCalc}. This
  * {@link org.apache.calcite.rel.logical.LogicalFilter} will eventually be
  * converted by {@link FilterCalcMergeRule}.
+ *
+ * 将LogicalFilter转换为LogicalCalc的Planner规则。
+ *
+ * 如果子元素是LogicalFilter或LogicalProject(我们假设它们将使用FilterToCalcRule或ProjectToCalcRule进行转换)
+ * 或
+ * LogicalCalc，则规则不会触发。这个LogicalFilter最终将由FilterCalcMergeRule转换。
  */
 public class FilterToCalcRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

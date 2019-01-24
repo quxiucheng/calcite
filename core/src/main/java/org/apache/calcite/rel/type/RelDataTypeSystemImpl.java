@@ -31,6 +31,9 @@ import org.apache.calcite.sql.type.SqlTypeName;
  *   <tr><th>Parameter</th>         <th>Value</th></tr>
  *   <tr><td>MAX_NUMERIC_SCALE</td> <td>19</td></tr>
  * </table>
+ *
+ * RelDataTypeSystem 默认实现类
+ * 默认 DECIMAL 为19
  */
 public abstract class RelDataTypeSystemImpl implements RelDataTypeSystem {
   public int getMaxScale(SqlTypeName typeName) {

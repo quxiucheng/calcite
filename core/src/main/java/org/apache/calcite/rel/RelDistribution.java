@@ -34,6 +34,11 @@ import javax.annotation.Nonnull;
  *       will need to create rules; or we could allow "converters" to be
  *       registered with the planner that are not trait-defs.
  * </ul>
+ * 关系表达式的物理分布的描述。
+ * TBD:
+ *  我们可以缩短再分配吗?HASH_DISTRIBUTED to HASH，等等。
+ *  我们需要RelDistributions}.DEFAULT?
+ *  RelDistributionTraitDef.convert(org.apache.calcite.plan。RelOptPlanner org.apache.calcite.rel。RelNode org.apache.calcite.rel。不像在训练中那样创建特定的物理操作符。演练需要创建规则;或者，我们可以允许“转换器”在计划器中注册，而不是在特徵-defs中注册。
  */
 public interface RelDistribution extends RelMultipleTrait {
   /** Returns the type of distribution. */

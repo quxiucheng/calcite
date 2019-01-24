@@ -211,6 +211,9 @@ import static org.apache.calcite.sql.SqlUtil.stripAs;
  *
  * <p>The public entry points are: {@link #convertQuery},
  * {@link #convertExpression(SqlNode)}.
+ *
+ * 将SQL解析树(由SqlNode对象组成)转换为关系代数表达式(由RelNode对象组成)。
+ * 公共入口点是:convertQuery(org.apache.calcite.sql)。SqlNode, boolean, boolean)， convertExpression(SqlNode)。
  */
 public class SqlToRelConverter {
   //~ Static fields/initializers ---------------------------------------------
@@ -541,12 +544,18 @@ public class SqlToRelConverter {
    * Converts an unvalidated query's parse tree into a relational expression.
    *
    * @param query           Query to convert
+   * 要转换的查询
+   *
    * @param needsValidation Whether to validate the query before converting;
    *                        <code>false</code> if the query has already been
    *                        validated.
+   *                        是否在转换前验证查询;如果查询已经过验证，则为false。
    * @param top             Whether the query is top-level, say if its result
    *                        will become a JDBC result set; <code>false</code> if
    *                        the query will be part of a view.
+   *                        查询是否是顶级的，比如它的结果是否会变成JDBC结果集;如果查询是视图的一部分，则为false
+   *
+   * 将未经验证的查询的解析树转换为关系表达式。
    */
   public RelRoot convertQuery(
       SqlNode query,
@@ -1797,6 +1806,7 @@ public class SqlToRelConverter {
    *
    * @param node Expression to translate
    * @return Converted expression
+   * 将表达式从SqlNode转换为RexNode格式。
    */
   public RexNode convertExpression(
       SqlNode node) {
@@ -5462,6 +5472,7 @@ public class SqlToRelConverter {
    *
    * @see ConfigBuilder
    * @see SqlToRelConverter#configBuilder()
+   * 接口定义SqlToRelConverter的配置。提供设置每个配置选项的方法。
    */
   public interface Config {
     /** Default configuration. */
@@ -5472,30 +5483,50 @@ public class SqlToRelConverter {
      * optimizer doesn't like leaf rels to have {@link Convention#NONE}.
      * However, if we are doing further conversion passes (e.g.
      * {@link RelStructuredTypeFlattener}), then we may need to defer
-     * conversion. */
+     * conversion.
+     * 返回convertTableAccess选项。
+     * 控制表访问引用是否立即转换为物理rels引用。
+     * The optimizer doesn't like leaf rels to have Convention.NONE
+     * 优化器不喜欢叶子节点rels含有Convention.NONE。
+     * 但是，如果我们正在进行进一步的转换，那么我们可能需要推迟转换。
+     * 然而，如果我们正在进行进一步的转换传递(e.g. {@link RelStructuredTypeFlattener})，那么我们可能需要推迟转换。
+     *
+     * */
     boolean isConvertTableAccess();
 
     /** Returns the {@code decorrelationEnabled} option. Controls whether to
      * disable sub-query decorrelation when needed. e.g. if outer joins are not
-     * supported. */
+     * supported.
+     * 返回反关系选项。控制是否在需要时禁用子查询反关系。如果不支持外部连接。
+     * 是否支持join
+     * */
     boolean isDecorrelationEnabled();
 
     /** Returns the {@code trimUnusedFields} option. Controls whether to trim
-     * unused fields as part of the conversion process. */
+     * unused fields as part of the conversion process.
+     * 返回trimUnusedFields选项。控制是否在转换过程中修剪未使用的字段。
+     * 去除无用字段
+     * */
     boolean isTrimUnusedFields();
 
     /** Returns the {@code createValuesRel} option. Controls whether instances
      * of {@link org.apache.calcite.rel.logical.LogicalValues} are generated.
-     * These may not be supported by all physical implementations. */
+     * These may not be supported by all physical implementations.
+     * 返回createValuesRel选项。控制是否生成逻辑值的实例。这些可能不是所有物理实现都支持的。
+     * */
     boolean isCreateValuesRel();
 
     /** Returns the {@code explain} option. Describes whether the current
-     * statement is part of an EXPLAIN PLAN statement. */
+     * statement is part of an EXPLAIN PLAN statement.
+     * 返回explain选项。描述当前语句是否为EXPLAIN PLAN语句的一部分。
+     * */
     boolean isExplain();
 
     /** Returns the {@code expand} option. Controls whether to expand
      * sub-queries. If false, each sub-query becomes a
-     * {@link org.apache.calcite.rex.RexSubQuery}. */
+     * {@link org.apache.calcite.rex.RexSubQuery}.
+     * 返回展开选项。控制是否展开子查询。如果为false，每个子查询将成为RexSubQuery
+     * */
     boolean isExpand();
 
     /** Returns the {@code inSubQueryThreshold} option,
@@ -5505,7 +5536,14 @@ public class SqlToRelConverter {
      * table ({@link org.apache.calcite.rel.logical.LogicalValues}) rather than
      * a predicate. A threshold of 0 forces usage of an inline table in all
      * cases; a threshold of {@link Integer#MAX_VALUE} forces usage of OR in all
-     * cases. */
+     * cases.
+     * 返回inSubQueryThreshold选项，默认SqlToRelConverter.DEFAULT_IN_SUB_QUERY_THRESHOLD。
+     * 控制SqlToRelConverter.convertInToOr(org.apache.calcite.sql2rel.SqlToRelConverter)的列表大小阈值。
+     * 黑板上,并不知道< org.apache.calcite.rex。org.apache.calcite.sql RexNode >。使用SqlNodeList, org.apache.calcite.sql.fun.SqlInOperator)。
+     * 这个大小或更大的列表将被转换为对内联表(LogicalValues)使用连接，而不是谓词。0的阈值强制在所有情况下使用内联表;整数的阈值。MAX_VALUE强制使用或在所有情况下使用。
+     *
+     * in的转换为子查询的个数
+     * */
     int getInSubQueryThreshold();
 
     /** Returns the factory to create {@link RelBuilder}, never null. Default is

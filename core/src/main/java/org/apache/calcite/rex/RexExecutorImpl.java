@@ -60,6 +60,14 @@ public class RexExecutorImpl implements RexExecutor {
     return compile(rexBuilder, constExps, getter, emptyRowType);
   }
 
+  /**
+   * 编译代码
+   * @param rexBuilder
+   * @param constExps
+   * @param getter
+   * @param rowType
+   * @return
+   */
   private String compile(RexBuilder rexBuilder, List<RexNode> constExps,
       RexToLixTranslator.InputGetter getter, RelDataType rowType) {
     final RexProgramBuilder programBuilder =

@@ -59,6 +59,15 @@ import java.util.Set;
  * <li>{@link org.apache.calcite.rel.rules.CalcMergeRule}
  *     merges two {@code LogicalCalc}s
  * </ul>
+ *
+ * 计算项目表达式和筛选器的关系表达式。
+ * 这个关系表达式结合了LogicalProject和LogicalFilter的功能。应该在优化的后期创建它，将连续的LogicalProject和LogicalFilter节点合并在一起。
+ * 以下是与LogicalCalc相关的规则:
+ *  FilterToCalcRule creates this from a LogicalFilter
+ ProjectToCalcRule creates this from a LogicalFilter
+ FilterCalcMergeRule merges this with a LogicalFilter
+ ProjectCalcMergeRule merges this with a LogicalProject
+ CalcMergeRule merges two LogicalCalcs
  */
 public final class LogicalCalc extends Calc {
   //~ Static fields/initializers ---------------------------------------------

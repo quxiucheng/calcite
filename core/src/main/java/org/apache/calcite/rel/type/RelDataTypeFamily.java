@@ -19,6 +19,8 @@ package org.apache.calcite.rel.type;
 /**
  * RelDataTypeFamily represents a family of related types. The specific criteria
  * for membership in a type family are type-system dependent.
+ *
+ * RelDataTypeFamily表示一组相关类型。类型族中成员资格的特定标准依赖于类型系统。
  */
 public interface RelDataTypeFamily {
 }

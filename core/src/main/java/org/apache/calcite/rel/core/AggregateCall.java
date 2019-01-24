@@ -34,6 +34,8 @@ import java.util.Objects;
 /**
  * Call to an aggregate function within an
  * {@link org.apache.calcite.rel.core.Aggregate}.
+ *
+ * 调用一个聚合函数
  */
 public class AggregateCall {
   //~ Instance fields --------------------------------------------------------

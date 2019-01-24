@@ -33,6 +33,7 @@ import java.util.RandomAccess;
 
 /**
  * Space-efficient, comparable, immutable lists.
+ * 节省空间，可比较，不可变的列表
  */
 public class FlatLists {
   private FlatLists() {

@@ -34,6 +34,11 @@ import java.util.function.Predicate;
  * <p>Note that <code>children</code> means different things if it is empty or
  * it is <code>null</code>: <code>Join(Filter <b>()</b>, Any)</code> means
  * that, to match the rule, <code>Filter</code> must have no operands.</p>
+ *
+ * 操作数，它确定RelOptRule是否可以应用于特定表达式。
+ * 例如
+ *  从联接的左侧拉出筛选器的规则接受操作数:联接(Filter，Any)。
+ *  注意，如果子元素为空或为null，则表示不同的含义:Join(Filter()， Any)意味着，为了匹配规则，Filter必须没有操作数。
  */
 public class RelOptRuleOperand {
   //~ Instance fields --------------------------------------------------------
@@ -53,6 +58,7 @@ public class RelOptRuleOperand {
 
   /**
    * Whether child operands can be matched in any order.
+   * 子操作数是否可以按任何顺序匹配
    */
   public final RelOptRuleOperandChildPolicy childPolicy;
 
@@ -195,6 +201,7 @@ public class RelOptRuleOperand {
    * Returns the child operands.
    *
    * @return child operands
+   * 返回子操作数。
    */
   public List<RelOptRuleOperand> getChildOperands() {
     return children;
@@ -203,6 +210,7 @@ public class RelOptRuleOperand {
   /**
    * Returns whether a relational expression matches this operand. It must be
    * of the right class and trait.
+   * 返回关系表达式是否与此操作数匹配。它必须具有正确的类别和特征。
    */
   public boolean matches(RelNode rel) {
     if (!clazz.isInstance(rel)) {

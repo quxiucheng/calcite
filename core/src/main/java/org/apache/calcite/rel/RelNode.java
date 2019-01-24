@@ -37,6 +37,10 @@ import java.util.Set;
 
 /**
  * A <code>RelNode</code> is a relational expression.
+ * 是一个关系表达式
+ * 关系表达式处理数据，所以他们的名字通常是动词：
+ * Sort,Join,Project,Filter,Scan,Sample
+ *
  *
  * <p>Relational expressions process data, so their names are typically verbs:
  * Sort, Join, Project, Filter, Scan, Sample.
@@ -75,6 +79,28 @@ import java.util.Set;
  * <p>Every relational expression must derive from {@link AbstractRelNode}. (Why
  * have the <code>RelNode</code> interface, then? We need a root interface,
  * because an interface can only derive from an interface.)</p>
+ *
+ * RelNode是一个关系表达式。
+
+ 关系表达式处理数据，因此它们的名称通常是动词:Sort、Join、Project、Filter、Scan、Sample。
+
+
+ 关系表达式不是标量表达式;参见SqlNode和RexNode。
+
+
+ 如果这种关系表达式有一些特定的planner规则，那么它应该实现公共静态方法AbstractRelNode.register(org.apache.calcite.plan.RelOptPlanner)。
+
+
+ 当需要实现关系表达式时，系统分配RelImplementor来管理流程。每个可实现的关系表达式都有一个RelTraitSet来描述其物理属性。RelTraitSet总是包含描述表达式如何将数据传递给其消费关系表达式的约定，但可能包含其他特征，包括一些应用于外部的特征。因为trait可以应用于外部，RelNode的实现不应该假设它们的trait集的大小或内容(除了RelNode本身配置的那些trait)。
+
+
+ 对于每个调用约定，都有相应的RelNode子接口。例如,org.apache.calcite.adapter.enumerable。EnumerableRel具有操作来管理到org.apache.calcite.adapter.enumerable图的转换。它与EnumerableRelImplementor交互。
+
+
+ 关系表达式只有在实际实现时(即转换为计划/程序时)才需要实现其调用约定的接口。这意味着不能实现的关系表达式(如转换器)不需要实现其约定的接口。
+
+
+ 每个关系表达式都必须从AbstractRelNode派生。那么，为什么要使用RelNode接口呢?我们需要一个根接口，因为一个接口只能从一个接口派生出来。
  */
 public interface RelNode extends RelOptNode, Cloneable {
   //~ Methods ----------------------------------------------------------------

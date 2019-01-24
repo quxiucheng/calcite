@@ -30,6 +30,7 @@ import java.util.List;
 /**
  * ChainedSqlOperatorTable implements the {@link SqlOperatorTable} interface by
  * chaining together any number of underlying operator table instances.
+ * ChainedSqlOperatorTable通过将任意数量的底层操作符表实例链接在一起来实现SqlOperatorTable接口。
  */
 public class ChainedSqlOperatorTable implements SqlOperatorTable {
   //~ Instance fields --------------------------------------------------------

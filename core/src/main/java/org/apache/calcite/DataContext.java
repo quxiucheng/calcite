@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Runtime context allowing access to the tables in a database.
+ * 允许访问数据库中表的运行时上下文
  */
 public interface DataContext {
   ParameterExpression ROOT =

@@ -225,6 +225,7 @@ public class HepPlannerTest extends RelOptTestBase {
     //   (select 1 from dept where abs(-1)=20)
     // occurs twice, but it's a common sub-expression, so the rule should only
     // apply once.
+    // 出现两次，但这是一种常见的子表达式，因此规则应该只出现两次
     HepProgramBuilder programBuilder = HepProgram.builder();
     programBuilder.addRuleInstance(FilterToCalcRule.INSTANCE);
 

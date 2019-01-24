@@ -69,6 +69,7 @@ public class Frameworks {
   /** Piece of code to be run in a context where a planner is available. The
    * planner is accessible from the {@code cluster} parameter, as are several
    * other useful objects.
+   * 一段代码要在计划器可用的上下文中运行。规划器可以从集群参数访问，其他几个有用的对象也可以。
    *
    * @param <R> result type */
   public interface PlannerAction<R> {
@@ -81,7 +82,7 @@ public class Frameworks {
    * are several other useful objects. The connection and
    * {@link org.apache.calcite.DataContext} are accessible from the
    * statement.
-   *
+   * 在计划器和语句可用的上下文中运行的一段代码。规划器可以从集群参数访问，其他几个有用的对象也可以。可以从语句中访问连接和DataContext。
    * @param <R> result type */
   public abstract static class PrepareAction<R> {
     private final FrameworkConfig config;

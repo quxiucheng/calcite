@@ -240,7 +240,10 @@ public class JavaTypeFactoryImpl
     return toSql(this, type);
   }
 
-  /** Converts a type in Java format to a SQL-oriented type. */
+  /**
+   * Converts a type in Java format to a SQL-oriented type.
+   * 将Java格式的类型转换为面向SQL的类型
+   * */
   public static RelDataType toSql(final RelDataTypeFactory typeFactory,
       RelDataType type) {
     if (type instanceof RelRecordType) {

@@ -21,6 +21,7 @@ import org.apache.calcite.util.Util;
 
 /**
  * Enumeration of possible syntactic types of {@link SqlOperator operators}.
+ * SqlOperator操作符的可能语法类型的枚举
  */
 public enum SqlSyntax {
   /**

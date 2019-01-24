@@ -29,6 +29,7 @@ import java.util.EnumSet;
 /**
  * Enumeration of the categories of
  * SQL-invoked routines.
+ * 枚举sql调用的例程的类别
  */
 public enum SqlFunctionCategory {
   STRING("STRING", "String function", FUNCTION),

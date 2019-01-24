@@ -204,6 +204,8 @@ abstract class RelOptTestBase extends SqlToRelTestBase {
 
     planner.setRoot(relBefore);
     RelNode r = planner.findBestExp();
+    System.out.println(RelOptUtil.toString(relInitial));
+    System.out.println(RelOptUtil.toString(r));
     if (tester.isLateDecorrelate()) {
       final String planMid = NL + RelOptUtil.toString(r);
       diffRepos.assertEquals("planMid", "${planMid}", planMid);
