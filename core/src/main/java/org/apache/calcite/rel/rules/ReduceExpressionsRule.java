@@ -87,6 +87,12 @@ import java.util.regex.Pattern;
  * <li>Removal of redundant casts, which occurs when the argument into the cast
  * is the same as the type of the resulting cast expression
  * </ul>
+ *
+ * 在RexNode树上应用各种简化转换的planner规则的集合。目前有两种转变:
+
+ 常量约简，它计算常量子树，用相应的RexLiteral替换它们
+
+ 删除冗余强制转换，当强制转换中的参数与结果强制转换表达式的类型相同时发生
  */
 public abstract class ReduceExpressionsRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------
@@ -525,6 +531,17 @@ public abstract class ReduceExpressionsRule extends RelOptRule {
    *                         NOT NULL
    *
    * @return whether reduction found something to change, and succeeded
+   *
+   * 计算表达式
+   *
+   * 当减少一个类型为空的表达式时，matchNullability标志就会发挥作用。
+   * 假设我们正在减少一个表达式的情况，当'a' = 'a'，那么1 ELSE NULL END。
+   * 在约简之前，类型是INTEGER (nullable)，但在约简之后，文字1的类型是INTEGER NOT NULL。
+   *
+   * 在某些情况下，保存类型更为重要;在这种情况下，您应该使用matchNullability = true(这曾经是该方法的默认行为)，它将把文字转换为整数(nullable)。
+   *
+   * 在其他情况下，您宁愿传播新的强类型，因为它可能允许以后进行进一步的优化;传递matchNullability = false，不会添加强制转换，但是您可能需要在表达式树的其他地方调整类型。
+   *
    */
   protected static boolean reduceExpressions(RelNode rel, List<RexNode> expList,
       RelOptPredicateList predicates, boolean unknownAsFalse,
@@ -536,7 +553,7 @@ public abstract class ReduceExpressionsRule extends RelOptRule {
     final RexSimplify simplify =
         new RexSimplify(rexBuilder, predicates, executor);
 
-    // Simplify predicates in place
+    // Simplify predicates in place 简化谓词
     final RexUnknownAs unknownAs = RexUnknownAs.falseIf(unknownAsFalse);
     final boolean reduced = reduceExpressionsInternal(rel, simplify, unknownAs,
         expList, predicates);

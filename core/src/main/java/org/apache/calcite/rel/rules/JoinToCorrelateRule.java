@@ -56,6 +56,18 @@ import org.apache.calcite.util.Util;
  *
  * <p>would require emitting a NULL emp row if a certain department contained no
  * employees, and Correlator cannot do that.</p>
+ *
+ * 将逻辑连接转换为逻辑关联的规则，然后可以使用嵌套循环实现该规则。
+
+ 例如,
+ select * from emp join dept on emp.deptno = dept.deptno
+ 成为相关器，它将为从LogicalTableScan(“EMP”)读取的每一行重新启动LogicalTableScan(“DEPT”)。
+
+
+ 此规则不适用于某些类型的外部连接。例如,
+ select * from emp right join dept on emp.deptno = dept.deptno
+
+ 如果某个部门不包含雇员，则需要发出空emp行，而Correlator无法做到这一点。
  */
 public class JoinToCorrelateRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

@@ -46,6 +46,8 @@ import java.util.List;
  * <p>If the condition allows nulls, then a null value is treated the same as
  * false.</p>
  *
+ * 遍历其输入并返回条件为true的元素的关系表达式。
+ * 如果条件允许为空，则空值将被视为false。
  * @see org.apache.calcite.rel.logical.LogicalFilter
  */
 public abstract class Filter extends SingleRel {

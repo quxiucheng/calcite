@@ -44,6 +44,11 @@ import com.google.common.collect.ImmutableList;
  * or a {@link org.apache.calcite.schema.ProjectableFilterableTable}
  * to a {@link org.apache.calcite.interpreter.Bindables.BindableTableScan}.
  *
+ *
+ Planner规则，它将FilterableTable或 ProjectableFilterableTable表上的filter转换为 Bindables.BindableTableScan.
+
+ 解释器变量允许一个介入的EnumerableInterpreter。
+ *
  * <p>The {@link #INTERPRETER} variant allows an intervening
  * {@link org.apache.calcite.adapter.enumerable.EnumerableInterpreter}.
  *

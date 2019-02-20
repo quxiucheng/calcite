@@ -105,6 +105,7 @@ import java.util.Set;
  * followed by {@link org.apache.calcite.rel.core.Aggregate} or an
  * {@link org.apache.calcite.rel.core.Aggregate} to a scan (and possibly
  * other operations) over a materialized view.
+ * Planner规则，它将项目后跟聚合或聚合转换为实体视图上的扫描(可能还有其他操作)。
  */
 public abstract class AbstractMaterializedViewRule extends RelOptRule {
 

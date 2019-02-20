@@ -32,6 +32,10 @@ import java.util.Objects;
  * of the immutability.
  *
  * <p>Variables are immutable.
+ *
+ * 标识基于类型和索引。我们希望在相同的上下文中对同一个槽的多个引用是相等的。一个副作用是，在不同上下文中对具有相同索引和类型的slot的引用将被认为是相等的;这不是我们想要的，但也不会造成太大的伤害，因为它是不变性的。
+ *
+ * 变量是不可变的。
  */
 public class RexLocalRef extends RexSlot {
   //~ Static fields/initializers ---------------------------------------------

@@ -35,6 +35,10 @@ import java.util.List;
  * <p>If "all" is true, then multiset subtraction is
  * performed; otherwise, set subtraction is performed (implying no duplicates in
  * the results).
+ *
+ * 返回第一个输入的行减去来自其他输入的任何匹配行的关系表达式。
+ * 对应 EXCEPT 操作
+ * 差集
  */
 public abstract class Minus extends SetOp {
   public Minus(RelOptCluster cluster, RelTraitSet traits, List<RelNode> inputs,

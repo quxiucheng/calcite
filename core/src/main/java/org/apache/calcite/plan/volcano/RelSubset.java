@@ -59,6 +59,12 @@ import java.util.Set;
  * @see RelNode
  * @see RelSet
  * @see RelTrait
+ * 等价类的子集，其中所有关系表达式具有相同的物理属性。
+
+物理属性是RelTraitSet的实例，由调用约定和排序(排序顺序)等特征组成。
+
+
+对于某些特征，关系表达式可以有多个实例。例如，R可以在[X]和[Y, Z]上排序。在这种情况下，R属于[X]和[Y, Z]的子集;还有前边[Y]和[]
  */
 public class RelSubset extends AbstractRelNode {
   //~ Static fields/initializers ---------------------------------------------

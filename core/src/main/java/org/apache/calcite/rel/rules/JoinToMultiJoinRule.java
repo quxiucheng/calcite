@@ -101,6 +101,32 @@ import java.util.Map;
  *
  * @see org.apache.calcite.rel.rules.FilterMultiJoinMergeRule
  * @see org.apache.calcite.rel.rules.ProjectMultiJoinMergeRule
+ *
+ * 规划规则，将逻辑连接树平展为具有N个输入的单个多连接。
+
+如果输入是在外部连接中生成的空输入，则输入不会变平，即，要么输入完整外连接，要么输入左外连接的右侧，要么输入右外连接的左侧。
+
+
+连接条件也从输入中提取到最顶层的多连接，除非输入对应于外部连接中的空生成输入，
+
+
+外部连接信息也存储在多连接中。布尔标志指示连接是否是完整的外部连接，在左右外部连接的情况下，连接类型和外部连接条件存储在多连接中的数组中。这个外部连接信息与外部连接中的空生成输入相关联。因此，在a和B之间的左外连接的情况下，信息与B相关，而不是a。
+
+
+下面是在将此规则应用于以下连接树之后构造的多连接的示例。
+
+A JOIN B → MJ(A, B)
+A JOIN B JOIN C → MJ(A, B, C)
+A LEFT JOIN B → MJ(A, B), left outer join on input#1
+A RIGHT JOIN B → MJ(A, B), right outer join on input#0
+A FULL JOIN B → MJ[full](A, B)
+A LEFT JOIN (B JOIN C) → MJ(A, MJ(B, C))), left outer join on input#1 in the outermost MultiJoin
+(A JOIN B) LEFT JOIN C → MJ(A, B, C), left outer join on input#2
+(A LEFT JOIN B) JOIN C → MJ(MJ(A, B), C), left outer join on input#1 of the inner MultiJoin TODO
+A LEFT JOIN (B FULL JOIN C) → MJ(A, MJ[full](B, C)), left outer join on input#1 in the outermost MultiJoin
+(A LEFT JOIN B) FULL JOIN (C RIGHT JOIN D) → MJ[full](MJ(A, B), MJ(C, D)), left outer join on input #1 in the first inner MultiJoin and right outer join on input#0 in the second inner MultiJoin
+
+构造函数被参数化以允许Join的任何子类，而不仅仅是LogicalJoin。
  */
 public class JoinToMultiJoinRule extends RelOptRule {
   public static final JoinToMultiJoinRule INSTANCE =

@@ -34,6 +34,7 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * same project list as the upper
  * {@link org.apache.calcite.rel.logical.LogicalCalc}, but expressed in terms of
  * the lower {@link org.apache.calcite.rel.logical.LogicalCalc}'s inputs.
+ * 合并两个Calc
  */
 public class CalcMergeRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

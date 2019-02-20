@@ -36,6 +36,7 @@ import java.util.List;
 /**
  * Planner rule that pushes a {@link org.apache.calcite.rel.core.Filter}
  * past a {@link org.apache.calcite.rel.core.SetOp}.
+ * filter下推到SetOp
  */
 public class FilterSetOpTransposeRule extends RelOptRule {
   public static final FilterSetOpTransposeRule INSTANCE =

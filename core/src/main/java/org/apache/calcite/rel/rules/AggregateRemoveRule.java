@@ -33,6 +33,7 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * if it computes no aggregate functions
  * (that is, it is implementing {@code SELECT DISTINCT})
  * and the underlying relational expression is already distinct.
+ * Planner规则，如果它不计算聚合函数(即，它实现的是SELECT DISTINCT)，并且底层关系表达式已经是不同的，则删除聚合
  */
 public class AggregateRemoveRule extends RelOptRule {
   public static final AggregateRemoveRule INSTANCE =

@@ -65,6 +65,9 @@ import java.math.BigDecimal;
  * <p><code>R6 = Proj(R5 on all attributes)</code>
  *
  * @see org.apache.calcite.rel.rules.UnionToDistinctRule
+ * 计划器规则，它将一个不同的交集(all = false)转换为一组由Union、Aggregate等组成的操作符。
+
+重写:(GB-Union all - gb)-GB-UDTF(关于所有属性)
  */
 public class IntersectToDistinctRule extends RelOptRule {
   public static final IntersectToDistinctRule INSTANCE =

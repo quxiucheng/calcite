@@ -32,6 +32,9 @@ import java.util.List;
  *
  * <p>In SQL, a sample is expressed using the {@code TABLESAMPLE BERNOULLI} or
  * {@code SYSTEM} keyword applied to a table, view or sub-query.
+ * 关系表达式，它从输入中返回行样本。
+
+ 在SQL中，使用表、视图或子查询应用的TABLESAMPLE BERNOULLI或SYSTEM关键字表示示例。
  */
 public class Sample extends SingleRel {
   //~ Instance fields --------------------------------------------------------

@@ -35,6 +35,7 @@ import java.util.List;
  * creating a richer {@code MultiJoin}.
  *
  * @see org.apache.calcite.rel.rules.ProjectMultiJoinMergeRule
+ * 将fitler和MultiJoin合并
  */
 public class FilterMultiJoinMergeRule extends RelOptRule {
   public static final FilterMultiJoinMergeRule INSTANCE =

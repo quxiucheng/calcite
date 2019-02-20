@@ -34,6 +34,13 @@ import java.lang.reflect.Method;
  * <p>If your provider is not a singleton, we recommend that you implement
  * {@link Object#equals(Object)} and {@link Object#hashCode()} methods. This
  * makes the cache of {@link JaninoRelMetadataProvider} more effective.
+ *
+ * RelMetadataProvider定义了一个接口，用于获取关于关系表达式的元数据。这个接口是弱类型的，不打算在大多数上下文中直接调用;相反，使用强类型facade，如RelMetadataQuery。
+ *
+ * 有关背景和动机，请参见wiki。
+
+
+ 如果您的提供者不是单例的，我们建议您实现Object.equals(Object)和Object. hashcode()方法。这使得JaninoRelMetadataProvider的缓存更加有效。
  */
 public interface RelMetadataProvider {
   //~ Methods ----------------------------------------------------------------

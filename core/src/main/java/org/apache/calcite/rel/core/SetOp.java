@@ -38,6 +38,8 @@ import java.util.List;
 /**
  * <code>SetOp</code> is an abstract base for relational set operators such
  * as UNION, MINUS (aka EXCEPT), and INTERSECT.
+ *
+ * SetOp是关系集操作符(如UNION、MINUS (aka EXCEPT)和INTERSECT)的抽象基。
  */
 public abstract class SetOp extends AbstractRelNode {
   //~ Instance fields --------------------------------------------------------

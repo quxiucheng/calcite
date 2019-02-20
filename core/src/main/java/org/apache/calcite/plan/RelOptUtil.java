@@ -3577,6 +3577,7 @@ public abstract class RelOptUtil {
 
     /**
      * Returns a bit set describing the inputs used by an expression.
+     * 返回描述表达式使用的输入的位集。
      */
     public static ImmutableBitSet bits(RexNode node) {
       return analyze(node).inputBitSet.build();
@@ -3613,6 +3614,7 @@ public abstract class RelOptUtil {
   /**
    * Walks an expression tree, converting the index of RexInputRefs based on
    * some adjustment factor.
+   * 遍历表达式树，根据某个调整因子转换RexInputRefs的索引。
    */
   public static class RexInputConverter extends RexShuttle {
     protected final RexBuilder rexBuilder;

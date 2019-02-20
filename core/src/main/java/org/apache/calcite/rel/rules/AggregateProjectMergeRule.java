@@ -52,6 +52,21 @@ import java.util.TreeSet;
  *
  * <p>In some cases, this rule has the effect of trimming: the aggregate will
  * use fewer columns than the project did.
+ *
+ * Planner规则，用于识别项目顶部的聚合，如果可能的话，通过项目进行聚合或删除项目。
+
+ 只有当聚合函数的分组表达式和参数是字段引用(即不是表达式)时，这才有可能。
+
+
+ 在某些情况下，此规则具有调整的效果:聚合将比项目使用更少的列。
+ select sum(sal) from emp
+
+LogicalAggregate(group=[{}], EXPR$0=[SUM($0)])
+  LogicalProject(SAL=[$5])
+    LogicalTableScan(table=[[CATALOG, SALES, EMP]])
+
+LogicalAggregate(group=[{}], EXPR$0=[SUM($5)])
+  LogicalTableScan(table=[[CATALOG, SALES, EMP]])
  */
 public class AggregateProjectMergeRule extends RelOptRule {
   public static final AggregateProjectMergeRule INSTANCE =

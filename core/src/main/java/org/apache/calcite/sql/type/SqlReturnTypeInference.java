@@ -29,6 +29,10 @@ import org.apache.calcite.sql.SqlOperatorBinding;
  * This makes
  * sense because many operators have similar, straightforward strategies, such
  * as to take the type of the first operand.</p>
+ *
+ * 策略接口，以从操作数的类型推断操作符调用的类型。
+
+ 这个接口是策略模式的一个例子。这是有意义的，因为许多操作符都有类似的、直接的策略，比如采用第一个操作数的类型。
  */
 public interface SqlReturnTypeInference {
   //~ Methods ----------------------------------------------------------------

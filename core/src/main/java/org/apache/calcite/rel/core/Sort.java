@@ -41,6 +41,7 @@ import java.util.List;
 /**
  * Relational expression that imposes a particular sort order on its input
  * without otherwise changing its content.
+ * 关系表达式，在其输入上强加特定的排序顺序而不改变其内容。
  */
 public abstract class Sort extends SingleRel {
   //~ Instance fields --------------------------------------------------------

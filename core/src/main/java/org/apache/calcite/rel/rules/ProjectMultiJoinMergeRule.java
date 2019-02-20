@@ -30,6 +30,8 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * into a {@link MultiJoin},
  * creating a richer {@code MultiJoin}.
  *
+ * 将project和multiJoin的projFields 合并到一起
+ *
  * @see org.apache.calcite.rel.rules.FilterMultiJoinMergeRule
  */
 public class ProjectMultiJoinMergeRule extends RelOptRule {

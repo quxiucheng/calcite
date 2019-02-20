@@ -49,8 +49,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Implements the logic for determining the optimal
- * semi-joins to be used in processing joins in a query.
+ * Implements the logic for determining the optimal semi-joins to be used in processing joins in a query.
+ * 实现用于确定在处理查询中的连接时使用的最佳半连接的逻辑。
  */
 public class LoptSemiJoinOptimizer {
   //~ Static fields/initializers ---------------------------------------------

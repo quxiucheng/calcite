@@ -43,6 +43,7 @@ import java.util.List;
  * Planner rule that pushes
  * a {@link org.apache.calcite.rel.logical.LogicalProject}
  * past a {@link org.apache.calcite.rel.logical.LogicalWindow}.
+ * 将project下推到window中
  */
 public class ProjectWindowTransposeRule extends RelOptRule {
   /** The default instance of

@@ -58,6 +58,7 @@ import java.util.TreeMap;
 
 /**
  * Planner rule that pushes an
+ * 将 聚合 下推到 join中
  * {@link org.apache.calcite.rel.core.Aggregate}
  * past a {@link org.apache.calcite.rel.core.Join}.
  */

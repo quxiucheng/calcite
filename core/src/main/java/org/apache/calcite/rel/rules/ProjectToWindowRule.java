@@ -71,6 +71,8 @@ import java.util.Set;
  *
  * <p>There is also a variant that matches
  * {@link org.apache.calcite.rel.core.Calc} rather than {@code Project}.
+ *
+ * project中提取window相关
  */
 public abstract class ProjectToWindowRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

@@ -39,6 +39,8 @@ import java.util.List;
  * <li>{@link org.apache.calcite.rel.rules.AggregateExpandDistinctAggregatesRule}
  * <li>{@link org.apache.calcite.rel.rules.AggregateReduceFunctionsRule}.
  * </ul>
+ *
+ * 聚合逻辑
  */
 public final class LogicalAggregate extends Aggregate {
   //~ Constructors -----------------------------------------------------------

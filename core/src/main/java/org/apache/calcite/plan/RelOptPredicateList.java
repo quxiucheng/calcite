@@ -63,6 +63,22 @@ import java.util.Objects;
  * <p>Note that the predicate from the left input appears in
  * {@code rightInferredPredicates}. Predicates from several sources appear in
  * {@code pulledUpPredicates}.
+ *
+ * 已知保存在特定关系表达式输出中的谓词。
+ * 拉出谓词(字段拉出谓词是应用于关系表达式的每一行输出的谓词。它们是从输入关系表达式和关系运算符推断出来的。
+ * 例如，如果将Filter(x > 1)应用于谓词y < 10的关系表达式，则该过滤器的上拉谓词为[y < 10, x >]。
+ * 推断谓词仅适用于连接。如果在连接的左侧输入上有一个谓词，并且该谓词位于连接条件中使用的列之上，那么可以在连接的右侧输入上推断出一个谓词。(反之亦然)。
+ * For example, in the query
+ *
+ SELECT *
+ FROM emp
+ JOIN dept ON emp.deptno = dept.deptno WHERE emp.gender = 'F' AND emp.deptno < 10
+
+ left: Filter(Scan(EMP), deptno < 10, predicates: [deptno < 10]
+ right: Scan(DEPT), predicates: []
+ join: Join(left, right, emp.deptno = dept.deptno, leftInferredPredicates: [], rightInferredPredicates: [deptno < 10], pulledUpPredicates: [emp.gender = 'F', emp.deptno < 10, emp.deptno = dept.deptno, dept.deptno < 10]
+
+ 注意，左侧输入的谓词出现在righttinferredpredicate中。来自多个源的谓词出现在pulledup谓词中。
  */
 public class RelOptPredicateList {
   private static final ImmutableList<RexNode> EMPTY_LIST = ImmutableList.of();
@@ -70,8 +86,10 @@ public class RelOptPredicateList {
       new RelOptPredicateList(EMPTY_LIST, EMPTY_LIST, EMPTY_LIST,
           ImmutableMap.of());
 
-  /** Predicates that can be pulled up from the relational expression and its
-   * inputs. */
+  /**
+   * Predicates that can be pulled up from the relational expression and its inputs.
+   * 可以从关系表达式及其输入中提取的谓词
+   * */
   public final ImmutableList<RexNode> pulledUpPredicates;
 
   /** Predicates that were inferred from the right input.

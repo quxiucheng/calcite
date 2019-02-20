@@ -30,6 +30,8 @@ import java.util.List;
  * <code>SqlOperatorBinding</code> represents the binding of an
  * {@link SqlOperator} to actual operands, along with any additional information
  * required to validate those operands if needed.
+ *
+ * SqlOperatorBinding表示SqlOperator与实际操作数的绑定，以及在需要时验证这些操作数所需的任何额外信息。
  */
 public abstract class SqlOperatorBinding {
   //~ Instance fields --------------------------------------------------------
@@ -63,6 +65,13 @@ public abstract class SqlOperatorBinding {
    * aggregate expression. For example, "SELECT sum(sal) FROM emp".</p>
    *
    * <p>Returns -1 if the query is not an aggregate query.</p>
+   *
+   *如果操作符调用发生在聚合查询中，则返回GROUP BY子句中的列数。例如，对于“按deptno, gender从emp组中选择count(*)”，返回2。
+
+   如果查询由于聚合表达式而隐式为“GROUP BY()”，则返回0。例如，“从emp中选择sum(sal)”。
+
+
+   如果查询不是聚合查询，则返回-1。
    */
   public int getGroupCount() {
     return -1;

@@ -43,6 +43,47 @@ import java.util.List;
  * past a {@link org.apache.calcite.rel.core.Aggregate}.
  *
  * @see org.apache.calcite.rel.rules.AggregateFilterTransposeRule
+ *
+ *
+ *  org.apache.calcite.test.RelOptRulesTest#testPushFilterPastAgg()
+filter下推
+dept{ 0
+  deptn o
+  name 1
+}
+
+select dname, c from (
+  select name dname, count(*) as c from dept group by name
+) t where dname = 'Charlie'
+
+LogicalProject(DNAME=[$0], C=[$1])
+  LogicalFilter(condition=[=($0, 'Charlie')])
+    LogicalAggregate(group=[{0}], C=[COUNT()])
+      LogicalProject(DNAME=[$1])
+        LogicalTableScan(table=[[CATALOG, SALES, DEPT]])
+
+
+LogicalProject(DNAME=[$0], C=[$1])
+  LogicalAggregate(group=[{0}], C=[COUNT()])
+    LogicalFilter(condition=[=($0, 'Charlie')])
+      LogicalProject(DNAME=[$1])
+        LogicalTableScan(table=[[CATALOG, SALES, DEPT]])
+
+sql:select dname, c from (select name dname, count(*) as c from dept where deptno=1 group by name) t where dname = 'Charlie' and c >500
+LogicalProject(DNAME=[$0], C=[$1])
+  LogicalFilter(condition=[AND(=($0, 'Charlie'), >($1, 500))])
+    LogicalAggregate(group=[{0}], C=[COUNT()])
+      LogicalProject(DNAME=[$1])
+        LogicalFilter(condition=[=($0, 1)])
+          LogicalTableScan(table=[[CATALOG, SALES, DEPT]])
+
+LogicalProject(DNAME=[$0], C=[$1])
+  LogicalFilter(condition=[>($1, 500)])
+    LogicalAggregate(group=[{0}], C=[COUNT()])
+      LogicalFilter(condition=[=($0, 'Charlie')])
+        LogicalProject(DNAME=[$1])
+          LogicalFilter(condition=[=($0, 1)])
+            LogicalTableScan(table=[[CATALOG, SALES, DEPT]])
  */
 public class FilterAggregateTransposeRule extends RelOptRule {
 
@@ -92,11 +133,14 @@ public class FilterAggregateTransposeRule extends RelOptRule {
     final Filter filterRel = call.rel(0);
     final Aggregate aggRel = call.rel(1);
 
+    // 返回由AND分解的条件
     final List<RexNode> conditions =
         RelOptUtil.conjunctions(filterRel.getCondition());
     final RexBuilder rexBuilder = filterRel.getCluster().getRexBuilder();
+    // 聚合字段类型
     final List<RelDataTypeField> origFields =
         aggRel.getRowType().getFieldList();
+    // 调整
     final int[] adjustments = new int[origFields.size()];
     int j = 0;
     for (int i : aggRel.getGroupSet()) {
@@ -106,7 +150,9 @@ public class FilterAggregateTransposeRule extends RelOptRule {
     final List<RexNode> pushedConditions = new ArrayList<>();
     final List<RexNode> remainingConditions = new ArrayList<>();
 
+    // 判断哪些条件可以下推
     for (RexNode condition : conditions) {
+      // 过滤条件所在的位置
       ImmutableBitSet rCols = RelOptUtil.InputFinder.bits(condition);
       if (canPush(aggRel, rCols)) {
         pushedConditions.add(
@@ -132,6 +178,7 @@ public class FilterAggregateTransposeRule extends RelOptRule {
 
   private boolean canPush(Aggregate aggregate, ImmutableBitSet rCols) {
     // If the filter references columns not in the group key, we cannot push
+    // 字段不在 group by 的字段中,无法下推
     final ImmutableBitSet groupKeys =
         ImmutableBitSet.range(0, aggregate.getGroupSet().cardinality());
     if (!groupKeys.contains(rCols)) {
@@ -142,6 +189,7 @@ public class FilterAggregateTransposeRule extends RelOptRule {
       // If grouping sets are used, the filter can be pushed if
       // the columns referenced in the predicate are present in
       // all the grouping sets.
+      // 如果使用组集，则可以在谓词中引用的列出现在所有组集中时推入筛选器。
       for (ImmutableBitSet groupingSet : aggregate.getGroupSets()) {
         if (!groupingSet.contains(rCols)) {
           return false;

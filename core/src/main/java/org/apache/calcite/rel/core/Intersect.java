@@ -31,6 +31,10 @@ import java.util.List;
  *
  * <p>If "all" is true, performs then multiset intersection; otherwise,
  * performs set set intersection (implying no duplicates in the results).
+ *
+ * 返回其输入行的交集的关系表达式。
+ * 如果“all”为真，则执行多集交集;否则，执行set set交集(意味着结果中没有重复)。
+ * INTERSECT 取交集
  */
 public abstract class Intersect extends SetOp {
   /**

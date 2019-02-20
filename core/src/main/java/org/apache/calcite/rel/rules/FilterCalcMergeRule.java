@@ -33,8 +33,10 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * {@link org.apache.calcite.rel.logical.LogicalCalc}. The
  * result is a {@link org.apache.calcite.rel.logical.LogicalCalc}
  * whose filter condition is the logical AND of the two.
+ * 其过滤条件是两者的逻辑AND
  *
  * @see FilterMergeRule
+ * 合并合并filter和Calc
  */
 public class FilterCalcMergeRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

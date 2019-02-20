@@ -25,6 +25,7 @@ import java.util.Set;
 
 /**
  * Checks whether two names are the same according to a case-sensitivity policy.
+ * 根据区分大小写的策略检查两个名称是否相同
  *
  * @see SqlNameMatchers
  */

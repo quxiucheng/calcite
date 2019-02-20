@@ -53,6 +53,8 @@ import java.util.Set;
  * 'select expressions' from its input relational expression.
  *
  * @see org.apache.calcite.rel.logical.LogicalProject
+ *
+ * input表达式
  */
 public abstract class Project extends SingleRel {
   //~ Instance fields --------------------------------------------------------

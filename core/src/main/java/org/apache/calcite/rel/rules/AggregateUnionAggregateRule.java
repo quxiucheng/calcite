@@ -37,9 +37,14 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * <p>This rule only handles cases where the
  * {@link org.apache.calcite.rel.core.Union}s
  * still have only two inputs.
+ *
+ * 计划器规则，它匹配Union下的聚合并将其拉出，以便单个聚合删除重复项。
+
+ 此规则仅处理联合仍然只有两个输入的情况。
  */
 public class AggregateUnionAggregateRule extends RelOptRule {
   /** Instance that matches an {@code Aggregate} as the left input of
+   * 实例，该实例将聚合匹配为Union的左输入。
    * {@code Union}. */
   public static final AggregateUnionAggregateRule AGG_ON_FIRST_INPUT =
       new AggregateUnionAggregateRule(LogicalAggregate.class, LogicalUnion.class,
@@ -47,6 +52,7 @@ public class AggregateUnionAggregateRule extends RelOptRule {
           "AggregateUnionAggregateRule:first-input-agg");
 
   /** Instance that matches an {@code Aggregate} as the right input of
+   * 实例，该实例将聚合匹配为Union的右输入。
    * {@code Union}. */
   public static final AggregateUnionAggregateRule AGG_ON_SECOND_INPUT =
       new AggregateUnionAggregateRule(LogicalAggregate.class, LogicalUnion.class,
@@ -54,12 +60,17 @@ public class AggregateUnionAggregateRule extends RelOptRule {
           "AggregateUnionAggregateRule:second-input-agg");
 
   /** Instance that matches an {@code Aggregate} as either input of
+   * 实例，该实例将聚合匹配为Union的任一输入。
    * {@link Union}.
    *
    * <p>Because it matches {@link RelNode} for each input of {@code Union}, it
    * will create O(N ^ 2) matches, which may cost too much during the popMatch
    * phase in VolcanoPlanner. If efficiency is a concern, we recommend that you
-   * use {@link #AGG_ON_FIRST_INPUT} and {@link #AGG_ON_SECOND_INPUT} instead. */
+   * use {@link #AGG_ON_FIRST_INPUT} and {@link #AGG_ON_SECOND_INPUT} instead.
+   实例，该实例将聚合匹配为Union的任一输入。
+
+   因为它匹配RelNode每个输入的联盟,它将创建O (N ^ 2)比赛,这可能花费太多在VolcanoPlanner popMatch阶段。如果考虑到效率，建议使用AGG_ON_FIRST_INPUT和AGG_ON_SECOND_INPUT。
+   * */
   public static final AggregateUnionAggregateRule INSTANCE =
       new AggregateUnionAggregateRule(LogicalAggregate.class,
           LogicalUnion.class, RelNode.class, RelNode.class,

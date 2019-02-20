@@ -38,6 +38,8 @@ import java.util.Objects;
  * without otherwise changing its content.
  *
  * @see org.apache.calcite.rel.core.SortExchange
+ *
+ * 一种关系表达式，它在不改变输入内容的情况下对输入施加特定的分布。
  */
 public abstract class Exchange extends SingleRel {
   //~ Instance fields --------------------------------------------------------

@@ -28,7 +28,6 @@ import java.util.List;
  * <p>It is not required that two-input relational expressions use this
  * class as a base class. However, default implementations of methods make life
  * easier.
- * 65/5000
  具有两个输入的关系表达式的抽象基类。
  */
 public abstract class BiRel extends AbstractRelNode {

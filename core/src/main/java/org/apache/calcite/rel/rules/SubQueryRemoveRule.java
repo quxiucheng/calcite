@@ -65,6 +65,7 @@ import java.util.stream.Collectors;
  * The Correlate can be removed using {@link RelDecorrelator}.
  *
  * 子查询可能相关，也可能不相关。如果子查询是相关的，则包装的RelNode将在重写之前包含RexCorrelVariable，重写的结果将是相关的。相关可以使用RelDecorrelator删除。
+ * 去除先关子查询
  */
 public abstract class SubQueryRemoveRule extends RelOptRule {
   public static final SubQueryRemoveRule PROJECT =

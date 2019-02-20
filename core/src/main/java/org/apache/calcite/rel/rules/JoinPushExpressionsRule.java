@@ -27,6 +27,7 @@ import org.apache.calcite.tools.RelBuilder;
 import org.apache.calcite.tools.RelBuilderFactory;
 
 /**
+ * 下推 等值链接的join中的表达式到project中
  * Planner rule that pushes down expressions in "equal" join condition.
  *
  * <p>For example, given

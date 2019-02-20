@@ -67,6 +67,19 @@ import static org.apache.calcite.util.mapping.Mappings.TargetMapping;
  *   <li>More than 1 join conditions that touch the same pair of factors,
  *       e.g. {@code t0.c1 = t1.c1 and t1.c2 = t0.c3}
  * </ol>
+ *
+ * 计划规则，它使用启发式算法为连接操作符找到一个近似最优的排序。
+
+ 它是由模式LogicalProject (MultiJoin)触发的。
+
+
+ 它类似于LoptOptimizeJoinRule。LoptOptimizeJoinRule只能产生左深连接;该规则能够生成浓密的连接。
+
+ 连接条件接触1因子。
+
+ 连接条件涉及3个因素。
+
+ 超过1个连接条件涉及相同的因素对，例如 t0.c1 = t1.c1 and t1.c2 = t0.c3
  */
 public class MultiJoinOptimizeBushyRule extends RelOptRule {
   public static final MultiJoinOptimizeBushyRule INSTANCE =

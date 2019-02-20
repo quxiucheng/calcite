@@ -66,6 +66,10 @@ public class MockCatalogReaderSimple extends MockCatalogReader {
     }
   }
 
+  /**
+   * 模拟数据
+   * @return
+   */
   @Override public MockCatalogReader init() {
     ObjectSqlType addressType = fixture.addressType;
 

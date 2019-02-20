@@ -35,6 +35,8 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * <p>The constructor is parameterized to allow any sub-class of
  * {@link org.apache.calcite.rel.core.Join}, not just
  * {@link org.apache.calcite.rel.logical.LogicalJoin}.
+ * 转换 semi-join
+ * LogicalJoin(X, Y) → LogicalJoin(SemiJoin(X, Y), Y)
  */
 public class JoinAddRedundantSemiJoinRule extends RelOptRule {
   public static final JoinAddRedundantSemiJoinRule INSTANCE =

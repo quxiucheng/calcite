@@ -20,6 +20,7 @@ import org.apache.calcite.DataContext;
 import org.apache.calcite.adapter.java.JavaTypeFactory;
 import org.apache.calcite.interpreter.Interpreter;
 import org.apache.calcite.linq4j.QueryProvider;
+import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.schema.SchemaPlus;
 import org.apache.calcite.sql.SqlNode;
@@ -100,6 +101,7 @@ public class InterpreterTest {
 
     SqlNode validate = planner.validate(parse);
     RelNode convert = planner.rel(validate).rel;
+    System.out.println(RelOptUtil.toString(convert));
 
     final Interpreter interpreter = new Interpreter(dataContext, convert);
     assertRows(interpreter, "[b, 2]", "[c, 3]");
@@ -166,7 +168,7 @@ public class InterpreterTest {
 
     SqlNode validate = planner.validate(parse);
     RelNode convert = planner.rel(validate).rel;
-
+    System.out.println(RelOptUtil.toString(convert));
     final Interpreter interpreter = new Interpreter(dataContext, convert);
     assertRows(interpreter,
         "[4, John]",
@@ -235,10 +237,12 @@ public class InterpreterTest {
     final String sql = "select \"j\",\n"
         + "  count(*) filter (where char_length(\"j\") > 4)\n"
         + "from \"beatles\" group by \"j\"";
+
     SqlNode parse = planner.parse(sql);
     SqlNode validate = planner.validate(parse);
     RelNode convert = planner.rel(validate).rel;
 
+    System.out.println(RelOptUtil.toString(convert));
     final Interpreter interpreter = new Interpreter(dataContext, convert);
     assertRowsUnordered(interpreter,
         "[George, 1]",

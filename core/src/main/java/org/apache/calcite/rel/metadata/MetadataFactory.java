@@ -27,6 +27,13 @@ import org.apache.calcite.rel.RelNode;
  * <p>Each kind of metadata has an interface that extends {@link Metadata} and
  * has a method. Some examples: {@link BuiltInMetadata.Selectivity},
  * {@link BuiltInMetadata.ColumnUniqueness}.</p>
+ *
+ * 关系表达式元数据的来源。
+
+ 元数据通常是用于估计成本的各种统计数据。
+
+
+ 每种元数据都有一个扩展元数据的接口和一个方法。一些例子:BuiltInMetadata。选择性,BuiltInMetadata.ColumnUniqueness。
  */
 public interface MetadataFactory {
   /** Returns a metadata interface to get a particular kind of metadata

@@ -32,6 +32,7 @@ import java.util.List;
  * CoerceInputsRule pre-casts inputs to a particular type. This can be used to
  * assist operator implementations which impose requirements on their input
  * types.
+ * 将输入强制转换为特定类型。这可以用来帮助对输入类型施加需求的操作符实现。
  */
 public class CoerceInputsRule extends RelOptRule {
   //~ Instance fields --------------------------------------------------------

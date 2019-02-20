@@ -33,6 +33,11 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * original order, and it does not filter.
  *
  * @see ProjectRemoveRule
+ *
+删除一个无关紧要的LogicalCalc的Planner规则。
+
+如果LogicalCalc按照输入字段的原始顺序进行投影，并且不进行过滤，那么它就不重要。
+ *
  */
 public class CalcRemoveRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

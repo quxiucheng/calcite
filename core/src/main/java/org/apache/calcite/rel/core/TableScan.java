@@ -42,6 +42,7 @@ import java.util.Set;
 
 /**
  * Relational operator that returns the contents of a table.
+ * 返回表内容的关系运算符。
  */
 public abstract class TableScan extends AbstractRelNode {
   //~ Instance fields --------------------------------------------------------

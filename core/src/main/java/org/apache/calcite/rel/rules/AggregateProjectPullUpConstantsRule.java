@@ -56,6 +56,30 @@ import java.util.TreeMap;
  * relational expression, the constants are placed in a projection above the
  * reduced aggregate. If those constants are not used, another rule will remove
  * them from the project.
+ * 计划器规则，用于从聚合中删除常量键。
+ * 使用RelMetadataQuery.getPulledUpPredicates(RelNode);输入不需要是Project
+ * 此规则从不删除最后一列，因为即使输入为空，Aggregate([])也返回1行。
+ * 由于转换后的关系表达式必须与原始关系表达式匹配，因此常量被放置在经过简化的聚合之上的投影中。如果不使用这些常量，另一条规则将从项目中删除它们。
+ *
+ select count(*) as c
+ from sales.emp
+ where deptno = 10
+ group by deptno, sal
+
+ LogicalProject(C=[$2])
+  LogicalAggregate(group=[{0, 1}], C=[COUNT()])
+    LogicalProject(DEPTNO=[$7], SAL=[$5])
+      LogicalFilter(condition=[=($7, 10)])
+        LogicalTableScan(table=[[CATALOG, SALES, EMP]])
+
+
+ planner优化
+ LogicalProject(C=[$2])
+  LogicalProject(DEPTNO=[10], SAL=[$0], C=[$1])
+    LogicalAggregate(group=[{1}], C=[COUNT()])
+      LogicalProject(DEPTNO=[$7], SAL=[$5])
+        LogicalFilter(condition=[=($7, 10)])
+          LogicalTableScan(table=[[CATALOG, SALES, EMP]])
  */
 public class AggregateProjectPullUpConstantsRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

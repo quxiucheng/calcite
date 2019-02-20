@@ -33,6 +33,7 @@ import static org.apache.calcite.util.Static.RESOURCE;
 /**
  * TableFunctionReturnTypeInference implements rules for deriving table function
  * output row types by expanding references to cursor parameters.
+ * TableFunctionReturnTypeInference通过扩展对游标参数的引用来实现用于派生表函数输出行类型的规则。
  */
 public class TableFunctionReturnTypeInference
     extends ExplicitReturnTypeInference {

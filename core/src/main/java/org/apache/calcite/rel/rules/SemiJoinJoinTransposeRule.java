@@ -44,6 +44,7 @@ import java.util.List;
  * <p>Whether this
  * first or second conversion is applied depends on which operands actually
  * participate in the semi-join.</p>
+ * semiJoin下推到join
  */
 public class SemiJoinJoinTransposeRule extends RelOptRule {
   public static final SemiJoinJoinTransposeRule INSTANCE =

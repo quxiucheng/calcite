@@ -24,12 +24,16 @@
  * <li>Package <code>
  * <a href="../logical/package-summary.html">org.apache.calcite.rel.logical</a></code>
  * contains logical relational expressions
+ * 包含逻辑关系表达式
  *
  * <li>Package <code>
  * <a href="../package-summary.html">org.apache.calcite.rex</a></code>
  * defines the relational expression API
+ * 定义关系表达式API
  *
  * </ul>
+ *
+ * 定义核心关系表达式。
  */
 @PackageMarker
 package org.apache.calcite.rel.core;

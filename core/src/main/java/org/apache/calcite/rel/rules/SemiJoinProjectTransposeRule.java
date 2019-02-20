@@ -51,6 +51,8 @@ import java.util.List;
  * <p>SemiJoin(LogicalProject(X), Y) &rarr; LogicalProject(SemiJoin(X, Y))
  *
  * @see org.apache.calcite.rel.rules.SemiJoinFilterTransposeRule
+ *
+ * semiJoin下推到project
  */
 public class SemiJoinProjectTransposeRule extends RelOptRule {
   public static final SemiJoinProjectTransposeRule INSTANCE =

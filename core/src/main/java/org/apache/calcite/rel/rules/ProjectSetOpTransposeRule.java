@@ -37,6 +37,7 @@ import java.util.List;
  * <p>The children of the {@code SetOp} will project
  * only the {@link RexInputRef}s referenced in the original
  * {@code LogicalProject}.
+ * 将project(投影) 下推到 SetOp(例如:union ,minus, except)
  */
 public class ProjectSetOpTransposeRule extends RelOptRule {
   public static final ProjectSetOpTransposeRule INSTANCE =

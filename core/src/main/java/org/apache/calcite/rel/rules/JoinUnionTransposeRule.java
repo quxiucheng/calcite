@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * join推入union下
  * Planner rule that pushes a
  * {@link org.apache.calcite.rel.core.Join}
  * past a non-distinct {@link org.apache.calcite.rel.core.Union}.

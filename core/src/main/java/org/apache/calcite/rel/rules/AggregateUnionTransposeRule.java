@@ -50,6 +50,7 @@ import java.util.Map;
  * Planner rule that pushes an
  * {@link org.apache.calcite.rel.core.Aggregate}
  * past a non-distinct {@link org.apache.calcite.rel.core.Union}.
+ * 将聚合(Aggregate)下推到union中
  */
 public class AggregateUnionTransposeRule extends RelOptRule {
   public static final AggregateUnionTransposeRule INSTANCE =

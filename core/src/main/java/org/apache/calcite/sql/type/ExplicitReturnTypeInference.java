@@ -23,6 +23,7 @@ import org.apache.calcite.sql.SqlOperatorBinding;
 
 /**
  * A {@link SqlReturnTypeInference} which always returns the same SQL type.
+ * 它总是返回相同的SQL类型。
  */
 public class ExplicitReturnTypeInference implements SqlReturnTypeInference {
   //~ Instance fields --------------------------------------------------------

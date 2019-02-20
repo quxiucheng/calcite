@@ -44,6 +44,10 @@ import java.util.Set;
  * It can appear as a leaf in a query tree,
  * or can be applied to relational inputs.
  *
+ * 调用表值函数的关系表达式。
+
+ 函数返回一个结果集，它可以显示为查询树中的叶子，也可以应用于关系输入。
+ *
  * @see org.apache.calcite.rel.logical.LogicalTableFunctionScan
  */
 public abstract class TableFunctionScan extends AbstractRelNode {
@@ -199,6 +203,7 @@ public abstract class TableFunctionScan extends AbstractRelNode {
 
   /**
    * Returns set of mappings known for this table function, or null if unknown
+   * 返回此表函数已知的映射集，如果未知，则返回null
    * (not the same as empty!).
    *
    * @return set of mappings known for this table function, or null if unknown

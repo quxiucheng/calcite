@@ -33,6 +33,7 @@ import org.apache.calcite.tools.RelBuilderFactory;
 import java.util.function.Predicate;
 
 /**
+ * 把filter下推到project中
  * Planner rule that pushes
  * a {@link org.apache.calcite.rel.core.Filter}
  * past a {@link org.apache.calcite.rel.core.Project}.

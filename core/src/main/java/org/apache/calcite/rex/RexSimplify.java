@@ -59,6 +59,7 @@ import static org.apache.calcite.rex.RexUnknownAs.UNKNOWN;
 
 /**
  * Context required to simplify a row-expression.
+ * 简化行表达式所需的上下文。
  */
 public class RexSimplify {
   private final boolean paranoid;
@@ -164,7 +165,13 @@ public class RexSimplify {
    * nullability.
    *
    * <p>This is useful if you are simplifying expressions in a
-   * {@link Project}. */
+   * {@link Project}.
+   *
+   *
+   *  简化布尔表达式，始终保持其类型和可空性。
+
+   如果要在项目中简化表达式，这非常有用。
+   * */
   public RexNode simplifyPreservingType(RexNode e) {
     return simplifyPreservingType(e, defaultUnknownAs, true);
   }
@@ -184,6 +191,7 @@ public class RexSimplify {
 
   /**
    * Simplifies a boolean expression.
+   * 简化布尔表达式。
    *
    * <p>In particular:</p>
    * <ul>
@@ -238,6 +246,10 @@ public class RexSimplify {
    * and {@link #simplifyUnknownAsFalse(RexNode)} methods,
    * never calls {@link #verify(RexNode, RexUnknownAs, Function)}.
    * Verify adds an overhead that is only acceptable for a top-level call.
+   *
+   * 内部方法来简化表达式。
+
+   与公共的simplify(RexNode)和simplifyUnknownAsFalse(RexNode)方法不同，永远不要调用verify(RexNode, RexUnknownAs, Function)。Verify添加了一个仅可接受于顶级调用的开销。
    */
   RexNode simplify(RexNode e, RexUnknownAs unknownAs) {
     if (strong.isNull(e)) {

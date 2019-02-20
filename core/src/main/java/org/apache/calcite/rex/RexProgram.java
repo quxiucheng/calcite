@@ -606,8 +606,8 @@ public class RexProgram {
   }
 
   /**
-   * Returns whether this program projects precisely its input fields. It may
-   * or may not apply a condition.
+   * Returns whether this program projects precisely its input fields. It may or may not apply a condition.
+   * 返回此程序是否精确投影其输入字段。它可能适用也可能不适用条件。
    */
   public boolean projectsOnlyIdentity() {
     if (projects.size() != inputRowType.getFieldCount()) {
@@ -626,6 +626,8 @@ public class RexProgram {
    * Returns whether this program returns its input exactly.
    *
    * <p>This is a stronger condition than {@link #projectsIdentity(boolean)}.
+   *
+   * 返回此程序是否完全返回其输入。
    */
   public boolean isTrivial() {
     return getCondition() == null && projectsOnlyIdentity();

@@ -27,6 +27,8 @@ import java.util.Set;
 
 /**
  * Base class for any join whose condition is based on column equality.
+ * 条件基于列相等性的任何连接的基类
+ * 等值链接
  */
 public abstract class EquiJoin extends Join {
   public final ImmutableIntList leftKeys;

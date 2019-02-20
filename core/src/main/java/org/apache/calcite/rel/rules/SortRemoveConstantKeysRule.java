@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
  * constant, or removes the entire Sort if all keys are constant.
  *
  * <p>Requires {@link RelCollationTraitDef}.
+ * 移除sort中的常量值
  */
 public class SortRemoveConstantKeysRule extends RelOptRule {
   public static final SortRemoveConstantKeysRule INSTANCE =

@@ -41,6 +41,7 @@ import org.apache.calcite.util.Pair;
  * of the original {@link org.apache.calcite.rel.logical.LogicalCalc}'s inputs.
  *
  * @see FilterCalcMergeRule
+ * 合并project和Calc
  */
 public class ProjectCalcMergeRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

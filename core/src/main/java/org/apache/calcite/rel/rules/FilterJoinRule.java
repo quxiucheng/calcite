@@ -45,26 +45,31 @@ import static org.apache.calcite.plan.RelOptUtil.conjunctions;
 
 /**
  * Planner rule that pushes filters above and
- * within a join node into the join node and/or its children nodes.
+within a join node into the join node and/or its children nodes.
  */
 public abstract class FilterJoinRule extends RelOptRule {
   /** Predicate that always returns true. With this predicate, every filter
    * will be pushed into the ON clause. */
   public static final Predicate TRUE_PREDICATE = (join, joinType, exp) -> true;
 
-  /** Rule that pushes predicates from a Filter into the Join below them. */
+  /** Rule that pushes predicates from a Filter into the Join below them.
+   * 将Join中的谓词推送到连接的输入的规则。*/
   public static final FilterJoinRule FILTER_ON_JOIN =
       new FilterIntoJoinRule(true, RelFactories.LOGICAL_BUILDER,
           TRUE_PREDICATE);
 
   /** Dumber version of {@link #FILTER_ON_JOIN}. Not intended for production
    * use, but keeps some tests working for which {@code FILTER_ON_JOIN} is too
-   * smart. */
+   * smart.
+   * FILTER_ON_JOIN的Dumber版本。
+   * */
   public static final FilterJoinRule DUMB_FILTER_ON_JOIN =
       new FilterIntoJoinRule(false, RelFactories.LOGICAL_BUILDER,
           TRUE_PREDICATE);
 
-  /** Rule that pushes predicates in a Join into the inputs to the join. */
+  /** Rule that pushes predicates in a Join into the inputs to the join.
+   *将Join中的谓词推送到连接的输入的规则。
+   * */
   public static final FilterJoinRule JOIN =
       new JoinConditionPushRule(RelFactories.LOGICAL_BUILDER, TRUE_PREDICATE);
 

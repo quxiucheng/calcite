@@ -54,6 +54,10 @@ import java.util.List;
  * <p>Projections are pulled up if the
  * {@link org.apache.calcite.rel.logical.LogicalProject} doesn't originate from
  * a null generating input in an outer join.
+ *
+ * 匹配其输入为LogicalProject的联接的Planner规则，并将该项目拉出。
+
+ 如果LogicalProject不是由外部连接中的空生成输入生成的，则会拉出投影。
  */
 public class JoinProjectTransposeRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

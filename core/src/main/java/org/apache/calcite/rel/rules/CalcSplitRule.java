@@ -37,6 +37,10 @@ import com.google.common.collect.ImmutableList;
  * convert {@code Project} and {@code Filter} to {@code Calc}. But useful for
  * specific tasks, such as optimizing before calling an
  * {@link org.apache.calcite.interpreter.Interpreter}.
+ *
+ 将Calc转换为project和filter的Planner规则。
+
+ 默认情况下不启用，因为它与通常的流程(将项目和筛选器转换为Calc)相反，但是对于特定的任务非常有用，比如在调用解释器之前进行优化。
  */
 public class CalcSplitRule extends RelOptRule {
   public static final CalcSplitRule INSTANCE =

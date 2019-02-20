@@ -38,6 +38,8 @@ import java.util.List;
  *
  * @see CalcRemoveRule
  * @see ProjectMergeRule
+ *
+ * 删除多余的project
  */
 public class ProjectRemoveRule extends RelOptRule {
   public static final ProjectRemoveRule INSTANCE =

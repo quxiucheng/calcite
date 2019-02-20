@@ -38,6 +38,10 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * the predicates,
  * returns them in a {@link org.apache.calcite.plan.RelOptPredicateList}
  * and applies them appropriately.
+ *
+ * Planner规则，它从联接上推断谓词，如果可以将这些谓词推入其输入，则创建过滤器。
+
+ 使用RelMdPredicates来推断谓词，在RelOptPredicateList中返回它们并适当地应用它们。
  */
 public class JoinPushTransitivePredicatesRule extends RelOptRule {
   /** The singleton. */

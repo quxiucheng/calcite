@@ -86,6 +86,20 @@ import javax.annotation.Nonnull;
  * WHERE the_date BETWEEN DATE '2016-04-01' AND DATE '2016-06-30'</blockquote>
  *
  * <p>and is especially useful for Druid, which has a single timestamp column.
+ *
+ 计划器规则的集合，这些规则将EXTRACT(timeUnit FROM dateTime) = constant、FLOOR(dateTime to timeUnit = constant}和CEIL(dateTime to timeUnit = constant} to dateTime BETWEEN lower and upper)转换为常量。
+
+ 这些规则允许对时间维度表的查询进行转换，例如
+
+
+ 选择……从销售连接time_by_day使用(time_id)其中的time_by_day。年= 1997年，时=日。月(4,5,6)
+
+ 成
+
+
+ 选择……FROM sales JOIN time_by_day USING (time_id) WHERE the_date BETWEEN DATE '2016-04-01' AND DATE '2016-06-30'
+
+ 对于德鲁伊来说尤其有用，因为它只有一个时间戳列
  */
 public abstract class DateRangeRules {
 

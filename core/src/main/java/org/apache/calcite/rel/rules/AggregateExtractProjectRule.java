@@ -47,6 +47,27 @@ import java.util.List;
  *
  * <p>To prevent cycles, this rule will not extract a {@code Project} if the
  * {@code Aggregate}s input is already a {@code Project}.
+ *
+ * 规则从聚合中提取项目并将其向下推到输入端。
+ * 可以安全地向下推哪些投影取决于聚合使用哪些字段。
+ * 为了防止循环，如果聚合输入已经是项目，则此规则不会提取项目。
+ 提取聚合后的字段,推入到Project 中
+ sql:select empno, deptno, sum(empno)
+ from emp
+ group by grouping sets ((empno, deptno),(deptno),(empno))
+ 初始rel
+ LogicalAggregate(group=[{0, 1}], groups=[[{0, 1}, {0}, {1}]], EXPR$2=[SUM($0)])
+  LogicalProject(EMPNO=[$0], DEPTNO=[$7])
+    LogicalTableScan(table=[[CATALOG, SALES, EMP]])
+
+ preProgram优化
+ LogicalAggregate(group=[{0, 7}], groups=[[{0, 7}, {0}, {7}]], EXPR$2=[SUM($0)])
+  LogicalTableScan(table=[[CATALOG, SALES, EMP]])
+
+ after优化
+ LogicalAggregate(group=[{0, 1}], groups=[[{0, 1}, {0}, {1}]], EXPR$2=[SUM($0)])
+  LogicalProject(EMPNO=[$0], DEPTNO=[$7])
+    LogicalTableScan(table=[[CATALOG, SALES, EMP]])
  */
 public class AggregateExtractProjectRule extends RelOptRule {
 

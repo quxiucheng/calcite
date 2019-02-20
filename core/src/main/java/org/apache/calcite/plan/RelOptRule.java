@@ -243,6 +243,10 @@ public abstract class RelOptRule {
    * @param <R> Class of relational expression to match
    * @return Operand that matches a relational expression with a given
    *   list of children
+   * 创建一个操作数，该操作数将关系表达式与给定的子表达式列表匹配。
+   * 操作数(clazz, some(…))的简写。
+   * 如果希望匹配没有子节点(即叶节点)的关系表达式，则写入操作数(clazz, none())
+   * 如果希望匹配具有任意数量子表达式的关系表达式，请编写操作数(clazz, any())
    */
   public static <R extends RelNode> RelOptRuleOperand operand(
       Class<R> clazz,
@@ -363,6 +367,9 @@ public abstract class RelOptRule {
    *
    * @return List of child operands that signifies that the operand matches
    *   any number of child relational expressions
+   *
+   *   创建子操作数列表，该列表表示操作数与任意数量的子关系表达式匹配。
+   *   @return   子操作数的列表，表示操作数与任意数量的子关系表达式匹配
    */
   public static RelOptRuleOperandChildren any() {
     return RelOptRuleOperandChildren.ANY_CHILDREN;

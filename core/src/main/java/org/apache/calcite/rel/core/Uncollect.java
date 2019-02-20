@@ -43,6 +43,12 @@ import java.util.List;
  * <p>Like its inverse operation {@link Collect}, Uncollect is generally
  * invoked in a nested loop, driven by
  * {@link org.apache.calcite.rel.logical.LogicalCorrelate} or similar.
+ * 关系表达式，它将输入的列解嵌套到关系中。
+
+ 输入可能有多个列，但每个列必须是一个多集或数组。如果有序数，则输出包含一个额外的序数列。
+
+
+ 与反操作Collect类似，Uncollect通常在一个嵌套循环中调用，由logicalcorrelation或类似的驱动。
  */
 public class Uncollect extends SingleRel {
   public final boolean withOrdinality;

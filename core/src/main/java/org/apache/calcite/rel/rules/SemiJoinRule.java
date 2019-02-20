@@ -41,6 +41,7 @@ import java.util.function.Predicate;
  * Planner rule that creates a {@code SemiJoinRule} from a
  * {@link org.apache.calcite.rel.core.Join} on top of a
  * {@link org.apache.calcite.rel.logical.LogicalAggregate}.
+ * Join和LogicalAggregate 转化成SemiJoin
  */
 public abstract class SemiJoinRule extends RelOptRule {
   private static final Predicate<Join> IS_LEFT_OR_INNER =

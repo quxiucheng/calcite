@@ -50,6 +50,7 @@ import java.util.Map;
  * past a {@link org.apache.calcite.rel.core.Project}.
  *
  * @see org.apache.calcite.rel.rules.ProjectSortTransposeRule
+ * 将sort下推到project中
  */
 public class SortProjectTransposeRule extends RelOptRule {
   public static final SortProjectTransposeRule INSTANCE =

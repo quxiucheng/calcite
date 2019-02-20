@@ -43,6 +43,11 @@ public class SqlParser {
   //~ Instance fields --------------------------------------------------------
   private final SqlAbstractParserImpl parser;
 
+  /**
+   * 目前只有一下配置生效
+   * @param parser
+   * @param config
+   */
   //~ Constructors -----------------------------------------------------------
   private SqlParser(SqlAbstractParserImpl parser,
       Config config) {
@@ -222,13 +227,13 @@ public class SqlParser {
     int identifierMaxLength();
 
     /**
-     *
+     * 转义内 大小写转换
      * @return
      */
     Casing quotedCasing();
 
     /**
-     * 大小写转换
+     * 转义字符外 大小写转换
      * @return
      */
     Casing unquotedCasing();
@@ -240,7 +245,7 @@ public class SqlParser {
     Quoting quoting();
 
     /**
-     * 大小写匹配
+     * 大小写匹配 - 在planner内生效
      * @return
      */
     boolean caseSensitive();
@@ -252,6 +257,11 @@ public class SqlParser {
     SqlConformance conformance();
     @Deprecated // to be removed before 2.0
     boolean allowBangEqual();
+
+    /**
+     * 解析工厂类
+     * @return
+     */
     SqlParserImplFactory parserFactory();
   }
 

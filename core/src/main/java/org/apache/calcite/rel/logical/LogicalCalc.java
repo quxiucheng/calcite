@@ -60,14 +60,15 @@ import java.util.Set;
  *     merges two {@code LogicalCalc}s
  * </ul>
  *
- * 计算项目表达式和筛选器的关系表达式。
- * 这个关系表达式结合了LogicalProject和LogicalFilter的功能。应该在优化的后期创建它，将连续的LogicalProject和LogicalFilter节点合并在一起。
- * 以下是与LogicalCalc相关的规则:
- *  FilterToCalcRule creates this from a LogicalFilter
- ProjectToCalcRule creates this from a LogicalFilter
- FilterCalcMergeRule merges this with a LogicalFilter
- ProjectCalcMergeRule merges this with a LogicalProject
- CalcMergeRule merges two LogicalCalcs
+ 该表达式标示计算project和filter节点
+ 这个表达式结合了LogicalProject 和LogicalFilter的功能
+ 应该在优化后期创建,将LogicalProject和LogicalFilter节点结合到一起
+ 以下是与LogicalCalc相关的规则
+ FilterToCalcRule filter转换为LogicalCalc
+ ProjectToCalcRule project转换为LogicalCalc
+ FilterCalcMergeRule 将filter条件聚合
+ ProjectCalcMergeRule 将Project条件聚合
+ CalcMergeRule 聚合两个Calc
  */
 public final class LogicalCalc extends Calc {
   //~ Static fields/initializers ---------------------------------------------

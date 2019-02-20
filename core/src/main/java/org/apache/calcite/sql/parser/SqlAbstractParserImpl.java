@@ -457,6 +457,8 @@ public abstract class SqlAbstractParserImpl {
 
   /**
    * Sets the casing policy for quoted identifiers.
+   * ets the casing policy for unquoted identifiers.
+   * 设置带引号的标识符的大小写策略。
    *
    * @param quotedCasing Casing to set.
    */

@@ -51,6 +51,8 @@ import java.util.Set;
  * <p>Each output row has columns from the left and right inputs.
  * The set of output rows is a subset of the cartesian product of the two
  * inputs; precisely which subset depends on the join condition.
+ * 关系表达式，根据某种条件组合两个关系表达式。
+ * 每个输出行都有来自左右输入的列。输出行的集合是两个输入的笛卡尔积的子集;确切地说，哪个子集取决于连接条件。
  */
 public abstract class Join extends BiRel {
   //~ Instance fields --------------------------------------------------------
@@ -289,6 +291,7 @@ public abstract class Join extends BiRel {
 
   /**
    * Analyzes the join condition.
+   * 分析连接条件
    *
    * @return Analyzed join condition
    */

@@ -39,7 +39,13 @@ import java.util.Objects;
  * join info, especially those that are equi-joins and sub-class
  * {@link org.apache.calcite.rel.core.EquiJoin}.</p>
  *
- * @see Join#analyzeCondition() */
+ * @see Join#analyzeCondition()
+ * 分析的连接条件。
+ * 对于许多关心连接是否是等连接的算法来说，它是有用的。
+ * 您可以使用(org.apache.calcite.rel.core.JoinInfo#of())创建一个。
+ * 调用Join.analyzeCondition();许多类型的连接缓存它们的连接信息，特别是那些等速连接和等速连接子类。
+ *
+ * */
 public abstract class JoinInfo {
   public final ImmutableIntList leftKeys;
   public final ImmutableIntList rightKeys;

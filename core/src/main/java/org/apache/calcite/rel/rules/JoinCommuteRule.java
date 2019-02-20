@@ -48,14 +48,21 @@ import java.util.List;
  *
  * <p>To preserve the order of columns in the output row, the rule adds a
  * {@link org.apache.calcite.rel.core.Project}.
+ *
+ 计划器规则，它对联接的输入进行排序。
+
+ 通过在构造函数中指定swapOuter标志，可以打开/关闭外部连接的排列。
+
+
+ 为了保持输出行中列的顺序，该规则添加了一个项目。
  */
 public class JoinCommuteRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------
 
-  /** Instance of the rule that only swaps inner joins. */
+  /** Instance of the rule that only swaps inner joins. 仅交换内部联接的规则的实例 */
   public static final JoinCommuteRule INSTANCE = new JoinCommuteRule(false);
 
-  /** Instance of the rule that swaps outer joins as well as inner joins. */
+  /** Instance of the rule that swaps outer joins as well as inner joins. 交换外连接以及内连接的规则的实例。 */
   public static final JoinCommuteRule SWAP_OUTER = new JoinCommuteRule(true);
 
   private final boolean swapOuter;

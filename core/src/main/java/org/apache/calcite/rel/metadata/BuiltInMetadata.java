@@ -36,6 +36,7 @@ import java.util.Set;
 
 /**
  * Contains the interfaces for several common forms of metadata.
+ * 包含几种常见元数据形式的接口。
  */
 public abstract class BuiltInMetadata {
 
@@ -299,6 +300,7 @@ public abstract class BuiltInMetadata {
      *
      * @return estimated percentage (between 0.0 and 1.0), or null if no
      * reliable estimate can be determined
+     * 估计如果删除所有单表筛选条件，关系表达式实际生成的行数占其生成的行数的百分比。
      */
     Double getPercentageOriginalRows();
 
@@ -536,15 +538,16 @@ public abstract class BuiltInMetadata {
   }
 
   /** Metadata about the predicates that hold in the rows emitted from a
-   * relational expression. */
+   * relational expression.
+   * 关于存储在关系表达式发出的行中的谓词的元数据。
+   * */
   public interface Predicates extends Metadata {
     MetadataDef<Predicates> DEF = MetadataDef.of(Predicates.class,
         Predicates.Handler.class, BuiltInMethod.PREDICATES.method);
 
     /**
-     * Derives the predicates that hold on rows emitted from a relational
-     * expression.
-     *
+     * Derives the predicates that hold on rows emitted from a relational expression.
+     * 派生保留从关系表达式发出的行的谓词
      * @return Predicate list
      */
     RelOptPredicateList getPredicates();

@@ -55,6 +55,23 @@ import org.apache.calcite.tools.RelBuilderFactory;
  *
  * <p>See the superclass for details on restrictions regarding which
  * {@link org.apache.calcite.rel.logical.LogicalProject}s cannot be pulled.
+ *
+ * MultiJoinProjectTransposeRule实现了提取位于多连接之上和之下的逻辑项目的规则，这样逻辑项目就会出现在逻辑连接之上。
+
+ 在这样做的过程中，还可以在结果多连接中保存有关我们正在提取的LogicalProject中的表达式中引用的各个字段的信息以及连接条件
+
+
+ 例如，如果我们有以下子查询:
+
+ (select X.x1, Y.y1 from X, Y
+ where X.x2 = Y.y2 and X.x3 = 1 and Y.y3 = 2)
+ 与(X, Y)相关联的多连接将x1与X相关联，y1与Y相关联，尽管由于过滤器的原因需要读取x3和y3，但是在行扫描完成后不需要读取它们，因此不会保存它们。连接字段x2和y2也分别被跟踪。
+
+
+ 注意，通过只提取多连接之上的项目，我们可以在行扫描之上保留投影。
+
+
+ 有关无法提取逻辑项目的限制的详细信息，请参见超类。
  */
 public class MultiJoinProjectTransposeRule extends JoinProjectTransposeRule {
   //~ Static fields/initializers ---------------------------------------------

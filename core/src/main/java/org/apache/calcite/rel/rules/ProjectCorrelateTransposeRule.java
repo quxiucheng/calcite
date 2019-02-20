@@ -42,6 +42,7 @@ import java.util.Map;
 
 /**
  * Push Project under Correlate to apply on Correlate's left and right child
+ * 在Correlate下按Project以应用于Correlate的左右孩子
  */
 public class ProjectCorrelateTransposeRule  extends RelOptRule {
 

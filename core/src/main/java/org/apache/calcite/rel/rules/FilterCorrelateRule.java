@@ -38,6 +38,7 @@ import java.util.List;
 /**
  * Planner rule that pushes a {@link Filter} above a {@link Correlate} into the
  * inputs of the Correlate.
+ * 将filter下推到Correlate
  */
 public class FilterCorrelateRule extends RelOptRule {
 

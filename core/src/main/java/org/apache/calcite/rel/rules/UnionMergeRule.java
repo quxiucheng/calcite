@@ -38,6 +38,7 @@ import org.apache.calcite.util.Util;
  *
  * <p>Originally written for {@link Union} (hence the name),
  * but now also applies to {@link Intersect}.
+ * 将多个union合并到一起
  */
 public class UnionMergeRule extends RelOptRule {
   public static final UnionMergeRule INSTANCE =

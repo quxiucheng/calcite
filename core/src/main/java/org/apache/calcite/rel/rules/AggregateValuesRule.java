@@ -51,6 +51,13 @@ import java.util.List;
  * <p>This rule only applies to "grand totals", that is, {@code GROUP BY ()}.
  * Any non-empty {@code GROUP BY} clause will return one row per group key
  * value, and each group will consist of at least one row.
+ *
+ * 将聚合应用于值(当前仅为空值)的规则。
+ * 这仍然很有用，因为PruneEmptyRules。AGGREGATE_INSTANCE不处理聚合，这是因为空关系的聚合需要一些特殊的处理:将生成一行，其中每一列的值取决于特定的聚合调用(例如COUNT是0,SUM是NULL)。
+ Sample query where this matters:
+
+ SELECT COUNT(*) FROM s.foo WHERE 1 = 0
+ 此规则仅适用于“总计”，即GROUP BY()。任何非空的GROUP BY子句将为每个组键值返回一行，并且每个组至少由一行组成。
  */
 public class AggregateValuesRule extends RelOptRule {
   public static final AggregateValuesRule INSTANCE =

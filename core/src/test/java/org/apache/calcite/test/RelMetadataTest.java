@@ -70,6 +70,7 @@ import org.apache.calcite.rel.metadata.RelMdColumnUniqueness;
 import org.apache.calcite.rel.metadata.RelMdUtil;
 import org.apache.calcite.rel.metadata.RelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataQuery;
+import org.apache.calcite.rel.rel2sql.RelToSqlConverterTest;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexCall;
@@ -2439,6 +2440,8 @@ public class RelMetadataTest extends SqlToRelTestBase {
             builder.field(1, 0, 0),
             builder.field(1, 0, 1)))
         .build();
+    RelToSqlConverterTest toSqlConverterTest = new RelToSqlConverterTest();
+    System.out.println(toSqlConverterTest.toSql(filter1));
     assertEquals("=($0, $1)",
         mq.getPulledUpPredicates(filter1).pulledUpPredicates.get(0).toString());
   }

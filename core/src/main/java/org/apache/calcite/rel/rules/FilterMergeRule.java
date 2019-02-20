@@ -29,6 +29,7 @@ import org.apache.calcite.tools.RelBuilder;
 import org.apache.calcite.tools.RelBuilderFactory;
 
 /**
+ * 合并filter
  * Planner rule that combines two
  * {@link org.apache.calcite.rel.logical.LogicalFilter}s.
  */

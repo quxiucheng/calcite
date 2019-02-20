@@ -18,7 +18,7 @@ package org.apache.calcite.rel.metadata;
 
 /**
  * Marker interface for a handler of metadata.
- *
+ * 元数据处理程序的标记接口。
  * @param <M> Kind of metadata
  */
 public interface MetadataHandler<M extends Metadata> {

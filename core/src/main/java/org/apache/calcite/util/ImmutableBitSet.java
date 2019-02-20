@@ -42,6 +42,7 @@ import javax.annotation.Nonnull;
 
 /**
  * An immutable list of bits.
+ * 一个不可变的位列表
  */
 public class ImmutableBitSet
     implements Iterable<Integer>, Serializable, Comparable<ImmutableBitSet> {

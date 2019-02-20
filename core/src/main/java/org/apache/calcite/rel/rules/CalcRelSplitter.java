@@ -74,6 +74,15 @@ import java.util.Set;
  *
  * <p>See {@link ProjectToWindowRule}
  * for an example of how this class is used.
+ CalcRelSplitter对具有多个RexCall子表达式的Calc进行操作，这些子表达式不能由单个具体RelNode实现。
+
+ 例如，Java和Fennel计算器不实现相同的一组操作符。Calc可用于使用混合Java和Fennel only操作符将单个Calc拆分为Calc对象树，每个Calc对象都可以由Java或Fennel单独实现。并将其分解为几个Calc实例。
+
+
+ 目前拆分器只能处理两种“rel类型”。也就是说，它可以处理Java vs. Fennel Calc，但不能处理Java vs. Fennel vs.其他类型的Calc。
+
+
+ 有关如何使用该类的示例，请参见ProjectToWindowRule。
  */
 public abstract class CalcRelSplitter {
   //~ Static fields/initializers ---------------------------------------------

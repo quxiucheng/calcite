@@ -74,16 +74,17 @@ import java.util.Set;
  * providers. Then supply that instance to the planner via the appropriate
  * plugin mechanism.
  *
- * RelMetadataQuery在RelMetadataProvider之上为一组关系表达式元数据查询提供了强类型facade，这些查询在calcite中定义为标准。这些方法上的Javadoc是它们的主要规范。
+ *
+ * RelMetadataQuery在RelMetadataProvider之上为一组关系表达式元数据查询提供了强类型门面方式，这些查询在Calcite中定义为标准。这些方法上的Javadoc是它们的主要规范
  * 要向该接口添加新的标准查询Xyz，请遵循以下步骤:
- *  向该类中添加一个静态方法getXyz规范。
- *  向org.apache.calcite.test.RelMetadataTest中添加单元测试。
- *  在这个包中编写一个新的provider类RelMdXyz。遵循现有类(如RelMdColumnOrigins)的模式，重载查询应用到的所有逻辑关系表达式。
- *  添加一个类似于RelMdColumnOrigins.SOURCE的源静态成员。
-    在DefaultRelMetadataProvider中注册源对象。
-    让单元测试工作。
+ * 1.向该类中添加一个静态方法getXyz规范。
+ * 2.向org.apache.calcite.test.RelMetadataTest中添加单元测试。
+ * 3.在这个包中编写一个新的provider类RelMdXyz。遵循现有类(如RelMdColumnOrigins)的模式，重载查询应用到的所有逻辑关系表达式。
+ * 4.添加一个类似于RelMdColumnOrigins.SOURCE的源静态成员。
+ * 5.在DefaultRelMetadataProvider中注册源对象。
  * 因为关系表达式元数据是可扩展的，所以扩展项目可以定义类似的外观，以便指定对定制元数据的访问。请不要在这里(也不要在RelNode上)添加在扩展名之外没有意义的查询。
  * 除了添加新的元数据查询之外，扩展项目可能还需要为标准查询添加定制的提供者，以便处理额外的关系表达式(逻辑或物理)。在这两种情况下，过程都是相同的:编写一个反射提供程序并将其链接到DefaultRelMetadataProvider的实例上，将其预先挂起到默认提供程序。然后通过适当的插件机制将该实例提供给计划器。
+ * RelMetadataQuery进行metadata访问的
  */
 public class RelMetadataQuery {
   /** Set of active metadata queries, and cache of previous results. */
@@ -225,10 +226,12 @@ public class RelMetadataQuery {
    * Returns the
    * {@link BuiltInMetadata.RowCount#getRowCount()}
    * statistic.
+   * Returns the BuiltInMetadata.RowCount.getRowCount() statistic.
    *
    * @param rel the relational expression
    * @return estimated row count, or null if no reliable estimate can be
    * determined
+   * 估计的行数，如果不能确定可靠的估计，则为null
    */
   public Double getRowCount(RelNode rel) {
     for (;;) {
@@ -286,6 +289,7 @@ public class RelMetadataQuery {
    *
    * @param rel the relational expression
    * @return estimated cost, or null if no reliable estimate can be determined
+   * 估计成本，如果无法确定可靠估计，则为null
    */
   public RelOptCost getCumulativeCost(RelNode rel) {
     for (;;) {
@@ -305,6 +309,7 @@ public class RelMetadataQuery {
    *
    * @param rel the relational expression
    * @return estimated cost, or null if no reliable estimate can be determined
+   * 估计成本，如果无法确定可靠估计，则为null
    */
   public RelOptCost getNonCumulativeCost(RelNode rel) {
     for (;;) {
@@ -323,8 +328,8 @@ public class RelMetadataQuery {
    * statistic.
    *
    * @param rel the relational expression
-   * @return estimated percentage (between 0.0 and 1.0), or null if no
-   * reliable estimate can be determined
+   * @return estimated percentage (between 0.0 and 1.0), or null if no reliable estimate can be determined
+   * 估计百分比（介于0.0和1.0之间），如果无法确定可靠的估计值，则为null
    */
   public Double getPercentageOriginalRows(RelNode rel) {
     for (;;) {
@@ -798,7 +803,8 @@ public class RelMetadataQuery {
    * statistic.
    *
    * @param rel the relational expression
-   * @return Predicates that can be pulled above this RelNode
+   * @return Predicates that can be pulled above this RelNode 可以在此RelNode之上拉的谓词
+   * 可以从这个RelNode上面拉出的谓词
    */
   public RelOptPredicateList getPulledUpPredicates(RelNode rel) {
     for (;;) {

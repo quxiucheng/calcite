@@ -88,6 +88,30 @@ import java.util.Map;
  * <p>Since many of these rewrites introduce multiple occurrences of simpler
  * forms like {@code COUNT(x)}, the rule gathers common sub-expressions as it
  * goes.
+ 聚合中的聚合函数简化为更简单的形式。
+ AVG(x) → SUM(x) / COUNT(x)
+ STDDEV_POP(x) → SQRT( (SUM(x * x) - SUM(x) * SUM(x) / COUNT(x)) / COUNT(x))
+ STDDEV_SAMP(x) → SQRT( (SUM(x * x) - SUM(x) * SUM(x) / COUNT(x)) / CASE COUNT(x) WHEN 1 THEN NULL ELSE COUNT(x) - 1 END)
+ VAR_POP(x) → (SUM(x * x) - SUM(x) * SUM(x) / COUNT(x)) / COUNT(x)
+ VAR_SAMP(x) → (SUM(x * x) - SUM(x) * SUM(x) / COUNT(x)) / CASE COUNT(x) WHEN 1 THEN NULL ELSE COUNT(x) - 1 END
+ COVAR_POP(x, y) → (SUM(x * y) - SUM(x, y) * SUM(y, x) / REGR_COUNT(x, y)) / REGR_COUNT(x, y)
+ COVAR_SAMP(x, y) → (SUM(x * y) - SUM(x, y) * SUM(y, x) / REGR_COUNT(x, y)) / CASE REGR_COUNT(x, y) WHEN 1 THEN NULL ELSE REGR_COUNT(x, y) - 1 END
+ REGR_SXX(x, y) → REGR_COUNT(x, y) * VAR_POP(y)
+ REGR_SYY(x, y) → REGR_COUNT(x, y) * VAR_POP(x)
+
+ sql:select name, max(name), avg(deptno), min(name) from sales.dept group by name
+
+ preProgram优化
+ LogicalAggregate(group=[{0}], EXPR$1=[MAX($0)], EXPR$2=[AVG($1)], EXPR$3=[MIN($0)])
+  LogicalProject(NAME=[$1], DEPTNO=[$0])
+    LogicalTableScan(table=[[CATALOG, SALES, DEPT]])
+
+ planner优化
+ LogicalProject(NAME=[$0], EXPR$1=[$1], EXPR$2=[CAST(/($2, $3)):INTEGER NOT NULL], EXPR$3=[$4])
+  LogicalAggregate(group=[{0}], EXPR$1=[MAX($0)], agg#1=[$SUM0($1)], agg#2=[COUNT()], EXPR$3=[MIN($0)])
+    LogicalProject(NAME=[$1], DEPTNO=[$0])
+      LogicalTableScan(table=[[CATALOG, SALES, DEPT]])
+ 由于许多重写会引入多次出现的COUNT(x)等更简单的形式，因此该规则在执行时收集公共子表达式。
  */
 public class AggregateReduceFunctionsRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------

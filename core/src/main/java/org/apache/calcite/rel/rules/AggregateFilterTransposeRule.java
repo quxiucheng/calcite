@@ -54,6 +54,40 @@ import java.util.List;
  * under an aggregate to an existing aggregate table.
  *
  * @see org.apache.calcite.rel.rules.FilterAggregateTransposeRule
+计划器规则，它匹配筛选器上的聚合并对其进行置换，将聚合推入筛选器之下。
+
+在某些情况下，有必要拆分聚合。
+
+
+这条规则不能直接提高性能。聚合将不得不处理更多的行，以生成将被丢弃的聚合行。如果谓词的计算代价非常高，则该规则可能是有益的。该规则的主要用途是将聚合下具有筛选器的查询与现有聚合表匹配。
+
+将聚合下推到filter中
+
+sql:
+select * from (select name, count(0) as cnt from hr.emps group by name ) t where name='1'
+
+原始:
+LogicalProject(name=[$0], cnt=[$1])
+ LogicalFilter(condition=[=(CAST($0):VARCHAR CHARACTER SET "ISO-8859-1" COLLATE "ISO-8859-1$en_US$primary", '1')])
+  LogicalAggregate(group=[{0}], cnt=[COUNT()])
+   LogicalProject(name=[$2], $f1=[0])
+    EnumerableTableScan(table=[[hr, emps]])
+
+
+pre执行:
+LogicalProject(name=[$0], cnt=[$1])
+ LogicalAggregate(group=[{0}], cnt=[COUNT()])
+  LogicalFilter(condition=[=(CAST($0):VARCHAR CHARACTER SET "ISO-8859-1" COLLATE "ISO-8859-1$en_US$primary", '1')])
+   LogicalProject(name=[$2], $f1=[0])
+    EnumerableTableScan(table=[[hr, emps]])
+
+
+after执行:
+LogicalProject(name=[$0], cnt=[$1])
+ LogicalFilter(condition=[=(CAST($0):VARCHAR CHARACTER SET "ISO-8859-1" COLLATE "ISO-8859-1$en_US$primary", '1')])
+  LogicalAggregate(group=[{0}], cnt=[COUNT()])
+   LogicalProject(name=[$2], $f1=[0])
+    EnumerableTableScan(table=[[hr, emps]])
  */
 public class AggregateFilterTransposeRule extends RelOptRule {
   public static final AggregateFilterTransposeRule INSTANCE =

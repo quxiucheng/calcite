@@ -16,8 +16,8 @@
  */
 
 /**
- * Defines metadata interfaces and utilities for relational
- * expressions.
+ * Defines metadata interfaces and utilities for relational expressions.
+ * 为关系表达式定义元数据接口和实用程序。
  */
 @PackageMarker
 package org.apache.calcite.rel.metadata;

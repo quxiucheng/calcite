@@ -119,6 +119,17 @@ import javax.annotation.Nonnull;
  *   <li> For Full Outer Joins no predicates are pulledUp or inferred.
  *   </ul>
  * </ol>
+ *
+ * 推断适用于RelNode之上的谓词的实用程序。
+
+ 这是JoinPushTransitivePredicatesRule当前使用的，用于推断可以从连接的一边推断到另一边的谓词。
+
+
+ 拉升策略是合理的，但并不完整。以下是一些限制:
+ 1.对于聚合，我们只拉出只包含分组键的谓词。可以将其扩展为从聚合列上的表达式推断聚合表达式上的谓词。如。
+ select a, max(b) from R1 where b > 7
+ → max(b) > 7 or max(b) is null
+
  */
 public class RelMdPredicates
     implements MetadataHandler<BuiltInMetadata.Predicates> {
@@ -465,6 +476,15 @@ public class RelMdPredicates
    * <li>'<code>R1(x) join R2(y) on x = y join R3(z) on y = z</code>' a call for
    * equivalentPredicates on the second join '<code>x &gt; 7</code>' will return
    * </ol>
+   *
+   * 实用程序，用于从连接的一侧推断应用于另一侧的谓词。
+   * 合同:
+      使用左子树和右子树上的连接和可选谓词进行初始化。
+      然后，您可以向它请求给定谓词的等价谓词。
+   所以对于:
+
+   1. 'R1(x) join R2(y) on x = y' a call for equivalentPredicates(等价的谓词) on 'x > 7' will return ' [y > 7]'
+   2. 'R1(x) join R2(y) on x = y join R3(z) on y = z' a call for equivalentPredicates on the second join 'x > 7' will return
    */
   static class JoinConditionBasedPredicateInference {
     final Join joinRel;

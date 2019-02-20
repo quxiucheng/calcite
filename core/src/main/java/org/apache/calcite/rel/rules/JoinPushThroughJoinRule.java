@@ -61,6 +61,8 @@ import java.util.List;
  *
  * <p>Before the rule, one join has two conditions and the other has none
  * ({@code ON TRUE}). After the rule, each join has one condition.</p>
+ *
+ * 将连接的右输入通过连接的左输入推入的规则，前提是左输入也是连接。
  */
 public class JoinPushThroughJoinRule extends RelOptRule {
   /** Instance of the rule that works on logical joins only, and pushes to the

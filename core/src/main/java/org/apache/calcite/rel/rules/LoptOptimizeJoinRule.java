@@ -58,8 +58,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Planner rule that implements the heuristic planner for determining optimal
- * join orderings.
+ * Planner rule that implements the heuristic planner for determining optimal join orderings.
+ *
+ * 规划器规则，用于实现用于确定最佳连接顺序的启发式规划器
  *
  * <p>It is triggered by the pattern
  * {@link org.apache.calcite.rel.logical.LogicalProject}

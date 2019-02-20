@@ -50,6 +50,13 @@ import java.util.Objects;
  * <p>When a materialization is defined, if it involves a join, it is converted
  * to a query on top of a star table. Queries that are candidates to map onto
  * the materialization are mapped onto the same star table.</p>
+ *
+ 由两个或多个连接在一起的表组成的虚拟表。
+
+ 星形表不会出现在最终用户查询中。优化器引入它们是为了帮助查询与物化匹配，并且仅在规划过程中使用。
+
+
+ 在定义物化时，如果它涉及连接，则将其转换为星型表上的查询。映射到物化的候选查询映射到相同的星型表。
  */
 public class StarTable extends AbstractTable implements TranslatableTable {
   public final Lattice lattice;

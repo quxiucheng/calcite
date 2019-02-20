@@ -55,6 +55,9 @@ import static org.apache.calcite.plan.RelOptRule.unordered;
  * <p>Conventionally, the way to represent an empty relational expression is
  * with a {@link Values} that has no tuples.
  *
+ * 删除查询计划中已知永远不会生成任何行的部分的规则的集合。
+
+ 通常，表示空关系表达式的方法是使用没有元组的值。
  * @see LogicalValues#createEmpty
  */
 public abstract class PruneEmptyRules {

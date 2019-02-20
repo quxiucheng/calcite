@@ -49,6 +49,7 @@ import org.apache.calcite.rel.metadata.CachingRelMetadataProvider;
 import org.apache.calcite.rel.metadata.ChainedRelMetadataProvider;
 import org.apache.calcite.rel.metadata.DefaultRelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataProvider;
+import org.apache.calcite.rel.rel2sql.RelToSqlConverter;
 import org.apache.calcite.rel.rules.AggregateExpandDistinctAggregatesRule;
 import org.apache.calcite.rel.rules.AggregateExtractProjectRule;
 import org.apache.calcite.rel.rules.AggregateFilterTransposeRule;
@@ -63,6 +64,7 @@ import org.apache.calcite.rel.rules.CalcMergeRule;
 import org.apache.calcite.rel.rules.CoerceInputsRule;
 import org.apache.calcite.rel.rules.DateRangeRules;
 import org.apache.calcite.rel.rules.FilterAggregateTransposeRule;
+import org.apache.calcite.rel.rules.FilterAndSortRule;
 import org.apache.calcite.rel.rules.FilterJoinRule;
 import org.apache.calcite.rel.rules.FilterMergeRule;
 import org.apache.calcite.rel.rules.FilterMultiJoinMergeRule;
@@ -113,6 +115,7 @@ import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.runtime.Hook;
 import org.apache.calcite.sql.SemiJoinType;
+import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlOperator;
@@ -384,8 +387,13 @@ public class RelOptRulesTest extends RelOptTestBase {
   @Test public void testPushFilterPastAgg() {
     checkPlanning(FilterAggregateTransposeRule.INSTANCE,
         "select dname, c from"
-            + " (select name dname, count(*) as c from dept group by name) t"
-            + " where dname = 'Charlie'");
+            + " (select name dname, count(*) as c from dept where deptno=1 group by name) t"
+            + " where dname = 'Charlie' and c >500");
+  }
+
+  @Test public void testFilterSort() {
+    checkPlanning(FilterAndSortRule.INSTANCE,
+            "select name,deptno from dept where name = '1' and deptno = 2 and upper(name) = '222' and deptno+2=2 and name||cast(deptno as varchar)='123456'");
   }
 
   private void basePushFilterPastAggWithGroupingSets(boolean unchanged)
@@ -612,7 +620,7 @@ public class RelOptRulesTest extends RelOptTestBase {
             .build();
     final String sql = "select dept.* from dept join (\n"
         + "  select distinct deptno from emp\n"
-        + "  where sal > 100) using (deptno)";
+        + "  ) using (deptno)";
     sql(sql)
         .withDecorrelation(true)
         .withTrim(true)
@@ -949,6 +957,15 @@ public class RelOptRulesTest extends RelOptTestBase {
         .build();
     sql(sql).with(program).check();
   }
+  @Test public void testAggregateExpandDistinctAggregatesRule() {
+    final String sql = "  select name, count(dept.deptno) as cn,sum(dept.deptno) as sm\n"
+            + "  from sales.dept group by name\n";
+    final HepProgram program = HepProgram.builder()
+            .addRuleInstance(AggregateExpandDistinctAggregatesRule.INSTANCE)
+            .build();
+    sql(sql).with(program).check();
+  }
+
 
   /** Test case for
    * <a href="https://issues.apache.org/jira/browse/CALCITE-1621">[CALCITE-1621]
@@ -2756,6 +2773,22 @@ public class RelOptRulesTest extends RelOptTestBase {
     checkPlanning(tester, preProgram, new HepPlanner(program), sql);
   }
 
+  @Test
+  public void testAggregateFilterTransposeRule() {
+    // final String sql = "select ename, sal, deptno from ("
+    //         + "  select ename, sal, deptno"
+    //         + "  from emp"
+    //         + "  where sal > 5000)"
+    //         + "group by ename, sal, deptno";
+    String sql = "select ename, sal from (  select ename, sal, deptno  from emp  where sal > 5000)";
+    HepProgram program = HepProgram.builder()
+            .addRuleInstance(ProjectMergeRule.INSTANCE)
+            // .addRuleInstance(ProjectFilterTransposeRule.INSTANCE)
+            // .addRuleInstance(AggregateFilterTransposeRule.INSTANCE)
+            .build();
+    checkPlanning(program, sql);
+  }
+
   @Test public void testPullFilterThroughAggregateGroupingSets()
       throws Exception {
     HepProgram preProgram = HepProgram.builder()
@@ -2886,6 +2919,15 @@ public class RelOptRulesTest extends RelOptTestBase {
             + "  select deptno as x, empno as y, sal as z, sal * 2 as zz\n"
             + "  from emp)\n"
             + "group by rollup(x, y)");
+  }
+
+  @Test public void testAggregateProjectMergeRule() {
+    final String sql = "select sum(sal)\n"
+            + "from emp";
+    HepProgram program = new HepProgramBuilder()
+            .addRuleInstance(AggregateProjectMergeRule.INSTANCE)
+            .build();
+    checkPlanning(program,sql);
   }
 
   @Test public void testAggregateExtractProjectRule() {
@@ -3633,7 +3675,7 @@ public class RelOptRulesTest extends RelOptTestBase {
   @Test public void testPushJoinCondDownToProject() {
     final HepProgram program = new HepProgramBuilder()
         .addRuleInstance(FilterJoinRule.FILTER_ON_JOIN)
-        .addRuleInstance(JoinPushExpressionsRule.INSTANCE)
+        // .addRuleInstance(JoinPushExpressionsRule.INSTANCE)
         .build();
     checkPlanning(program,
         "select d.deptno, e.deptno from sales.dept d, sales.emp e"
@@ -4248,7 +4290,10 @@ public class RelOptRulesTest extends RelOptTestBase {
             builder.call(SqlStdOperatorTable.IS_NOT_DISTINCT_FROM,
             builder.field("DEPTNO"), builder.literal(20)))
         .build();
-
+    RelToSqlConverter relToSqlConverter = new RelToSqlConverter(SqlDialect.DatabaseProduct.MYSQL.getDialect());
+    final SqlNode sqlNode = relToSqlConverter.visitChild(0, root).asStatement();
+    String sql = sqlNode.toSqlString(SqlDialect.DatabaseProduct.MYSQL.getDialect()).getSql();
+    System.out.println(sql);
     HepProgram preProgram = new HepProgramBuilder().build();
     HepPlanner prePlanner = new HepPlanner(preProgram);
     prePlanner.setRoot(root);

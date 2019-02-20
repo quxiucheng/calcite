@@ -44,6 +44,7 @@ import java.util.Map;
 
 /**
  * Planner rule that pulls up constants through a Union operator.
+ * 提取常量值
  */
 public class UnionPullUpConstantsRule extends RelOptRule {
 

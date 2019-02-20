@@ -40,6 +40,12 @@ import java.util.Objects;
  * <p>Several implementations of SortExchange are possible; the purpose of this
  * base class allows rules to be written that apply to all of those
  * implementations.
+ * 同时执行交换和排序的关系表达式。
+
+ 排序产生具有特定重新排序的输出，交换产生具有特定重新分布的输出，而SortExchange的输出同时具有所需的排序和分布。
+
+
+ SortExchange的几种实现是可能的;这个基类的目的是允许编写适用于所有这些实现的规则。
  */
 public abstract class SortExchange extends Exchange {
   protected final RelCollation collation;

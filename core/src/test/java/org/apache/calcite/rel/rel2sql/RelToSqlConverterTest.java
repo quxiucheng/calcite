@@ -131,7 +131,7 @@ public class RelToSqlConverterTest {
   }
 
   /** Converts a relational expression to SQL. */
-  private String toSql(RelNode root) {
+  public String toSql(RelNode root) {
     return toSql(root, SqlDialect.DatabaseProduct.CALCITE.getDialect());
   }
 

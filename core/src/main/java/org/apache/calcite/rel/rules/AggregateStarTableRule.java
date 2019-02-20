@@ -58,6 +58,12 @@ import java.util.List;
  *
  * <p>This pattern indicates that an aggregate table may exist. The rule asks
  * the star table for an aggregate table at the required level of aggregation.
+ *
+ 在StarTable.StarTableScan上匹配聚合的Planner规则。
+
+ 此模式表明可能存在聚合表。该规则要求星型表提供所需聚合级别的聚合表。
+
+ 试验未做
  */
 public class AggregateStarTableRule extends RelOptRule {
   public static final AggregateStarTableRule INSTANCE =

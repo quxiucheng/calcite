@@ -32,6 +32,7 @@ import org.apache.calcite.tools.RelBuilderFactory;
 /**
  * Planner rule that pushes a {@link org.apache.calcite.rel.core.Project}
  * past a {@link org.apache.calcite.rel.core.Filter}.
+ * 下推Project到filter
  */
 public class ProjectFilterTransposeRule extends RelOptRule {
   public static final ProjectFilterTransposeRule INSTANCE =

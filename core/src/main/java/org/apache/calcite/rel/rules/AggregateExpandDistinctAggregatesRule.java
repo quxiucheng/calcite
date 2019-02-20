@@ -74,17 +74,41 @@ import java.util.TreeSet;
  * (e.g. {@code COUNT(DISTINCT x), COUNT(DISTINCT y)})
  * the rule creates separate {@code Aggregate}s and combines using a
  * {@link org.apache.calcite.rel.core.Join}.
+ *
+ * 计划器规则，它从聚合中展开不同的聚合(如COUNT(distinct x))。
+ * 如何做到这一点取决于函数的参数。如果所有函数都有相同的参数(例如COUNT(DISTINCT x), SUM(DISTINCT x)都有参数x)，那么一个额外的聚合就足够了。
+ * 如果有多个参数(例如COUNT(DISTINCT x)、COUNT(DISTINCT y))，则规则创建单独的聚合并使用连接进行组合。
+
+
+
+ AggregateExpandDistinctAggregatesRule.JOIN
+ SELECT deptno, SUM(comm), MIN(comm), COUNT(DISTINCT sal, deptno, comm) FROM emp GROUP BY deptno
+
+ preProgram优化
+ LogicalAggregate(group=[{0}], EXPR$1=[SUM($1)], EXPR$2=[MIN($1)], EXPR$3=[COUNT(DISTINCT $2, $0, $1)])
+  LogicalProject(DEPTNO=[$7], COMM=[$6], SAL=[$5])
+    LogicalTableScan(table=[[CATALOG, SALES, EMP]])
+
+ planner优化
+ LogicalAggregate(group=[{0}], EXPR$1=[SUM($3)], EXPR$2=[MIN($4)], EXPR$3=[COUNT($2, $0, $1)])
+  LogicalAggregate(group=[{0, 1, 2}], EXPR$1=[SUM($1)], EXPR$2=[MIN($1)])
+    LogicalProject(DEPTNO=[$7], COMM=[$6], SAL=[$5])
+      LogicalTableScan(table=[[CATALOG, SALES, EMP]])
  */
 public final class AggregateExpandDistinctAggregatesRule extends RelOptRule {
   //~ Static fields/initializers ---------------------------------------------
 
-  /** The default instance of the rule; operates only on logical expressions. */
+  /**
+   * The default instance of the rule; operates only on logical expressions.
+   * 规则的默认实例;仅对逻辑表达式起作用
+   * */
   public static final AggregateExpandDistinctAggregatesRule INSTANCE =
       new AggregateExpandDistinctAggregatesRule(LogicalAggregate.class, true,
           RelFactories.LOGICAL_BUILDER);
 
-  /** Instance of the rule that operates only on logical expressions and
-   * generates a join. */
+  /** Instance of the rule that operates only on logical expressions and generates a join.
+   * 仅对逻辑表达式进行操作并生成连接的规则实例
+   * */
   public static final AggregateExpandDistinctAggregatesRule JOIN =
       new AggregateExpandDistinctAggregatesRule(LogicalAggregate.class, false,
           RelFactories.LOGICAL_BUILDER);

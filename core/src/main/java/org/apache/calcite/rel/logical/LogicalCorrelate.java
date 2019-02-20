@@ -41,7 +41,7 @@ import org.apache.calcite.util.Litmus;
  *
  * @see org.apache.calcite.rel.core.CorrelationId
  *
- * 执行嵌套循环连接的关系运算符
+ * 类似 nested-loop joins.
  * LogicalCorrelate用于表示相关查询。一种实现策略是将表达式去相关。
  */
 public final class LogicalCorrelate extends Correlate {

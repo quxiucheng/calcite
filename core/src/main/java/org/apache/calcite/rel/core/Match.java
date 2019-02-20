@@ -52,6 +52,9 @@ import java.util.TreeSet;
  * Relational expression that represent a MATCH_RECOGNIZE node.
  *
  * <p>Each output row has the columns defined in the measure statements.
+ *
+ * 表示MATCH_RECOGNIZE节点的关系表达式。
+ * 每个输出行都包含在measure语句中定义的列。
  */
 public abstract class Match extends SingleRel {
   //~ Instance fields ---------------------------------------------

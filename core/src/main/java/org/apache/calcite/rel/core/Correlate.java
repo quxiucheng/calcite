@@ -41,9 +41,13 @@ import java.util.Set;
 /**
  * A relational operator that performs nested-loop joins.
  *
+ * 关系运算符 nested-loop joins
+ *
  * <p>It behaves like a kind of {@link org.apache.calcite.rel.core.Join},
  * but works by setting variables in its environment and restarting its
  * right-hand input.
+ * 关系表达式有点类似Join ,
+ * 但它的工作原理是在它的环境中设置变量并重新启动右边的输入。
  *
  * <p>Correlate is not a join since: typical rules should not match Correlate.
  *
@@ -74,12 +78,17 @@ import java.util.Set;
  关联用于表示相关的查询。一种实现策略是解关联表达式。
 
 
+ Nested Loops常执行Inner Join(内部联接)、Left Outer Join(左外部联接)、Left Semi Join(左半部联接)和Left Anti Semi Join(左反半部联接)逻辑操作。
+ 
  物理操作到逻辑操作的映射
  Physical operation	Logical operation
+
  NestedLoops	Correlate(A, B, regular)
  NestedLoopsOuter	Correlate(A, B, outer)
  NestedLoopsSemi	Correlate(A, B, semi)
  NestedLoopsAnti	Correlate(A, B, anti)
+
+
  HashJoin	EquiJoin(A, B)
  HashJoinOuter	EquiJoin(A, B, outer)
  HashJoinSemi	SemiJoin(A, B, semi)

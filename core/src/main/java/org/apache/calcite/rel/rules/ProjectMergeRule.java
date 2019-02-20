@@ -35,6 +35,7 @@ import java.util.List;
  * ProjectMergeRule merges a {@link org.apache.calcite.rel.core.Project} into
  * another {@link org.apache.calcite.rel.core.Project},
  * provided the projects aren't projecting identical sets of input references.
+ * ProjectMergeRule将一个项目合并到另一个项目中，前提是项目不投射相同的输入引用集。
  */
 public class ProjectMergeRule extends RelOptRule {
   public static final ProjectMergeRule INSTANCE =

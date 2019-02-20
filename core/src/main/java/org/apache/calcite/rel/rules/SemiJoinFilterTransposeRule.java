@@ -35,6 +35,8 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * <p>SemiJoin(LogicalFilter(X), Y) &rarr; LogicalFilter(SemiJoin(X, Y))
  *
  * @see SemiJoinProjectTransposeRule
+ *
+ * semiJoin下推到filter
  */
 public class SemiJoinFilterTransposeRule extends RelOptRule {
   public static final SemiJoinFilterTransposeRule INSTANCE =

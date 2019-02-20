@@ -41,6 +41,7 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * <p>At the moment, we only consider left/right outer joins.
  * However, an extension for full outer joins for this rule could be envisioned.
  * Special attention should be paid to null values for correctness issues.
+ * sort下推到join中
  */
 public class SortJoinTransposeRule extends RelOptRule {
 

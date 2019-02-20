@@ -32,6 +32,7 @@ import org.apache.calcite.tools.RelBuilderFactory;
  *
  * <p>It should only be enabled if all SemiJoins in the plan are advisory; that
  * is, they can be safely dropped without affecting the semantics of the query.
+ * SemiJoin
  */
 public class SemiJoinRemoveRule extends RelOptRule {
   public static final SemiJoinRemoveRule INSTANCE =

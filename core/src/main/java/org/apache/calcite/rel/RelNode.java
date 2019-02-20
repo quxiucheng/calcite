@@ -296,6 +296,7 @@ public interface RelNode extends RelOptNode, Cloneable {
 
   /**
    * Returns a metadata interface.
+   * 返回元数据接口。
    *
    * @param <M> Type of metadata being requested
    * @param metadataClass Metadata interface

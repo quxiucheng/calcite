@@ -34,6 +34,13 @@ import org.apache.calcite.tools.RelBuilderFactory;
  * <p>The constructor is parameterized to allow any sub-class of
  * {@link org.apache.calcite.rel.core.Join}, not just
  * {@link org.apache.calcite.rel.logical.LogicalJoin}.</p>
+ *
+ * 将内连接转换为笛卡尔内连接之上的过滤器的规则。
+
+ 这种转换的一个好处是，在它之后，连接条件可以与连接上面的条件和表达式相结合。它还使FennelCartesianJoinRule适用。
+
+
+ 构造函数被参数化以允许Join的任何子类，而不仅仅是LogicalJoin。
  */
 public final class JoinExtractFilterRule extends AbstractJoinExtractFilterRule {
   //~ Static fields/initializers ---------------------------------------------

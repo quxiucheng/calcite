@@ -32,6 +32,7 @@ import java.util.List;
 /**
  * Planner rule that pushes a {@link org.apache.calcite.rel.core.Sort} past a
  * {@link org.apache.calcite.rel.core.Union}.
+ * sort移动到union下
  *
  */
 public class SortUnionTransposeRule extends RelOptRule {
