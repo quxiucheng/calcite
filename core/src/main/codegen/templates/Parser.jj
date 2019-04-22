@@ -562,6 +562,7 @@ JAVACODE boolean matchesPrefix(int[] seq, int[][] prefixes)
 
 /*****************************************
  * Syntactical Descriptions              *
+ * 语法描述
  *****************************************/
 
 /**
