@@ -18,7 +18,7 @@ package org.apache.calcite.sql.validate;
 
 /**
  * An enumeration of moniker types.
- *
+ * 枚举的名字类型。
  * <p>Used in {@link SqlMoniker}.
  */
 public enum SqlMonikerType {

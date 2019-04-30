@@ -47,6 +47,21 @@ import java.util.List;
  *
  * @see SqlValidator
  * @see SqlValidatorScope
+ * https://calcite.apache.org/apidocs/org/apache/calcite/sql/validate/SqlValidatorNamespace.html
+ * 命名空间描述了SQL查询的一部分返回的关系。
+ * 例如，在查询SELECT emp.deptno，age FROM emp，dept中，
+ * FROM子句形成一个由两个表EMP和DEPT组成的命名空间，以及一个由这些表的组合列组成的行类型。
+ * 命名空间的其他示例包括from列表中的表（命名空间包含组成列）和子查询（命名空间包含子查询的SELECT子句中的列）
+ * 这些不同类型的命名空间由表名的IdentifierNamespace类，SELECT查询的SelectNamespace，UNION的SetopNamespace，EXCEPT和INTERSECT等实现。
+  但是，如果您正在查看SELECT查询并调用SqlValidator.getNamespace（org.apache.calcite.sql.SqlNode），则可能无法获得SelectNamespace。
+  为什么？
+  因为允许验证器将名称空间包装在实现SqlValidatorNamespace的其他对象中。
+  您的SelectNamespace将在某处，但可能是一个或两个级别。
+  不要尝试强制命名空间或使用instanceof;
+  使用unwrap（Class）和isWrapperFor（Class）代替
+ *
+ *
+ *
  */
 public interface SqlValidatorNamespace {
   //~ Methods ----------------------------------------------------------------
@@ -93,7 +108,7 @@ public interface SqlValidatorNamespace {
 
   /**
    * Returns the row type of this namespace, sans any system columns.
-   *
+   * 返回此命名空间的行类型，不包含任何系统列。
    * @return Row type sans system columns
    */
   RelDataType getRowTypeSansSystemColumns();

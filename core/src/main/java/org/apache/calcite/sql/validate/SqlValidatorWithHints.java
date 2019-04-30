@@ -26,6 +26,8 @@ import java.util.List;
  * Extends {@link SqlValidator} to allow discovery of useful data such as fully
  * qualified names of sql objects, alternative valid sql objects that can be
  * used in the SQL statement (dubbed as hints)
+ *
+ * 扩展SqlValidator，以允许发现有用的数据，如sql对象的完全限定名、可在sql语句中使用的其他有效sql对象(称为提示)
  */
 public interface SqlValidatorWithHints extends SqlValidator {
   //~ Methods ----------------------------------------------------------------
@@ -45,6 +47,9 @@ public interface SqlValidatorWithHints extends SqlValidator {
    *                all the possible table names in 'sales' schema
    * @return an array of {@link SqlMoniker} (sql identifiers) that can fill in
    * at the indicated position
+   *
+   * 查找已解析为表达式树的语法正确的SQL语句的完成提示。(注意，这应该在SqlValidator.validate(org.apache.calcite.sql.SqlNode)之后调用。
+   *
    */
   List<SqlMoniker> lookupHints(SqlNode topNode, SqlParserPos pos);
 
@@ -61,6 +66,8 @@ public interface SqlValidatorWithHints extends SqlValidator {
    * @return a string of the fully qualified name of the {@link SqlIdentifier}
    * if the Parser position represents a valid {@link SqlIdentifier}. Else
    * return an empty string
+   *
+   * 注意:只有在调用SqlValidator.validate(org.apache.calcite.sql.SqlNode)之后才调用它。
    */
   SqlMoniker lookupQualifiedName(SqlNode topNode, SqlParserPos pos);
 }

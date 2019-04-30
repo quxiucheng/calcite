@@ -192,6 +192,14 @@ public class CalciteMetaImpl extends MetaImpl {
         cursorFactory, Frame.EMPTY);
   }
 
+  /**
+   * 创建结果集合
+   * @param internalParameters
+   * @param columns
+   * @param cursorFactory
+   * @param firstFrame
+   * @return
+   */
   protected MetaResultSet createResultSet(
       Map<String, Object> internalParameters, List<ColumnMetaData> columns,
       CursorFactory cursorFactory, final Frame firstFrame) {
@@ -547,6 +555,7 @@ public class CalciteMetaImpl extends MetaImpl {
             calciteConnection.server.getStatement(h);
         final Context context = statement.createPrepareContext();
         final CalcitePrepare.Query<Object> query = toQuery(context, sql);
+        // 解析sql
         signature = calciteConnection.parseQuery(query, context, maxRowCount);
         statement.setSignature(signature);
         final int updateCount;

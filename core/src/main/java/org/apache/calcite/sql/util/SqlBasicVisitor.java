@@ -33,6 +33,9 @@ import org.apache.calcite.sql.SqlNodeList;
  * methods it chooses.
  *
  * @param <R> Return type
+ * SqlVisitor的基本实现，它在每个节点上什么也不做。
+
+这个类作为实现SqlVisitor接口的类的基类非常有用。派生类可以覆盖它选择的任何方法。
  */
 public class SqlBasicVisitor<R> implements SqlVisitor<R> {
   //~ Methods ----------------------------------------------------------------

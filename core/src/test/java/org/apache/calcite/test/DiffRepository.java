@@ -451,6 +451,8 @@ public class DiffRepository {
         // insensitivity, it can report on the line
         // at which the first diff occurs, which is useful
         // for largish snippets
+        System.out.println("expected2 :\n" + expected2);
+        System.out.println("actual :\n" +actual);
         String expected2Canonical =
             expected2.replace(Util.LINE_SEPARATOR, "\n");
         String actualCanonical =
@@ -460,6 +462,7 @@ public class DiffRepository {
             expected2Canonical,
             actualCanonical);
       } catch (ComparisonFailure e) {
+
         amend(expected, actual);
         throw e;
       }

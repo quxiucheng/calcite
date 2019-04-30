@@ -21,6 +21,7 @@ import java.util.Locale;
 
 /**
  * SqlAccessType is represented by a set of allowed access types
+ * 由一组允许的访问类型表示
  */
 public class SqlAccessType {
   //~ Static fields/initializers ---------------------------------------------

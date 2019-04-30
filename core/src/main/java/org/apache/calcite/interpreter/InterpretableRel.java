@@ -27,6 +27,7 @@ import java.util.Map;
 
 /**
  * Relational expression that can implement itself using an interpreter.
+ * 可以使用解释器实现自身的关系表达式。
  */
 public interface InterpretableRel extends RelNode {
   /** Creates an interpreter node to implement this relational expression. */

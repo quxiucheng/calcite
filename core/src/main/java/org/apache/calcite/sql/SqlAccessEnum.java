@@ -18,6 +18,7 @@ package org.apache.calcite.sql;
 
 /**
  * Enumeration representing different access types
+ * 枚举表示不同的访问类型
  */
 public enum SqlAccessEnum {
   SELECT, UPDATE, INSERT, DELETE;

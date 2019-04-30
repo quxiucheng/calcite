@@ -17,6 +17,7 @@
 
 /**
  * Query optimizer rules for Java calling convention.
+ * 查询Java调用约定的优化器规则
  */
 @PackageMarker
 package org.apache.calcite.adapter.enumerable;

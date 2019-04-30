@@ -17,6 +17,7 @@
 
 /**
  * Provides a pretty-printer for SQL statements.
+ * 为SQL语句提供漂亮的打印机。
  */
 @PackageMarker
 package org.apache.calcite.sql.pretty;

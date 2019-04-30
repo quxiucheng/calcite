@@ -990,6 +990,7 @@ SqlNode SqlStmt() :
 
 /**
  * Parses an SQL statement followed by the end-of-file symbol.
+ 解析SQL语句，后跟文件结束符号。
  */
 SqlNode SqlStmtEof() :
 {
@@ -2988,6 +2989,7 @@ SqlNode LeafQueryOrExpr(ExprContext exprContext) :
 
 /**
  * Parses a row expression or a parenthesized expression of any kind.
+ 解析任何类型的行表达式或带括号的表达式。
  */
 SqlNode Expression(ExprContext exprContext) :
 {
@@ -4247,8 +4249,8 @@ void SimpleIdentifierCommaList(List<SqlNode> list) :
 }
 
 /**
-  * List of simple identifiers in parentheses. The position extends from the
-  * open parenthesis to the close parenthesis.
+  * List of simple identifiers in parentheses. The position extends from the open parenthesis to the close parenthesis.
+  * 括号中的简单标识符列表。该位置从左括号延伸到右括号
   */
 SqlNodeList ParenthesizedSimpleIdentifierList() :
 {

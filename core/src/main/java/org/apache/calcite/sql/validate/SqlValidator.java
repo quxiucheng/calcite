@@ -109,10 +109,21 @@ import java.util.Map;
  * to resolve
  * names in a particular clause of a SQL statement.</p>
  *
- * 查询的不同部分有不同类型的名称空间。例如，用于表名的IdentifierNamespace，用于选择查询的SelectNamespace，用于UNION的SetopNamespace, EXCEPT和INTERSECT。验证器允许将名称空间包装在实现SqlValidatorNamespace的其他对象中，因此不要尝试强制转换名称空间或使用instanceof;改为使用SqlValidatorNamespace.unwrap(类)和SqlValidatorNamespace.isWrapperFor(类)。
+ * 查询的不同部分有不同类型的名称空间。
+ * 例如，用于表名的IdentifierNamespace，用于选择查询的SelectNamespace，用于UNION的SetopNamespace, EXCEPT和INTERSECT。
+ * 验证器允许将名称空间包装在实现SqlValidatorNamespace的其他对象中，
+ * 因此不要尝试强制转换名称空间或使用instanceof
+ * ;改为使用SqlValidatorNamespace.unwrap(类)和SqlValidatorNamespace.isWrapperFor(类)。
  *
- * 验证器通过在首次提供根SqlNode时对查询进行快速扫描来构建映射。然后，在调用验证方法时，它提供正确的范围或名称空间对象。
- * 方法getSelectScope(org.apache.calcite.sql.SqlSelect)， getFromScope(org.apache.calcite.sql.SqlSelect)， getWhereScope(org.apache.calcite.sql.SqlSelect)， getGroupScope(org.apache.calcite.sql.SqlSelect)， getHavingScope(org.apache.calcite.sql.SqlSelect)， getOrderScope(org.apache.calcite.sql.SqlSelect)和getJoinScope(org.apache.calcite.sql.SqlNode)获得正确的作用域来解析SQL语句特定子句中的名称
+ * 验证器通过在首次提供根SqlNode时对查询进行快速扫描来构建映射。
+ * 然后，在调用验证方法时，它提供正确的范围或名称空间对象。
+ * 方法getSelectScope(org.apache.calcite.sql.SqlSelect)，
+ * getFromScope(org.apache.calcite.sql.SqlSelect)，
+ * getWhereScope(org.apache.calcite.sql.SqlSelect)，
+ * getGroupScope(org.apache.calcite.sql.SqlSelect)，
+ * getHavingScope(org.apache.calcite.sql.SqlSelect)，
+ * getOrderScope(org.apache.calcite.sql.SqlSelect)和
+ * getJoinScope(org.apache.calcite.sql.SqlNode)获得正确的作用域来解析SQL语句特定子句中的名称
  */
 public interface SqlValidator {
   /**
@@ -152,6 +163,7 @@ public interface SqlValidator {
    *
    * @param topNode top of expression tree to be validated
    * @return validated tree (possibly rewritten)
+   * 验证表达式树。您可以多次调用此方法，但不能重复调用此方法。
    */
   SqlNode validate(SqlNode topNode);
 
@@ -163,6 +175,8 @@ public interface SqlValidator {
    * @param nameToTypeMap map of simple name to {@link RelDataType}; used to
    *                      resolve {@link SqlIdentifier} references
    * @return validated tree (possibly rewritten)
+   * 验证表达式树。
+  您可以多次调用此方法，但不能重复调用此方法。
    */
   SqlNode validateParameterizedExpression(
       SqlNode topNode,
@@ -200,6 +214,7 @@ public interface SqlValidator {
 
   /**
    * Returns the type assigned to a node by validation.
+   * 返回通过验证分配给节点的类型
    *
    * @param node the node of interest
    * @return validated type, never null
@@ -214,6 +229,9 @@ public interface SqlValidator {
    *
    * @param node the node of interest
    * @return validated type, or null if unknown or not applicable
+   * 返回通过验证分配给节点的类型，如果未知则返回null。
+  这允许对诸如别名之类的节点进行查询，这些节点没有自己的类型。
+  如果要断言感兴趣的节点必须具有类型，请改用getValidatedNodeType（org.apache.calcite.sql.SqlNode）
    */
   RelDataType getValidatedNodeTypeIfKnown(SqlNode node);
 
@@ -222,6 +240,7 @@ public interface SqlValidator {
    *
    * @param id    Identifier
    * @param scope Naming scope
+   * 将标识符解析为完全限定名称
    */
   void validateIdentifier(SqlIdentifier id, SqlValidatorScope scope);
 
@@ -488,7 +507,7 @@ public interface SqlValidator {
 
   /**
    * Returns an object representing the "unknown" type.
-   *
+   *  返回表示“未知”类型的对象。
    * @return unknown type
    */
   RelDataType getUnknownType();

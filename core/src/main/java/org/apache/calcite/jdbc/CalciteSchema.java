@@ -52,6 +52,8 @@ import java.util.Set;
  * Schema.
  *
  * <p>Wrapper around user-defined schema used internally.</p>
+ * 内部使用的用户定义模式的包装器。
+ *
  */
 public abstract class CalciteSchema {
 
@@ -473,6 +475,7 @@ public abstract class CalciteSchema {
    * <p>When <code>addMetadataSchema</code> argument is true adds a "metadata"
    * schema containing definitions of tables, columns etc. to root schema.
    * By default, creates a {@link CachingCalciteSchema}.
+   * 当addMetadataSchema参数为true时，将包含表、列等定义的“元数据”模式添加到根模式。默认情况下，创建一个CachingCalciteSchema。
    */
   public static CalciteSchema createRootSchema(boolean addMetadataSchema) {
     return createRootSchema(addMetadataSchema, true);

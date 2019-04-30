@@ -32,6 +32,12 @@
  *
  * <p>There are several examples of schemas in the
  * <a href="https://calcite.apache.org/docs/tutorial.html">tutorial</a>.
+ * 提供JSON格式的模型文件，定义模式和其他元数据。
+ * 使用JDBC连接字符串上的model = <uri>参数指定模型。
+ Calcite在初始化连接时加载模型。
+ 它首先解析JSON，然后使用ModelHandler作为解析树上的访问者。
+
+ 有模式和表的标准实现，但用户可以通过实现SchemaFactory或TableFactory接口并在模型中包含自定义模式来提供自己的模式。
  */
 @PackageMarker
 package org.apache.calcite.model;

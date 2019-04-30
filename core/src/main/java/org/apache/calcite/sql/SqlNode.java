@@ -39,6 +39,9 @@ import java.util.Set;
  * <p>It may be an
  * {@link SqlOperator operator}, {@link SqlLiteral literal},
  * {@link SqlIdentifier identifier}, and so forth.
+ *
+ *   SqlNode是一个SQL解析树。
+ * 它可以是一个操作符、文字、标识符等等。
  */
 public abstract class SqlNode implements Cloneable {
   //~ Static fields/initializers ---------------------------------------------
@@ -245,6 +248,8 @@ public abstract class SqlNode implements Cloneable {
    *
    * <p>The type parameter <code>R</code> must be consistent with the type
    * parameter of the visitor.
+   *
+   * 接受普通访问者。
    */
   public abstract <R> R accept(SqlVisitor<R> visitor);
 

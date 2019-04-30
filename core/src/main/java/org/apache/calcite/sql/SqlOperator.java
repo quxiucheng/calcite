@@ -326,8 +326,8 @@ public abstract class SqlOperator {
 
   /**
    * Writes a SQL representation of a call to this operator to a writer,
-   * including parentheses if the operators on either side are of greater
-   * precedence.
+   * including parentheses if the operators on either side are of greater precedence.
+   *
    *
    * <p>The default implementation of this method delegates to
    * {@link SqlSyntax#unparse}.

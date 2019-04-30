@@ -50,7 +50,7 @@ public class JdbcExample {
         statement.executeQuery("select *\n"
             + "from \"foodmart\".\"sales_fact_1997\" as s\n"
             + "join \"hr\".\"emps\" as e\n"
-            + "on e.\"empid\" = s.\"cust_id\"");
+            + "on e.\"empid\" = s.\"cust_id\" where e.\"empid\" =100");
     final StringBuilder buf = new StringBuilder();
     while (resultSet.next()) {
       int n = resultSet.getMetaData().getColumnCount();

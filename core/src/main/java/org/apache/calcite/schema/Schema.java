@@ -71,6 +71,7 @@ public interface Schema {
 
   /**
    * Returns a type with a given name, or null if not found.
+   * 返回具有给定名称的类型，如果未找到，则返回null。
    *
    * @param name Table name
    * @return Table, or null

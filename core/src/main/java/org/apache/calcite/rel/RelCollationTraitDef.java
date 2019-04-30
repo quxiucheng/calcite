@@ -35,6 +35,13 @@ import org.apache.calcite.rel.logical.LogicalSort;
  * <code>{the_year, the_month, the_date}</code> and also by
  * <code>{time_id}</code>. We have to allow a RelNode to belong to more than
  * one RelSubset (these RelSubsets are always in the same set).</p>
+ *
+排序特征的定义。
+
+ 排序是一种物理属性(即特征)，因为它可以在不丢失信息的情况下进行更改。执行此操作的转换器是排序操作符。
+
+
+ 与当前的其他特征不同，RelNode可以同时具有该特征的多个值。例如，LogicalTableScan(table=TIME_BY_DAY)可以按{the_year, the_month, the_date}和{time_id}进行排序。我们必须允许一个RelNode属于多个rel子集(这些rel子集总是在同一个集合中)。
  */
 public class RelCollationTraitDef extends RelTraitDef<RelCollation> {
   public static final RelCollationTraitDef INSTANCE =

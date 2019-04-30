@@ -25,6 +25,7 @@ import java.util.Objects;
  * output is to be sorted.
  *
  * @see RelCollation
+ * RelNode的一个字段的排序的定义，该字段的输出要排序。
  */
 public class RelFieldCollation {
   /** Utility method that compares values taking into account null

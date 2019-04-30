@@ -1229,7 +1229,7 @@ public class SqlToRelConverterTest extends SqlToRelTestBase {
   @Test public void testExistsCorrelated() {
     final String sql = "select*from emp where exists (\n"
         + "  select 1 from dept where emp.deptno=dept.deptno)";
-    sql(sql).decorrelate(false).ok();
+    sql(sql).decorrelate(true).ok();
   }
 
   @Test public void testNotExistsCorrelated() {
@@ -1829,7 +1829,7 @@ public class SqlToRelConverterTest extends SqlToRelTestBase {
    * match</a>. */
   @Test public void testSortWithTrim() {
     final String sql = "select ename from (select * from emp order by sal) a";
-    sql(sql).trim(true).ok();
+    sql(sql).trim(false).ok();
   }
 
   @Test public void testOffset0() {
@@ -3027,6 +3027,7 @@ public class SqlToRelConverterTest extends SqlToRelTestBase {
     }
 
     public void convertsTo(String plan) {
+      System.out.println(plan);
       tester.withExpand(expand)
           .withDecorrelation(decorrelate)
           .withConformance(conformance)

@@ -25,6 +25,7 @@ import java.util.List;
 
 /**
  * An interface of an object identifier that represents a SqlIdentifier
+ * 表示SqlIdentifier的对象标识符的接口
  */
 public interface SqlMoniker {
   Comparator<SqlMoniker> COMPARATOR =
@@ -46,6 +47,7 @@ public interface SqlMoniker {
 
   /**
    * Returns the type of object referred to by this moniker. Never null.
+   * 返回此名字对象引用的对象类型。永远不会。
    */
   SqlMonikerType getType();
 

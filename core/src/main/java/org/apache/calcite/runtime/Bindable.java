@@ -21,6 +21,7 @@ import org.apache.calcite.linq4j.Enumerable;
 
 /**
  * Statement that can be bound to a {@link DataContext} and then executed.
+ * 可以绑定到DataContext然后执行的语句。
  *
  * @param <T> Element type of the resulting enumerable
  */
@@ -32,6 +33,8 @@ public interface Bindable<T> {
    *
    * @param dataContext Environment that provides tables
    * @return Enumerable over rows
+   *
+   * 执行此语句并返回可枚举的行。环境参数提供环境根(通常是模式)中的值。
    */
   Enumerable<T> bind(DataContext dataContext);
 }

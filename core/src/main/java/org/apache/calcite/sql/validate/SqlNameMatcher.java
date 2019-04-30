@@ -60,7 +60,9 @@ public interface SqlNameMatcher {
    */
   RelDataTypeField field(RelDataType rowType, String fieldName);
 
-  /** Returns how many times a string occurs in a collection.
+  /**
+   * Returns how many times a string occurs in a collection.
+   * 返回字符串在集合中出现的次数。
    *
    * <p>Similar to {@link java.util.Collections#frequency}. */
   int frequency(Iterable<String> names, String name);

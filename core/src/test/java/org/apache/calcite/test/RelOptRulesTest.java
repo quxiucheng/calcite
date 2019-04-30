@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.test;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.calcite.config.CalciteConnectionConfigImpl;
 import org.apache.calcite.plan.Context;
 import org.apache.calcite.plan.Contexts;
@@ -64,7 +65,6 @@ import org.apache.calcite.rel.rules.CalcMergeRule;
 import org.apache.calcite.rel.rules.CoerceInputsRule;
 import org.apache.calcite.rel.rules.DateRangeRules;
 import org.apache.calcite.rel.rules.FilterAggregateTransposeRule;
-import org.apache.calcite.rel.rules.FilterAndSortRule;
 import org.apache.calcite.rel.rules.FilterJoinRule;
 import org.apache.calcite.rel.rules.FilterMergeRule;
 import org.apache.calcite.rel.rules.FilterMultiJoinMergeRule;
@@ -77,7 +77,6 @@ import org.apache.calcite.rel.rules.JoinAddRedundantSemiJoinRule;
 import org.apache.calcite.rel.rules.JoinCommuteRule;
 import org.apache.calcite.rel.rules.JoinExtractFilterRule;
 import org.apache.calcite.rel.rules.JoinProjectTransposeRule;
-import org.apache.calcite.rel.rules.JoinPushExpressionsRule;
 import org.apache.calcite.rel.rules.JoinPushTransitivePredicatesRule;
 import org.apache.calcite.rel.rules.JoinToMultiJoinRule;
 import org.apache.calcite.rel.rules.JoinUnionTransposeRule;
@@ -128,9 +127,6 @@ import org.apache.calcite.sql2rel.SqlToRelConverter;
 import org.apache.calcite.test.catalog.MockCatalogReader;
 import org.apache.calcite.tools.RelBuilder;
 import org.apache.calcite.util.ImmutableBitSet;
-
-import com.google.common.collect.ImmutableList;
-
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -143,7 +139,6 @@ import java.util.function.Predicate;
 import static org.apache.calcite.plan.RelOptRule.none;
 import static org.apache.calcite.plan.RelOptRule.operand;
 import static org.apache.calcite.plan.RelOptRule.operandJ;
-
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -391,10 +386,6 @@ public class RelOptRulesTest extends RelOptTestBase {
             + " where dname = 'Charlie' and c >500");
   }
 
-  @Test public void testFilterSort() {
-    checkPlanning(FilterAndSortRule.INSTANCE,
-            "select name,deptno from dept where name = '1' and deptno = 2 and upper(name) = '222' and deptno+2=2 and name||cast(deptno as varchar)='123456'");
-  }
 
   private void basePushFilterPastAggWithGroupingSets(boolean unchanged)
       throws Exception {

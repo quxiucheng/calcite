@@ -44,6 +44,10 @@ import java.util.List;
  * garbage collected. The conversion information consists of a graph of
  * conversions (from one calling convention to another) and a map of graph arcs
  * to {@link ConverterRule}s.
+ *
+ * 约定特征的定义。为每个注册至少一个ConverterRule实例的计划器创建一组新的转换信息。
+
+ 转换数据保存在带有弱键的LoadingCache中，这样JVM的垃圾收集器就可以在计划器本身被垃圾收集之后回收转换数据。转换信息由转换图(从一个调用约定到另一个调用约定)和转换规则的图形弧映射组成。
  */
 public class ConventionTraitDef extends RelTraitDef<Convention> {
   //~ Static fields/initializers ---------------------------------------------

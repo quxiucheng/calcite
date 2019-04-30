@@ -35,6 +35,10 @@ import java.util.List;
  * <p>This class is useful as a base class for classes which implement the
  * {@link SqlVisitor} interface and have {@link SqlNode} as the return type. The
  * derived class can override whichever methods it chooses.
+ *
+ * SqlVisitor的基本实现，它不改变返回每个叶子节点。
+
+ 这个类作为实现SqlVisitor接口并将SqlNode作为返回类型的类的基类非常有用。派生类可以覆盖它选择的任何方法。
  */
 public class SqlShuttle extends SqlBasicVisitor<SqlNode> {
   //~ Methods ----------------------------------------------------------------

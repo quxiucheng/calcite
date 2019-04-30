@@ -17,6 +17,8 @@
 
 /**
  * SQL unparsers for JDBC dialects.
+ *
+ * sql 方言配置
  */
 @PackageMarker
 package org.apache.calcite.sql.dialect;

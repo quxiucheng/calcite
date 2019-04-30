@@ -17,6 +17,7 @@
 
 /**
  * Utility classes for the SQL object model, parsing, and validation.
+ * 用于SQL对象模型、解析和验证的实用程序类。
  */
 @PackageMarker
 package org.apache.calcite.sql.util;

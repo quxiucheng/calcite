@@ -358,7 +358,7 @@ public interface CalcitePrepare {
         // "no limit", and 0 is a valid limit.
         enumerable = EnumerableDefaults.take(enumerable, maxRowCount);
       }
-      return enumerable;
+       return enumerable;
     }
 
     public List<RelCollation> getCollationList() {

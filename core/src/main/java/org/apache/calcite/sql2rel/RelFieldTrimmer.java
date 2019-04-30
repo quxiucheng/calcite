@@ -98,6 +98,16 @@ import java.util.Set;
  * particular order. For instance, it may avoid a project at the top of the
  * tree just for reordering. Could ease the transition by writing methods that
  * convert BitSet to Mapping and vice versa.
+ *
+ Transformer遍历关系表达式树，用只投射使用者所需列的“精简”关系表达式替换每个RelNode。
+
+ 使用多种方法为每种关系表达式类型触发正确的规则。这允许对transformer进行扩展，而不需要向RelNode添加新方法，也不需要分散到四方的规则类集合。
+
+
+ 查看:jhyde, 2009/7/28: sql2rel是这个类的正确包吗?修剪字段并不是SQL-to-Rel转换的重要部分，它可能属于优化阶段。但这种变压器不符合规划规则的一般模式;这样做很困难，因为每个RelNode在修剪之后需要返回不同的字段集。
+
+
+ TODO:改变trimFields的第二个参数(org.apache.calcite.rel)。RelNode org.apache.calcite.util。方法从位集到映射。有时，如果您以特定的顺序返回列，那么它会帮助使用者。例如，它可能只是为了重新排序而避免树顶的项目。可以通过编写将位集转换为映射的方法来简化这种转换，反之亦然。
  */
 public class RelFieldTrimmer implements ReflectiveVisitor {
   //~ Static fields/initializers ---------------------------------------------

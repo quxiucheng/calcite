@@ -20,8 +20,7 @@ import org.apache.calcite.DataContext;
 import org.apache.calcite.linq4j.Enumerable;
 
 /**
- * Table that can be scanned without creating an intermediate relational
- * expression.
+ * Table that can be scanned without creating an intermediate relational expression.
  */
 public interface ScannableTable extends Table {
   /** Returns an enumerator over the rows in this Table. Each row is represented

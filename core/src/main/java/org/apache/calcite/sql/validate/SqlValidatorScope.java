@@ -49,23 +49,28 @@ import java.util.Objects;
  * 名称解析的范围。表示表达式之外的解析树中的任何位置，或具有列的解析树中的任何位置。
  *
  * 验证表达式时，说“foo”。
- * 首先使用解析(java.util.List)。字符串>,org.apache.calcite.sql.validate。SqlNameMatcher, boolean, org.apache.calcite.sql. validatorscope . defined)方法，该方法用于定义表达式以定位“foo”。如果成功，则返回一个描述结果对象类型的名称空间。
+ * 首先使用解析(java.util.List)。字符串>
+ * ,org.apache.calcite.sql.validate。SqlNameMatcher, boolean, org.apache.calcite.sql. validatorscope . defined)方法
+ * ，该方法用于定义表达式以定位“foo”。如果成功，则返回一个描述结果对象类型的名称空间。
  */
 public interface SqlValidatorScope {
   //~ Methods ----------------------------------------------------------------
 
   /**
    * Returns the validator which created this scope.
+   * 返回创建此范围的验证程序。
    */
   SqlValidator getValidator();
 
   /**
    * Returns the root node of this scope. Never null.
+   * 返回此范围的根节点。永远不会。
    */
   SqlNode getNode();
 
   /**
    * Looks up a node with a given name. Returns null if none is found.
+   * 查找具有给定名称的节点。如果未找到，则返回null。
    *
    * @param names       Name of node to find, maybe partially or fully qualified
    * @param nameMatcher Name matcher
@@ -82,8 +87,8 @@ public interface SqlValidatorScope {
       SqlNode ctx);
 
   /**
-   * Finds all table aliases which are implicitly qualifying an unqualified
-   * column name.
+   * Finds all table aliases which are implicitly qualifying an unqualified column name.
+   * 查找隐式限定非限定列名的所有表别名。
    *
    * <p>This method is only implemented in scopes (such as
    * {@link org.apache.calcite.sql.validate.SelectScope}) which can be the
@@ -104,7 +109,8 @@ public interface SqlValidatorScope {
   /**
    * Collects the {@link SqlMoniker}s of all possible columns in this scope.
    *
-   * @param result an array list of strings to add the result to
+   * 收集此范围内所有可能列的{@link SqlMoniker}。
+   * @param result an array list of strings to add the result to 要添加结果的字符串数组列表
    */
   void findAllColumnNames(List<SqlMoniker> result);
 

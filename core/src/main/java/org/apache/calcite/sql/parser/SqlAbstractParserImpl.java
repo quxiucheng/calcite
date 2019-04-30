@@ -46,6 +46,7 @@ import java.util.TreeSet;
 
 /**
  * Abstract base for parsers generated from CommonParser.jj.
+ * 从CommonParser.jj生成的解析器的抽象库。
  */
 public abstract class SqlAbstractParserImpl {
   //~ Static fields/initializers ---------------------------------------------
@@ -284,38 +285,45 @@ public abstract class SqlAbstractParserImpl {
 
   /**
    * Type-safe enum for context of acceptable expressions.
+   * 可接受表达式上下文的类型安全枚举。
    */
   protected enum ExprContext {
     /**
      * Accept any kind of expression in this context.
+     * 在此上下文中接受任何形式的表达式。
      */
     ACCEPT_ALL,
 
     /**
      * Accept any kind of expression in this context, with the exception of
      * CURSOR constructors.
+     * 接受此上下文中任何类型的表达式，游标构造函数除外。
      */
     ACCEPT_NONCURSOR,
 
     /**
      * Accept only query expressions in this context.
+     * 在此上下文中只接受查询表达式。。
      */
     ACCEPT_QUERY,
 
     /**
      * Accept only non-query expressions in this context.
+     * 在此上下文中只接受非查询表达式。
      */
     ACCEPT_NON_QUERY,
 
     /**
      * Accept only parenthesized queries or non-query expressions in this
      * context.
+     * 在此上下文中只接受带括号的查询或非查询表达式。
      */
     ACCEPT_SUB_QUERY,
 
     /**
      * Accept only CURSOR constructors, parenthesized queries, or non-query
      * expressions in this context.
+     * Accept only CURSOR constructors, parenthesized queries, or non-query expressions in this context.
      */
     ACCEPT_CURSOR;
 
@@ -518,6 +526,12 @@ public abstract class SqlAbstractParserImpl {
    * identifier.
    * <li>"DOMAIN" is a reserved word as specified by the SQL:92 standard.
    * </ul>
+   Metadata about the parser. For example:
+     "KEY" is a keyword: it is meaningful in certain contexts, such as "CREATE FOREIGN KEY", but can be used as an identifier, as in "CREATE TABLE t (key INTEGER)".
+     "SELECT" is a reserved word. It can not be used as an identifier.
+     "CURRENT_USER" is the name of a context variable. It cannot be used as an identifier.
+     "ABS" is the name of a reserved function. It cannot be used as an identifier.
+     "DOMAIN" is a reserved word as specified by the SQL:92 standard.
    */
   public interface Metadata {
     /**

@@ -23,7 +23,12 @@
  *
  * <p>The advisor uses the validation and parser framework set up in
  * <code>org.apache.calcite.sql.validate</code> package.
-*/
+ *
+ * 提供编辑SQL语句的提示和更正。
+ * SQL语句可能是部分形成的SQL语句，也可能是无效的。它是在SQL编辑器用户界面中编辑的。
+ * advisor使用org.apache.calcite.sql中设置的验证和解析器框架。验证方案。
+ *
+ */
 @PackageMarker
 package org.apache.calcite.sql.advise;
 

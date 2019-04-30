@@ -39,6 +39,9 @@ import org.apache.calcite.sql.SqlOperator;
  * @see SqlOperator#acceptCall
  *
  * @param <R> Return type
+ *
+ * 访问者类，遵循访问者模式。
+ * 类型参数R是每个visit()方法的返回类型。如果方法不需要返回值，则使用Void。
  */
 public interface SqlVisitor<R> {
   //~ Methods ----------------------------------------------------------------

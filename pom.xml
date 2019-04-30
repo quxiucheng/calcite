@@ -81,7 +81,6 @@ limitations under the License.
     <drill-fmpp-maven-plugin.version>1.14.0</drill-fmpp-maven-plugin.version>
     <foodmart-data-hsqldb.version>0.3</foodmart-data-hsqldb.version>
     <foodmart-queries.version>0.4.1</foodmart-queries.version>
-    <forbiddenapis.version>2.6</forbiddenapis.version>
     <freemarker.version>2.3.28</freemarker.version>
     <git-commit-id-plugin.version>2.1.9</git-commit-id-plugin.version>
     <geode.version>1.6.0</geode.version>
@@ -111,7 +110,6 @@ limitations under the License.
     <jmh.version>1.12</jmh.version>
     <jsoup.version>1.11.3</jsoup.version>
     <junit.version>4.12</junit.version>
-    <kotlin.version>1.2.71</kotlin.version>
     <checkstyle.version>7.8.2</checkstyle.version>
     <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
     <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
@@ -188,7 +186,6 @@ limitations under the License.
     <module>spark</module>
     <module>splunk</module>
     <module>ubenchmark</module>
-      <module>flink</module>
   </modules>
 
   <!-- No dependencies here. Declare dependency VERSIONS in
@@ -257,30 +254,6 @@ limitations under the License.
         <groupId>org.apache.cassandra</groupId>
         <artifactId>cassandra-all</artifactId>
         <version>${cassandra.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-stdlib</artifactId>
-        <version>${kotlin.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-stdlib-jdk8</artifactId>
-        <version>${kotlin.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-test</artifactId>
-        <version>${kotlin.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-test-junit</artifactId>
-        <version>${kotlin.version}</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>com.esri.geometry</groupId>
@@ -609,47 +582,6 @@ limitations under the License.
   <build>
     <plugins>
       <plugin>
-        <groupId>de.thetaphi</groupId>
-        <artifactId>forbiddenapis</artifactId>
-        <configuration>
-          <!-- if the used Java version is too new, don't fail, just do nothing: -->
-          <failOnUnsupportedJava>false</failOnUnsupportedJava>
-          <bundledSignatures>
-            <!--
-              This will automatically choose the right
-              signatures based on 'maven.compiler.target':
-            -->
-            <bundledSignature>jdk-unsafe</bundledSignature>
-            <bundledSignature>jdk-deprecated</bundledSignature>
-            <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-            <bundledSignature>jdk-non-portable</bundledSignature>
-          </bundledSignatures>
-          <signaturesFiles>
-            <signaturesFile>${top.dir}/src/main/config/forbidden-apis/signatures.txt</signaturesFile>
-          </signaturesFiles>
-          <excludes>
-            <exclude>**/ParseException.class</exclude>
-            <exclude>**/SimpleCharStream.class</exclude>
-            <exclude>**/*TokenManager.class</exclude>
-            <exclude>**/TokenMgrError.class</exclude>
-            <exclude>**/org/apache/calcite/adapter/os/Processes$ProcessFactory.class</exclude>
-            <exclude>**/org/apache/calcite/adapter/os/OsAdapterTest.class</exclude>
-            <exclude>**/org/apache/calcite/runtime/Resources$Inst.class</exclude>
-            <exclude>**/org/apache/calcite/test/concurrent/ConcurrentTestCommandScript.class</exclude>
-            <exclude>**/org/apache/calcite/test/concurrent/ConcurrentTestCommandScript$ShellCommand.class</exclude>
-            <exclude>**/org/apache/calcite/util/Unsafe.class</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-              <goal>testCheck</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
         <configuration>
@@ -893,11 +825,6 @@ limitations under the License.
           </dependencies>
         </plugin>
         <plugin>
-          <groupId>de.thetaphi</groupId>
-          <artifactId>forbiddenapis</artifactId>
-          <version>${forbiddenapis.version}</version>
-        </plugin>
-        <plugin>
           <groupId>net.hydromatic</groupId>
           <artifactId>hydromatic-resource-maven-plugin</artifactId>
           <version>${hydromatic-resource.version}</version>
@@ -1041,44 +968,6 @@ limitations under the License.
           <groupId>pl.project13.maven</groupId>
           <artifactId>git-commit-id-plugin</artifactId>
           <version>${git-commit-id-plugin.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.jetbrains.kotlin</groupId>
-          <artifactId>kotlin-maven-plugin</artifactId>
-          <version>${kotlin.version}</version>
-          <executions>
-            <!-- Kotlin is supposed to be used in test code only for now,
-                 that is why compile execution is commented. -->
-            <!--<execution>
-              <id>compile</id>
-              <phase>compile</phase>
-              <goals>
-                <goal>compile</goal>
-              </goals>
-              <configuration>
-                <sourceDirs>
-                  <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                  <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                </sourceDirs>
-              </configuration>
-            </execution>-->
-            <execution>
-              <id>test-compile</id>
-              <phase>test-compile</phase>
-              <goals>
-                <goal>test-compile</goal>
-              </goals>
-              <configuration>
-                <sourceDirs>
-                  <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                  <sourceDir>${project.basedir}/src/test/java</sourceDir>
-                </sourceDirs>
-              </configuration>
-            </execution>
-          </executions>
-          <configuration>
-            <jvmTarget>1.8</jvmTarget>
-          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

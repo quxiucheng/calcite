@@ -17,6 +17,7 @@
 
 /**
  * Preparation of queries (parsing, planning and implementation).
+ * 准备查询（解析，计划和实施）。
  */
 @PackageMarker
 package org.apache.calcite.prepare;

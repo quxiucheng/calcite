@@ -41,6 +41,18 @@ import com.google.common.collect.ImmutableList;
  * {@link SchemaFactory#create(SchemaPlus, String, java.util.Map)} contains a
  * parent schema that might be a wrapped instance of a user-defined
  * {@link Schema}, or indeed might not.
+ *
+ * 给定实现Schema接口的用户定义模式，Calcite创建一个实现SchemaPlus接口的包装器。
+ 这提供了额外的功能，例如访问已明确添加的表。
+
+ 用户定义的模式不需要实现此接口，但是当模式传递给用户定义的模式或用户定义的表中的方法时，它将被包装在此接口中。
+
+ SchemaPlus旨在供用户使用，但不由它们实例化。
+ 用户应该只使用系统提供的SchemaPlus。
+ SchemaPlus的目的是以只读方式向用户代码公开有关在注册模式时Calcite构建的模式的一些额外信息。
+ 它出现在几个SPI调用中作为上下文;
+ 例如，SchemaFactory.create（SchemaPlus，String，java.util.Map）包含一个父模式，该模式可能是用户定义的模式的包装实例，实际上可能不是
+
  */
 public interface SchemaPlus extends Schema {
   /**

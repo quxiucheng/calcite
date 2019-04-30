@@ -50,7 +50,7 @@ class RelCompositeTrait<T extends RelMultipleTrait> implements RelTrait {
     }
   }
 
-  /** Creates a RelCompositeTrait. The constituent traits are canonized. */
+  /** Creates a RelCompositeTrait. The constituent traits are canonized.创建一个RelCompositeTrait。组成特征被册封。 */
   @SuppressWarnings("unchecked")
   static <T extends RelMultipleTrait> RelTrait of(RelTraitDef def,
       List<T> traitList) {

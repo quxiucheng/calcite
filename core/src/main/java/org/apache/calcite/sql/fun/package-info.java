@@ -26,6 +26,13 @@
  * implemented in a top-level class within this package instead.  Operators
  * which are not row-level (e.g. select and join) should be defined in package
  * {@link org.apache.calcite.sql} instead.</p>
+ *
+ * 定义一组标准SQL行级函数和操作符。
+ 行级函数和操作符的标准集在类SqlStdOperatorTable中声明。
+ 该表中的匿名内部类只允许指定操作符的测试函数;
+ 如果操作符需要其他自定义代码，则应在此包中的顶级类中实现。
+ 非行级操作符(例如select和join)应在包org.apache.calcite中定义。
+ sql。
  */
 @PackageMarker
 package org.apache.calcite.sql.fun;

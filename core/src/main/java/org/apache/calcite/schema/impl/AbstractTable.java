@@ -32,6 +32,9 @@ import org.apache.calcite.sql.SqlNode;
  * {@link Table#rolledUpColumnValidInsideAgg(String, SqlCall, SqlNode, CalciteConnectionConfig)}
  * if their table can potentially contain rolled up values. This information is
  * used by the validator to check for illegal uses of these columns.
+ * 用于实现Table的抽象基类。
+ 如果子表可能包含卷起的值，则子类应覆盖isRolledUp（java.lang.String）和Table.rolledUpColumnValidInsideAgg（String，SqlCall，SqlNode，CalciteConnectionConfig）。
+ 验证器使用此信息来检查这些列的非法使用。
  */
 public abstract class AbstractTable implements Table, Wrapper {
   protected AbstractTable() {

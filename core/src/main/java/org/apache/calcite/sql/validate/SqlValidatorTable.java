@@ -25,6 +25,7 @@ import java.util.List;
 
 /**
  * Supplies a {@link SqlValidator} with the metadata for a table.
+ * 为{@link SqlValidator}提供表的元数据。
  *
  * @see SqlValidatorCatalogReader
  */
@@ -38,11 +39,13 @@ public interface SqlValidatorTable extends Wrapper {
 
   /**
    * Returns whether a given column is monotonic.
+   * 返回列的单调性
    */
   SqlMonotonicity getMonotonicity(String columnName);
 
   /**
    * Returns the access type of the table
+   * 返回表的访问类型
    */
   SqlAccessType getAllowedAccess();
 

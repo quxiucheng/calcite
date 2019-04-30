@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
  * a given set of rules and a cost model.
  *
  * 查询优化器接口
+ * RelOptPlanner是查询优化器:根据给定的规则集和成本模型，它将关系表达式转换为语义上等效的关系表达式
  */
 public interface RelOptPlanner {
   //~ Static fields/initializers ---------------------------------------------
@@ -63,6 +64,8 @@ public interface RelOptPlanner {
    *
    * @return whether the RelTraitDef was added, as per
    * {@link java.util.Collection#add}
+   *
+   * 注册一个rel特征定义。如果RelTraitDef已经注册，则什么也不做。
    */
   boolean addRelTraitDef(RelTraitDef relTraitDef);
 

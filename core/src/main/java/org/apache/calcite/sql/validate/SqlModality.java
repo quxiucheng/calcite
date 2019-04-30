@@ -16,9 +16,14 @@
  */
 package org.apache.calcite.sql.validate;
 
-/** Relational or streaming. */
+/**
+ * Relational or streaming.
+ * 关系或流媒体
+ * */
 public enum SqlModality {
+  // 关系
   RELATION,
+  // 流
   STREAM
 }
 

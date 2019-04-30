@@ -357,6 +357,7 @@ public class SqlToRelConverter {
 
   /**
    * Returns the type inferred for a dynamic parameter.
+   * 返回动态参数的推断类型
    *
    * @param index 0-based index of dynamic parameter
    * @return inferred type, never null
@@ -370,8 +371,8 @@ public class SqlToRelConverter {
   }
 
   /**
-   * Returns the current count of the number of dynamic parameters in an
-   * EXPLAIN PLAN statement.
+   * Returns the current count of the number of dynamic parameters in an EXPLAIN PLAN statement.
+   * 返回EXPLAIN PLAN语句中动态参数数量的当前计数
    *
    * @param increment if true, increment the count
    * @return the current count before the optional increment
@@ -398,6 +399,8 @@ public class SqlToRelConverter {
    * have been converted by another SqlToRelConverter.
    *
    * @param alreadyConvertedNonCorrSubqs the other map
+   *
+   * 将来自另一个映射的元素添加到非相关转换子查询的当前映射中，该映射包含已由另一个SqlToRelConverter转换的非相关子查询。
    */
   public void addConvertedNonCorrSubqs(
       Map<SqlNode, RexNode> alreadyConvertedNonCorrSubqs) {
@@ -407,6 +410,7 @@ public class SqlToRelConverter {
   /**
    * Sets a new SubQueryConverter. To have any effect, this must be called
    * before any convert method.
+   * 设置一个新的子查询转换器。要产生任何效果，必须在任何转换方法之前调用它。
    *
    * @param converter new SubQueryConverter
    */
@@ -419,6 +423,7 @@ public class SqlToRelConverter {
    * statement.
    *
    * @param explainParamCount number of dynamic parameters in the statement
+   * 设置当前EXPLAIN PLAN语句中动态参数的数量。
    */
   public void setDynamicParamCountInExplain(int explainParamCount) {
     assert config.isExplain();
@@ -472,6 +477,7 @@ public class SqlToRelConverter {
   /**
    * If sub-query is correlated and decorrelation is enabled, performs
    * decorrelation.
+   * 如果子查询是相关的并启用了反关系，则执行反关系。
    *
    * @param query   Query
    * @param rootRel Root relational expression
@@ -506,6 +512,13 @@ public class SqlToRelConverter {
    * a particular order (typically because it has an ORDER BY at top level)
    * @param rootRel Relational expression that is at the root of the tree
    * @return Trimmed relational expression
+   *
+   * 遍历关系表达式树，用只投射使用者所需字段的“精简”关系表达式替换每个RelNode。
+
+  通过删除会扩展搜索空间的crud，这可能使优化器的工作变得更简单，但优化器本身很难做到这一点，因为优化器规则必须保留字段的数量和类型。因此，这个转换操作整个树，类似于类型扁平化转换。
+
+
+  目前该功能在farrago/luciddb中禁用;这个方法的默认实现什么都不做。
    */
   public RelNode trimUnusedFields(boolean ordered, RelNode rootRel) {
     // Trim fields that are not used by their consumer.
@@ -627,6 +640,7 @@ public class SqlToRelConverter {
 
   /**
    * Converts a SELECT statement's parse tree into a relational expression.
+   * 将SELECT语句的分析树转换为关系表达式。
    */
   public RelNode convertSelect(SqlSelect select, boolean top) {
     final SqlValidatorScope selectScope = validator.getWhereScope(select);
@@ -1357,6 +1371,7 @@ public class SqlToRelConverter {
    * @param query the query
    * @param plan   the original RelNode tree corresponding to the statement
    * @return the converted RelNode tree
+   * 将select语句的RelNode树转换为生成单个值的select。
    */
   public RelNode convertToSingleValueSubq(
       SqlNode query,
@@ -3059,11 +3074,12 @@ public class SqlToRelConverter {
 
   /**
    * Recursively converts a query to a relational expression.
+   * 递归地将查询转换为关系表达式。
    *
    * @param query         Query
-   * @param top           Whether this query is the top-level query of the
-   *                      statement
-   * @param targetRowType Target row type, or null
+   * @param top           Whether this query is the top-level query of the statement
+   *                      此查询是否是语句的顶级查询
+   * @param targetRowType Target row type, or null 目标行类型，或null
    * @return Relational expression
    */
   protected RelRoot convertQueryRecursive(SqlNode query, boolean top,

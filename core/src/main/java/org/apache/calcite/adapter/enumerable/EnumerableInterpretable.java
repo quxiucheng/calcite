@@ -82,6 +82,14 @@ public class EnumerableInterpretable extends ConverterImpl
     return new EnumerableNode(enumerable, implementor.compiler, this);
   }
 
+  /**
+   * 生成动态代码
+   * @param parameters
+   * @param spark
+   * @param rel
+   * @param prefer
+   * @return
+   */
   public static Bindable toBindable(Map<String, Object> parameters,
       CalcitePrepare.SparkHandler spark, EnumerableRel rel,
       EnumerableRel.Prefer prefer) {

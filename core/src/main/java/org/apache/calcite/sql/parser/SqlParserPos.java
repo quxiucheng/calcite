@@ -33,6 +33,8 @@ import static org.apache.calcite.util.Static.RESOURCE;
 /**
  * SqlParserPos represents the position of a parsed token within SQL statement
  * text.
+ *
+ * SqlParserPos表示已解析Token在SQL语句文本中的位置。
  */
 public class SqlParserPos implements Serializable {
   //~ Static fields/initializers ---------------------------------------------

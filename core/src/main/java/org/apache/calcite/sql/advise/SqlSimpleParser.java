@@ -28,8 +28,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * A simple parser that takes an incomplete and turn it into a syntactically
- * correct statement. It is used in the SQL editor user-interface.
+ * A simple parser that takes an incomplete and turn it into a syntactically correct statement. It is used in the SQL editor user-interface.
+ * 一个简单的解析器，它接受一个不完整的语句并将其转换为语法正确的语句。它在SQL编辑器用户界面中使用。
  */
 public class SqlSimpleParser {
   //~ Enums ------------------------------------------------------------------

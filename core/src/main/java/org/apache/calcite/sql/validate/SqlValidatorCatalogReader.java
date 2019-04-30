@@ -28,14 +28,17 @@ import java.util.List;
 /**
  * Supplies catalog information for {@link SqlValidator}.
  *
- * <p>This interface only provides a thin API to the underlying repository, and
- * this is intentional. By only presenting the repository information of
- * interest to the validator, we reduce the dependency on exact mechanism to
- * implement the repository. It is also possible to construct mock
- * implementations of this interface for testing purposes.
+ * This interface only provides a thin API to the underlying repository, and this is intentional.
+ * By only presenting the repository information of interest to the validator,
+ * we reduce the dependency on exact mechanism to implement the repository.
+ * It is also possible to construct mock implementations of this interface for testing purposes.
  *
  * 为SqlValidator提供目录信息。
- * 这个接口只向底层存储库提供一个瘦API，这是有意为之的。通过只向验证器显示感兴趣的存储库信息，我们减少了对实现存储库的精确机制的依赖。为了进行测试，还可以构造此接口的模拟实现。
+ *
+ * 此接口仅为底层存储库提供精简API，这是有意的
+ * 通过仅向验证器呈现感兴趣的存储库信息
+ * 我们减少了对实现存储库的确切机制的依赖
+ * 为了测试目的，还可以构造该接口的模拟实现
  */
 public interface SqlValidatorCatalogReader extends Wrapper {
   //~ Methods ----------------------------------------------------------------
@@ -52,6 +55,11 @@ public interface SqlValidatorCatalogReader extends Wrapper {
    * @param names Name of table, may be qualified or fully-qualified
    *
    * @return Table with the given name, or null
+   *
+   * 查找具有给定名称的表或模式，可能是合格的。
+   * 使用目录读者的区分大小写策略。
+   *
+   *
    */
   SqlValidatorTable getTable(List<String> names);
 
@@ -65,25 +73,35 @@ public interface SqlValidatorCatalogReader extends Wrapper {
    *
    * @param typeName Name of type
    * @return named type, or null if not found
+   *
+   * 查找具有给定名称的用户定义类型，可能是限定的。
    */
   RelDataType getNamedType(SqlIdentifier typeName);
 
   /**
-   * Given fully qualified schema name, returns schema object names as
-   * specified. They can be schema, table, function, view.
+   * Given fully qualified schema name, returns schema object names as specified.
+   * They can be schema, table, function, view.
    * When names array is empty, the contents of root schema should be returned.
    *
-   * @param names the array contains fully qualified schema name or empty
-   *              list for root schema
-   * @return the list of all object (schema, table, function,
-   *         view) names under the above criteria
+   * @param names the array contains fully qualified schema name or empty list for root schema
+   *              该数组包含完全限定的模式名称或根模式的空列表
+   *
+   * @return the list of all object (schema, table, function, view) names under the above criteria
+   *         上述条件下的所有对象（模式，表，函数，视图）名称的列表
+   *
+   * 给定完全限定的模式名称，返回指定的模式对象名称。
+   * 它们可以是schema, table, function, view.
+   * 当names数组为空时，应返回根模式的内容。
+   *
+   *
    */
   List<SqlMoniker> getAllSchemaObjectNames(List<String> names);
 
   /**
    * Returns the paths of all schemas to look in for tables.
+   * 返回要查找表的所有模式的路径。
    *
-   * @return paths of current schema and root schema
+   * @return paths of current schema and root schema 当前架构和根架构的路径
    */
   List<List<String>> getSchemaPaths();
 
@@ -110,10 +128,16 @@ public interface SqlValidatorCatalogReader extends Wrapper {
   @Deprecated // to be removed before 2.0
   boolean isCaseSensitive();
 
-  /** Returns the root namespace for name resolution. */
+  /**
+   * Returns the root namespace for name resolution.
+   * 返回名称解析的根命名空间
+   * */
   CalciteSchema getRootSchema();
 
-  /** Returns Config settings */
+  /**
+   * Returns Config settings
+   * 获取config信息
+   **/
   CalciteConnectionConfig getConfig();
 }
 

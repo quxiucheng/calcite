@@ -66,6 +66,7 @@ import static org.apache.calcite.util.Static.RESOURCE;
 
 /**
  * Utility methods relating to parsing SQL.
+ * 与解析SQL有关的实用方法
  */
 public final class SqlParserUtil {
   //~ Static fields/initializers ---------------------------------------------

@@ -39,7 +39,12 @@ import org.apache.calcite.sql.SqlNode;
  *
  * <p>A particular table instance may also implement {@link Wrapper},
  * to give access to sub-objects.
- *
+ *创建表的典型方法是，Calcite询问用户定义的模式，以验证出现在SQL查询中的名称。
+ Calcite通过在连接的根模式上调用Schema.getSubSchema（String）来查找模式，然后通过调用Schema.getTable（String）获取表。
+ 请注意，表格不知道其名称。
+ 事实上，一个表可能被多次使用，可能在多个名称下或多个模式下使用。
+ （与UNIX文件系统中的i-node概念比较。）
+ 特定的表实例也可以实现Wrapper，以提供对子对象的访问
  * @see TableMacro
  */
 public interface Table {
@@ -71,7 +76,8 @@ public interface Table {
   /**
    * Determines whether the given rolled up column can be used inside the given aggregate function.
    * You can assume that {@code isRolledUp(column)} is {@code true}.
-   *
+   *确定给定的汇总列是否可以在给定的聚合函数中使用。
+   您可以假设isRolledUp（列）为true。
    * @param column The column name for which {@code isRolledUp} is true
    * @param call The aggregate call
    * @param parent Parent node of {@code call} in the {@link SqlNode} tree

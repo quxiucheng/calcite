@@ -46,6 +46,9 @@ import java.util.List;
  * <li>{@code s = Span.of();} initializes s to an empty Span, not even
  *   including the most recent token; rarely used
  * </ul>
+ *
+ * 因为它是可变的，所以可以方便地跟踪进入非终端的令牌的位置。它可以传递给方法，方法可以将所使用的令牌位置添加到它。
+ *
  */
 public final class Span {
   private final List<SqlParserPos> posList = new ArrayList<>();

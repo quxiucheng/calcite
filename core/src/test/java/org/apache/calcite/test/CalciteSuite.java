@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.test;
 
-import org.apache.calcite.TestKtTest;
 import org.apache.calcite.adapter.clone.ArrayTableTest;
 import org.apache.calcite.jdbc.CalciteRemoteDriverTest;
 import org.apache.calcite.materialize.LatticeSuggesterTest;
@@ -70,7 +69,6 @@ import org.apache.calcite.util.TestUtilTest;
 import org.apache.calcite.util.UtilTest;
 import org.apache.calcite.util.graph.DirectedGraphTest;
 import org.apache.calcite.util.mapping.MappingTest;
-
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -86,7 +84,6 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     // very fast tests (under 0.1s)
-    TestKtTest.class,
     ArrayTableTest.class,
     BitSetsTest.class,
     ImmutableBitSetTest.class,

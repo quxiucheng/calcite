@@ -91,6 +91,16 @@ public class CalciteJdbc41Factory extends CalciteFactory {
         resultSetConcurrency, resultSetHoldability);
   }
 
+  /**
+   * 生成结果集
+   * @param statement
+   * @param state
+   * @param signature
+   * @param timeZone
+   * @param firstFrame
+   * @return
+   * @throws SQLException
+   */
   public CalciteResultSet newResultSet(AvaticaStatement statement, QueryState state,
       Meta.Signature signature, TimeZone timeZone, Meta.Frame firstFrame)
       throws SQLException {
