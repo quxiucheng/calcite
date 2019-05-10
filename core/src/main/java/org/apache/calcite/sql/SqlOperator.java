@@ -315,7 +315,11 @@ public abstract class SqlOperator {
    * the trivial operator doesn't need its own implementation of type
    * derivation methods). The default implementation is to just return the
    * original call without any rewrite.
-   *
+   * 重写对此运算符的调用。
+    一些运算符被实现为普通的重写（例如，NULLIF变为CASE）。
+    但是，我们不会在createCall时执行此操作，因为我们希望尽可能保留原始SQL语法;
+   相反，我们在验证调用之前这样做（因此普通的运算符不需要它自己的类型派生方法的实现）。
+   默认实现是只返回原始调用而不进行任何重写。
    * @param validator Validator
    * @param call      Call to be rewritten
    * @return rewritten call

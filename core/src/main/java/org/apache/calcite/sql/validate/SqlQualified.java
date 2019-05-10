@@ -23,6 +23,7 @@ import java.util.List;
 
 /**
  * Fully-qualified identifier.
+ *完全限定的标识符。
  *
  * <p>The result of calling
  * {@link org.apache.calcite.sql.validate.SqlValidatorScope#fullyQualify(org.apache.calcite.sql.SqlIdentifier)},

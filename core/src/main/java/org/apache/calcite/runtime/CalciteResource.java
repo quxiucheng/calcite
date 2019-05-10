@@ -26,6 +26,7 @@ import static org.apache.calcite.runtime.Resources.Property;
 
 /**
  * Compiler-checked resources for the Calcite project.
+ * 于Calcite项目的编译器检查资源。
  */
 public interface CalciteResource {
   @BaseMessage("line {0,number,#}, column {1,number,#}")

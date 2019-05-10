@@ -627,8 +627,11 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
   }
 
   public SqlNode validate(SqlNode topNode) {
+    //note: root 对应的 Scope
     SqlValidatorScope scope = new EmptyScope(this);
     scope = new CatalogScope(scope, ImmutableList.of("CATALOG"));
+    //note: 1.rewrite expression
+    //note: 2.做相应的语法检查
     final SqlNode topNode2 = validateScopedExpression(topNode, scope);
     final RelDataType type = getValidatedNodeType(topNode2);
     Util.discard(type);
@@ -918,13 +921,17 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
   private SqlNode validateScopedExpression(
       SqlNode topNode,
       SqlValidatorScope scope) {
+    //note: 1. rewrite expression，将其标准化，便于后面的逻辑计划优化
     SqlNode outermostNode = performUnconditionalRewrites(topNode, false);
     cursorSet.add(outermostNode);
     top = outermostNode;
     TRACER.trace("After unconditional rewrite: {}", outermostNode);
+    //note: 2. Registers a query in a parent scope.
+    //note: register scopes and namespaces implied a relational expression
     if (outermostNode.isA(SqlKind.TOP_LEVEL)) {
       registerQuery(scope, null, outermostNode, outermostNode, null, false);
     }
+    //note: 3. catalog 验证，调用 SqlNode 的 validate 方法
     outermostNode.validate(this, scope);
     if (!outermostNode.isA(SqlKind.TOP_LEVEL)) {
       // force type derivation so that we can provide it to the
@@ -1106,12 +1113,14 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
   }
 
   /**
-   * Performs expression rewrites which are always used unconditionally. These
-   * rewrites massage the expression tree into a standard form so that the
-   * rest of the validation logic can be simpler.
+   * Performs expression rewrites which are always used unconditionally.
+   * 执行始终无条件使用的表达式重写
+   * These rewrites massage the expression tree into a standard form so that the rest of the validation logic can be simpler.
+   * 这些重写将表达式树按摩成标准形式，以便验证逻辑的其余部分可以更简单。
    *
    * @param node      expression to be rewritten
    * @param underFrom whether node appears directly under a FROM clause
+   * 节点是否直接出现在FROM子句下
    * @return rewritten expression
    */
   protected SqlNode performUnconditionalRewrites(
@@ -1124,6 +1133,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
     SqlNode newOperand;
 
     // first transform operands and invoke generic call rewrite
+    // 首先转换操作数并调用泛型调用重写
     if (node instanceof SqlCall) {
       if (node instanceof SqlMerge) {
         validatingSqlMerge = true;

@@ -27,9 +27,10 @@ import java.util.List;
 
 /**
  * Placeholder for an unresolved function.
+ * 占位符表示未解决的功能。
  *
- * <p>Created by the parser, then it is rewritten to proper SqlFunction by
- * the validator to a function defined in a Calcite schema.</p>
+ * Created by the parser, then it is rewritten to proper SqlFunction by the validator to a function defined in a Calcite schema.
+ * 由解析器创建，然后由验证器将其重写为适当的SqlFunction到Calcite模式中定义的函数。
  */
 public class SqlUnresolvedFunction extends SqlFunction {
   /**

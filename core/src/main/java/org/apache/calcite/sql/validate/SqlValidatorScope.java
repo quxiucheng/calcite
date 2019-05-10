@@ -48,7 +48,7 @@ import java.util.Objects;
  *
  * 名称解析的范围。表示表达式之外的解析树中的任何位置，或具有列的解析树中的任何位置。
  *
- * 验证表达式时，说“foo”。
+ * 验证表达式时，"foo"."bar"
  * 首先使用解析(java.util.List)。字符串>
  * ,org.apache.calcite.sql.validate。SqlNameMatcher, boolean, org.apache.calcite.sql. validatorscope . defined)方法
  * ，该方法用于定义表达式以定位“foo”。如果成功，则返回一个描述结果对象类型的名称空间。

@@ -36,8 +36,8 @@ import java.util.Objects;
 import static org.apache.calcite.util.Static.RESOURCE;
 
 /**
- * Abstract base for a scope which is defined by a list of child namespaces and
- * which inherits from a parent scope.
+ * Abstract base for a scope which is defined by a list of child namespaces and which inherits from a parent scope.
+ * 范围的抽象基础，由子命名空间列表定义，并从父范围继承。
  */
 public abstract class ListScope extends DelegatingScope {
   //~ Instance fields --------------------------------------------------------

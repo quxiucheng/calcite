@@ -45,15 +45,15 @@ import java.util.Map;
 import static org.apache.calcite.util.Static.RESOURCE;
 
 /**
- * A scope which delegates all requests to its parent scope. Use this as a base
- * class for defining nested scopes.
+ * A scope which delegates all requests to its parent scope. Use this as a base class for defining nested scopes.
+ * 将所有请求委托给其父作用域的作用域。将其用作定义嵌套作用域的基类
  */
 public abstract class DelegatingScope implements SqlValidatorScope {
   //~ Instance fields --------------------------------------------------------
 
   /**
-   * Parent scope. This is where to look next to resolve an identifier; it is
-   * not always the parent object in the parse tree.
+   * Parent scope. This is where to look next to resolve an identifier; it is not always the parent object in the parse tree.
+   * 父范围。这是接下来要解析标识符的地方;它并不总是解析树中的父对象
    *
    * <p>This is never null: at the top of the tree, it is an
    * {@link EmptyScope}.

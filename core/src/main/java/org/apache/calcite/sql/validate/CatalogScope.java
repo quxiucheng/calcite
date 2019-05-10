@@ -32,6 +32,11 @@ import java.util.List;
  * <p>Helps resolve {@code schema.table.column} column references, such as
  *
  * <blockquote><pre>select sales.emp.empno from sales.emp</pre></blockquote>
+ *
+ * SqlValidatorScope的实现，可以查看当前目录中的所有模式。
+ * 发生在作用域堆栈的根目录附近;它的父级通常是EmptyScope。
+ * 帮助解析schema.table.column列引用，例如
+ *  select sales.emp.empno from sales.emp
  */
 class CatalogScope extends DelegatingScope {
   /** Fully-qualified name of the catalog. Typically empty or ["CATALOG"]. */

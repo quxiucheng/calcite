@@ -51,6 +51,9 @@ import static org.apache.calcite.util.Static.RESOURCE;
  *
  * <p>It is convenient, because we never need to check whether a scope's parent
  * is null. (This scope knows not to ask about its parents, just like Adam.)
+ * 异步实现SqlValidatorScope作为范围堆栈的顶部。
+ * 这很方便，因为我们永远不需要检查作用域的父级是否为空。
+ （这个范围知道不要问其父母，就像亚当一样。）
  */
 class EmptyScope implements SqlValidatorScope {
   //~ Instance fields --------------------------------------------------------

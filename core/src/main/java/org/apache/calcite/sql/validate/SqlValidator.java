@@ -203,7 +203,7 @@ public interface SqlValidator {
    * 检查查询是否有效。
    * SELECT语句,
 
-  集合运算(并集、相交、除外)
+  集合运算(并集、相交、除)
 
   标识符(例如在FROM子句中表示表的使用)
 
@@ -237,6 +237,7 @@ public interface SqlValidator {
 
   /**
    * Resolves an identifier to a fully-qualified name.
+   * 将标识符解析为完全限定名称。
    *
    * @param id    Identifier
    * @param scope Naming scope
@@ -246,7 +247,7 @@ public interface SqlValidator {
 
   /**
    * Validates a literal.
-   *
+   *验证文字。
    * @param literal Literal
    */
   void validateLiteral(SqlLiteral literal);
@@ -288,7 +289,7 @@ public interface SqlValidator {
 
   /**
    * Validates a data type expression.
-   *
+   * 验证数据类型表达式。
    * @param dataType Data type
    */
   void validateDataType(SqlDataTypeSpec dataType);
@@ -359,8 +360,9 @@ public interface SqlValidator {
       List<SqlNode> operands);
 
   /**
-   * Derives the type of a node in a given scope. If the type has already been
-   * inferred, returns the previous type.
+   * Derives the type of a node in a given scope. If the type has already been inferred,
+   * returns the previous type.
+   * 派生给定范围内的节点类型。如果已经推断出类型，返回上一个类型
    *
    * @param scope   Syntactic scope
    * @param operand Parse tree node
@@ -394,6 +396,8 @@ public interface SqlValidator {
    *
    * @param select SELECT statement
    * @return whether SELECT statement is an aggregation
+   * 返回SELECT语句是否为聚合
+   *
    */
   boolean isAggregate(SqlSelect select);
 
@@ -422,6 +426,7 @@ public interface SqlValidator {
    *                       but not when validating.
    * @return A window
    * @throws RuntimeException Validation exception if window does not exist
+   * 将窗口规范或窗口名称转换为完全解析的窗口规范
    */
   SqlWindow resolveWindow(
       SqlNode windowOrRef,
@@ -449,6 +454,9 @@ public interface SqlValidator {
    * @param ordinal Ordinal of expression
    * @return derived alias, or null if no alias can be derived and ordinal is
    * less than zero
+   *
+   * 派生表达式的别名。
+  如果不能派生别名，则如果ordinal小于零则返回null，否则生成别名EXPR $ ordinal。
    */
   String deriveAlias(
       SqlNode node,
@@ -457,6 +465,7 @@ public interface SqlValidator {
   /**
    * Returns a list of expressions, with every occurrence of "&#42;" or
    * "TABLE.&#42;" expanded.
+   * 返回表达式列表，每次出现“*”或“TABLE.*”都会扩展。
    *
    * @param selectList        Select clause to be expanded
    * @param query             Query
@@ -544,6 +553,8 @@ public interface SqlValidator {
    *
    * @param select SELECT statement
    * @return naming scope for SELECT statement
+   *
+   * 返回验证SELECT语句的特定子句的适当范围。
    */
   SqlValidatorScope getSelectScope(SqlSelect select);
 
@@ -554,6 +565,9 @@ public interface SqlValidator {
    *
    * @param select SELECT statement
    * @return naming scope for SELECT statement, sans any aggregating scope
+   * 返回解析SELECT，GROUP BY和HAVING子句的范围。
+  始终是SelectScope;
+  如果这是一个聚合查询，则会剥离AggregatingScope
    */
   SelectScope getRawSelectScope(SqlSelect select);
 
@@ -624,18 +638,20 @@ public interface SqlValidator {
 
   /**
    * Pushes a new instance of a function call on to a function call stack.
+   * 将函数调用的新实例推送到函数调用堆栈。
    */
   void pushFunctionCall();
 
   /**
    * Removes the topmost entry from the function call stack.
+   * Retrieves the name of the parent cursor referenced by a column list parameter.
    */
   void popFunctionCall();
 
   /**
    * Retrieves the name of the parent cursor referenced by a column list
    * parameter.
-   *
+   * 检索列列表参数引用的父游标的​​名称。
    * @param columnListParamName name of the column list parameter
    * @return name of the parent cursor
    */
@@ -652,6 +668,8 @@ public interface SqlValidator {
   /**
    * Enables or disables expansion of column references. (Currently this does
    * not apply to the ORDER BY clause; may be fixed in the future.)
+   * 启用或禁用列引用的扩展。
+   （目前这不适用于ORDER BY子句;将来可能会修复。）
    *
    * @param expandColumnReferences new setting
    */
@@ -672,6 +690,7 @@ public interface SqlValidator {
 
   /**
    * Returns expansion of identifiers.
+   * 返回标识符的扩展。
    *
    * @return whether this validator should expand identifiers
    */
@@ -679,14 +698,14 @@ public interface SqlValidator {
 
   /**
    * Enables or disables rewrite of "macro-like" calls such as COALESCE.
-   *
+   * 启用或禁用重写“类似宏”的调用，例如COALESCE。
    * @param rewriteCalls new setting
    */
   void setCallRewrite(boolean rewriteCalls);
 
   /**
    * Derives the type of a constructor.
-   *
+   * 派生构造函数的类型。
    * @param scope                 Scope
    * @param call                  Call
    * @param unresolvedConstructor TODO
@@ -733,11 +752,15 @@ public interface SqlValidator {
    * @param select    Select statement which contains ORDER BY
    * @param orderExpr Expression in the ORDER BY clause.
    * @return Expression translated into SELECT clause semantics
+   *
+   * 将ORDER BY子句中的表达式扩展为与SELECT子句中的表达式具有相同语义的表达式。
+   *
    */
   SqlNode expandOrderExpr(SqlSelect select, SqlNode orderExpr);
 
   /**
    * Expands an expression.
+   * 扩展表达式。
    *
    * @param expr  Expression
    * @param scope Scope
@@ -753,6 +776,8 @@ public interface SqlValidator {
    *
    * @param field Field
    * @return whether field is a system field
+   * 返回字段是否为系统字段。
+  这些字段可能具有特定属性，例如排序性和可空性
    */
   boolean isSystemField(RelDataTypeField field);
 
@@ -767,6 +792,9 @@ public interface SqlValidator {
    * @param sqlQuery Query
    * @return Description of how each field in the row type maps to a schema
    * object
+   * 返回行类型中每个字段如何映射到架构中的目录，架构，表和列的说明。
+  返回的列表永远不为null，并且行类型中的每个字段都有一个元素。
+  每个元素都是四个元素（目录，模式，表，列）的列表，如果列是表达式，则可以为null。
    */
   List<List<String>> getFieldOrigins(SqlNode sqlQuery);
 
@@ -776,6 +804,8 @@ public interface SqlValidator {
    *
    * @param sqlQuery Query
    * @return Record type
+   * 返回包含每个参数的名称和类型的记录类型。
+  如果没有参数，则返回没有字段的记录类型。
    */
   RelDataType getParameterRowType(SqlNode sqlQuery);
 
@@ -788,9 +818,8 @@ public interface SqlValidator {
   SqlValidatorScope getOverScope(SqlNode node);
 
   /**
-   * Validates that a query is capable of producing a return of given modality
-   * (relational or streaming).
-   *
+   * Validates that a query is capable of producing a return of given modality (relational or streaming).
+   * 验证查询是否能够生成给定模态（关系或流）的返回。
    * @param select Query
    * @param modality Modality (streaming or relational)
    * @param fail Whether to throw a user error if does not support required

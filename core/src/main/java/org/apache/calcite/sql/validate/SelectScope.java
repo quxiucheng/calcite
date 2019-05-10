@@ -68,8 +68,7 @@ import java.util.List;
  * <li>expr1 can see t1, t2, q3</li>
  * <li>expr2 can see t3</li>
  * <li>expr3 can see t4, t1, t2</li>
- * <li>expr4 can see t1, t2, q3, plus (depending upon the dialect) any aliases
- * defined in the SELECT clause</li>
+ * <li>expr4 can see t1, t2, q3, plus (depending upon the dialect) any aliases defined in the SELECT clause</li>
  * </ul>
  *
  * <h3>Namespaces</h3>
@@ -84,6 +83,15 @@ import java.util.List;
  * </ul>
  *
  * @see SelectNamespace
+ *
+ * SELECT子句的名称解析范围。可见的对象是FROM子句中的对象，以及从父作用域继承的对象。
+ * 该对象是SqlValidatorScope和SqlValidatorNamespace。在查询中
+ * SELECT name FROM (
+    SELECT *
+      FROM emp
+    WHERE gender = 'F')
+ * 我们需要在解析'name'时将SelectScope用作SqlValidatorNamespace，在解析'gender'时用作SqlValidatorScope。
+ *
  */
 public class SelectScope extends ListScope {
   //~ Instance fields --------------------------------------------------------
