@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 /**
  * Abstract base class for a rule which converts from one calling convention to
  * another without changing semantics.
+ * 规则的抽象基类，它从一个调用约定转换为另一个调用约定而不更改语义。
  */
 public abstract class ConverterRule extends RelOptRule {
   //~ Instance fields --------------------------------------------------------

@@ -29,6 +29,14 @@ package org.apache.calcite.sql.validate;
  *
  * @see SqlConformanceEnum
  * @see SqlAbstractConformance
+ *
+ * 有效SQL兼容模式的枚举。
+
+对于大多数目的，enum sqlcon共振峰中的一种内置兼容性模式就足够了。
+
+
+
+如果您希望实现这个接口来构建自己的一致性，我们强烈建议您扩展sqlabstract符合性，或者使用sqldelegating符合性，以便将来的更改不会破坏您的一致性。
  * @see SqlDelegatingConformance
  */
 public interface SqlConformance {
@@ -64,6 +72,8 @@ public interface SqlConformance {
   /**
    * Whether this dialect supports features from a wide variety of
    * dialects. This is enabled for the Babel parser, disabled otherwise.
+   * 71/5000
+   这种方言是否支持来自各种方言的特性。
    */
   boolean isLiberal();
 

@@ -680,8 +680,11 @@ public interface SqlValidator {
    */
   boolean getColumnReferenceExpansion();
 
-  /** Sets how NULL values should be collated if an ORDER BY item does not
-   * contain NULLS FIRST or NULLS LAST. */
+  /**
+   * Sets how NULL values should be collated if an ORDER BY item does not contain NULLS FIRST or NULLS LAST.
+   * 设置如果ORDER BY项不包含NULLS FIRST或NULLS LAST，应如何整理NULL值。
+   * NULL 如何排序,NULL排在第一位或者NULL排最后,默认HIGH,和Oracle相同
+   * */
   void setDefaultNullCollation(NullCollation nullCollation);
 
   /** Returns how NULL values should be collated if an ORDER BY item does not

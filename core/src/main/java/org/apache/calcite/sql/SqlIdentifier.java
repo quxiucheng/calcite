@@ -50,6 +50,12 @@ public class SqlIdentifier extends SqlNode {
    * If you assign to this member, please use
    * {@link #setNames(java.util.List, java.util.List)}.
    * And yes, we'd like to make identifiers immutable one day.
+   * 此复合标识符的组件数组。
+   * 空字符串表示通配符“*”，以区别于真实的“*”（可能使用引号指定）
+   * 让这个成员公开是很方便的，让这个成员不是最终成员很方便，但是它是公开的而不是最终的耻辱。
+   如果您指定此成员，请使用setNames（java.util.List，java.util.List）。
+   是的，我们希望有一天能够使标识符不可变。
+   *
    */
   public ImmutableList<String> names;
 
@@ -204,6 +210,7 @@ public class SqlIdentifier extends SqlNode {
   /**
    * Copies names and components from another identifier. Does not modify the
    * cross-component parser position.
+   * 从其他标识符复制名称和组件。不修改跨组件解析器位置。
    *
    * @param other identifier from which to copy
    */

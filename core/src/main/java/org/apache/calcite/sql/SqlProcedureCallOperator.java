@@ -23,8 +23,8 @@ import org.apache.calcite.sql.validate.SqlValidator;
 import java.util.Collections;
 
 /**
- * SqlProcedureCallOperator represents the CALL statement. It takes a single
- * operand which is the real SqlCall.
+ * SqlProcedureCallOperator represents the CALL statement.
+ * It takes a single operand which is the real SqlCall.
  */
 public class SqlProcedureCallOperator extends SqlPrefixOperator {
   //~ Constructors -----------------------------------------------------------

@@ -59,6 +59,7 @@ import static org.junit.Assert.assertThat;
  * but user-defined table functions are in {@link TableFunctionTest}.
  *
  * @see Smalls
+ *
  */
 public class UdfTest {
   private CalciteAssert.AssertThat withUdf() {
