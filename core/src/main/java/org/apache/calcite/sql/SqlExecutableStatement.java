@@ -24,6 +24,9 @@ import org.apache.calcite.linq4j.function.Experimental;
  * executed directly.
  *
  * <p>NOTE: Subject to change without notice.
+ *
+ * 用于SqlNode的混合接口，允许直接执行DDL命令。
+ * 注:如有更改，恕不另行通知。
  */
 @Experimental
 public interface SqlExecutableStatement {

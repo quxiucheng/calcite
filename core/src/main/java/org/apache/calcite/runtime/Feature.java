@@ -19,8 +19,10 @@ package org.apache.calcite.runtime;
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-/** SQL language feature. Expressed as the exception that would be thrown if it
- * were used while disabled. */
+/**
+ * SQL language feature. Expressed as the exception that would be thrown if it were used while disabled.
+ * SQL语言特性。表示为禁用时使用它将引发的异常。
+ * */
 public class Feature
     extends Resources.ExInstWithCause<CalciteContextException> {
   public Feature(String base, Locale locale, Method method, Object... args) {

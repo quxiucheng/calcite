@@ -52,6 +52,8 @@ public class SqlCoalesceFunction extends SqlFunction {
         SqlFunctionCategory.SYSTEM);
   }
 
+
+
   //~ Methods ----------------------------------------------------------------
 
   // override SqlOperator

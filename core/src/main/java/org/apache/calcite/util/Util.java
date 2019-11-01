@@ -199,6 +199,7 @@ public class Util {
    * Does nothing with its argument. Call this method when you have a value
    * you are not interested in, but you don't want the compiler to warn that
    * you are not using it.
+   * 与它的论点无关。当您有一个您不感兴趣的值，但您不希望编译器警告您没有使用它时，请调用此方法。
    */
   public static void discard(Object o) {
     if (false) {

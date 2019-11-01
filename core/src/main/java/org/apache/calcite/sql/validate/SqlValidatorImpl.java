@@ -627,13 +627,14 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
   }
 
   public SqlNode validate(SqlNode topNode) {
-    //note: root 对应的 Scope
+    // root 对应的 Scope
     SqlValidatorScope scope = new EmptyScope(this);
     scope = new CatalogScope(scope, ImmutableList.of("CATALOG"));
-    //note: 1.rewrite expression
-    //note: 2.做相应的语法检查
+    // 语法检查
     final SqlNode topNode2 = validateScopedExpression(topNode, scope);
+    // 节点的类型
     final RelDataType type = getValidatedNodeType(topNode2);
+    // 取消编译器告警-没用的代码
     Util.discard(type);
     return topNode2;
   }
@@ -921,27 +922,39 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
   private SqlNode validateScopedExpression(
       SqlNode topNode,
       SqlValidatorScope scope) {
-    //note: 1. rewrite expression，将其标准化，便于后面的逻辑计划优化
+    // 将其标准化，便于后面的逻辑计划优化,主要做以下转换
+    // SqlOrderBy -> SqlSelect
+    // SqlDelete -> SqlSelect
+    // SqlMerge -> SqlSelect
+    // SqlUpdate -> SqlSelect
+    // VALUES函数 -> SqlSelect
+    // explicit table类似'select * from (TABLE t)'-> SqlSelect
     SqlNode outermostNode = performUnconditionalRewrites(topNode, false);
     cursorSet.add(outermostNode);
     top = outermostNode;
     TRACER.trace("After unconditional rewrite: {}", outermostNode);
-    //note: 2. Registers a query in a parent scope.
-    //note: register scopes and namespaces implied a relational expression
+    // 注册scope和namespace
     if (outermostNode.isA(SqlKind.TOP_LEVEL)) {
       registerQuery(scope, null, outermostNode, outermostNode, null, false);
     }
-    //note: 3. catalog 验证，调用 SqlNode 的 validate 方法
+    // 验证，调用 SqlNode 的 validate 方法
     outermostNode.validate(this, scope);
     if (!outermostNode.isA(SqlKind.TOP_LEVEL)) {
-      // force type derivation so that we can provide it to the
-      // caller later without needing the scope
+      // 推断出类型
       deriveType(scope, outermostNode);
     }
     TRACER.trace("After validation: {}", outermostNode);
     return outermostNode;
   }
 
+  /**
+   * sqlNode.validateQuery
+   * 检查查询是否有效。
+   * @param node  Query node
+   * @param scope Scope in which the query occurs
+   * @param targetRowType Desired row type, must not be null, may be the data
+   *                      type 'unknown'.
+   */
   public void validateQuery(SqlNode node, SqlValidatorScope scope,
       RelDataType targetRowType) {
     final SqlValidatorNamespace ns = getNamespace(node, scope);
@@ -981,8 +994,10 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
    */
   protected void validateNamespace(final SqlValidatorNamespace namespace,
       RelDataType targetRowType) {
+    // 调用namespace中validate
     namespace.validate(targetRowType);
     if (namespace.getNode() != null) {
+      // 设置节点类型
       setValidatedNodeType(namespace.getNode(), namespace.getType());
     }
   }
@@ -1131,8 +1146,6 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
     }
 
     SqlNode newOperand;
-
-    // first transform operands and invoke generic call rewrite
     // 首先转换操作数并调用泛型调用重写
     if (node instanceof SqlCall) {
       if (node instanceof SqlMerge) {
@@ -1191,8 +1204,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
         }
       }
     }
-
-    // now transform node itself
+    // 将各个非标准的SqlNode转换为标准的SqlSelect
     final SqlKind kind = node.getKind();
     switch (kind) {
     case VALUES:
@@ -5265,7 +5277,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
    * Validates that a particular feature is enabled. By default, all features
    * are enabled; subclasses may override this method to be more
    * discriminating.
-   *
+   * 验证启用了特定功能。默认情况下，所有功能都已启用;子类可能会覆盖此方法，以便更有辨别力。
    * @param feature feature being used, represented as a resource instance
    * @param context parser position context for error reporting, or null if
    */
@@ -5669,8 +5681,8 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
   }
 
   /**
-   * Converts an expression into canonical form by fully-qualifying any
-   * identifiers.
+   * Converts an expression into canonical form by fully-qualifying any identifiers.
+   * 通过完全限定任何标识符将表达式转换为规范形式。
    */
   private static class Expander extends SqlScopedShuttle {
     protected final SqlValidatorImpl validator;

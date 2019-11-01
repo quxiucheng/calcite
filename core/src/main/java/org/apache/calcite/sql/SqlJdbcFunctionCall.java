@@ -649,6 +649,7 @@ public class SqlJdbcFunctionCall extends SqlFunction {
 
   /**
    * Lookup table between JDBC functions and internal representation
+   * JDBC函数和内部表示之间的查找表
    */
   private static class JdbcToInternalLookupTable {
     /**
