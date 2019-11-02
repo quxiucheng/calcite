@@ -53,6 +53,7 @@ import java.util.TreeSet;
 /**
  * An assistant which offers hints and corrections to a partially-formed SQL
  * statement. It is used in the SQL editor user-interface.
+ * 为部分形成的SQL语句提供提示和更正的助手。它在SQL编辑器用户界面中使用。
  */
 public class SqlAdvisor {
   //~ Static fields/initializers ---------------------------------------------
@@ -118,6 +119,7 @@ public class SqlAdvisor {
    * Gets completion hints for a partially completed or syntactically incorrect
    * sql statement with cursor pointing to the position where completion hints
    * are requested.
+   * 获取部分完成的或语法错误的sql语句的完成提示，其中光标指向请求完成提示的位置。
    *
    * <p>Writes into <code>replaced[0]</code> the string that is being
    * replaced. Includes the cursor and the preceding identifier. For example,
@@ -125,11 +127,19 @@ public class SqlAdvisor {
    * replaced[0]</code> to "abc". If the cursor is in the middle of
    * whitespace, the replaced string is empty. The replaced string is never
    * null.
+   * 将要替换的字符串写入replace [0]。
+   * 包括光标和前面的标识符。
+   * 例如，如果sql是“从t选择abc ^ de”，则将replaced [0]设置为“ abc”。
+   * 如果光标在空格中间，则替换的字符串为空。
+   * 替换的字符串永远不会为空
    *
    * @param sql      A partial or syntactically incorrect sql statement for
    *                 which to retrieve completion hints
+   *                 检索完成提示的部分或语法错误的sql语句
    * @param cursor   to indicate the 0-based cursor position in the query at
+   * 指示查询中基于0的光标位置
    * @param replaced String which is being replaced (output)
+   * 被替换的字符串（输出）
    * @return completion hints
    */
   public List<SqlMoniker> getCompletionHints(
@@ -219,6 +229,9 @@ public class SqlAdvisor {
    * Returns casing which is preferred for replacement.
    * For instance, {@code en => ename, EN => ENAME}.
    * When input has mixed case, {@code Casing.UNCHANGED} is returned.
+   * 返回首选更换的套管。
+   * 例如，en => ename，EN => ENAME。
+   * 输入混合大小写时，返回Casing.UNCHANGED。
    * @param word input word
    * @return preferred casing when replacing input word
    */
@@ -308,6 +321,7 @@ public class SqlAdvisor {
   /**
    * Gets completion hints for a syntactically correct sql statement with dummy
    * SqlIdentifier
+   * 使用虚拟SqlIdentifier获取语法正确的sql语句的完成提示
    *
    * @param sql A syntactically correct sql statement for which to retrieve
    *            completion hints
@@ -318,6 +332,14 @@ public class SqlAdvisor {
    *            17' returns all the possible column names that can be selected
    *            from sales.dept table setting pos to 'Line 1, Column 31' returns
    *            all the possible table names in 'sales' schema
+   *
+   * 指示在查询中需要检索完成提示的行和列的位置。
+   * 例如，
+   * “从sales.emp中选择a.ename，b.deptno，
+   * 在a.deptno = b.deptno上，
+   * 在empno = 1上加入join sales.dept b”；将pos设置为“第1行，第17列”会返回所有
+   * 可以从sales.dept表设置pos设置为“第1行，第31列”的可能的列名，返回“ sales”模式中的所有可能的表名
+   *
    * @return an array of hints ({@link SqlMoniker}) that can fill in at the
    * indicated position
    */
@@ -385,6 +407,7 @@ public class SqlAdvisor {
    * @param sql      SQL statement
    * @param hintList List of hints suggesting allowable tokens at the point of
    *                 failure
+   *                 提示在故障点允许令牌的提示列表
    * @return Parse tree if succeeded, null if parse failed
    */
   private SqlNode tryParse(String sql, List<SqlMoniker> hintList) {
@@ -412,12 +435,14 @@ public class SqlAdvisor {
   /**
    * Gets the fully qualified name for a {@link SqlIdentifier} at a given
    * position of a sql statement.
+   * 在sql语句的给定位置获取SqlIdentifier的全限定名称
    *
    * @param sql    A syntactically correct sql statement for which to retrieve a
    *               fully qualified SQL identifier name
    * @param cursor to indicate the 0-based cursor position in the query that
    *               represents a SQL identifier for which its fully qualified
    *               name is to be returned.
+   *               指示查询中基于0的光标位置，该位置表示要为其返回其完全限定名称的SQL标识符
    * @return a {@link SqlMoniker} that contains the fully qualified name of
    * the specified SQL identifier, returns null if none is found or the SQL
    * statement is invalid.
@@ -441,6 +466,7 @@ public class SqlAdvisor {
   /**
    * Attempts to complete and validate a given partially completed sql
    * statement, and returns whether it is valid.
+   * 尝试完成并验证给定的部分完成的sql语句，并返回它是否有效。
    *
    * @param sql A partial or syntactically incorrect sql statement to validate
    * @return whether SQL statement is valid
@@ -467,6 +493,9 @@ public class SqlAdvisor {
    * Attempts to parse and validate a SQL statement. Throws the first
    * exception encountered. The error message of this exception is to be
    * displayed on the UI
+   * 尝试解析和验证SQL语句。
+   * 引发遇到的第一个异常。
+   * 此异常的错误消息将显示在UI上
    *
    * @param sql A user-input sql statement to be validated
    * @return a List of ValidateErrorInfo (null if sql is valid)
@@ -506,6 +535,7 @@ public class SqlAdvisor {
   /**
    * Turns a partially completed or syntactically incorrect sql statement into
    * a simplified, valid one that can be passed into getCompletionHints()
+   * 将部分完成或语法上不正确的sql语句转换为可以传递给getCompletionHints（）的简化的有效语句
    *
    * @param sql    A partial or syntactically incorrect sql statement
    * @param cursor to indicate column position in the query at which
@@ -519,6 +549,7 @@ public class SqlAdvisor {
 
   /**
    * Return an array of SQL reserved and keywords
+   * 返回SQL保留数组和关键字
    *
    * @return an of SQL reserved and keywords
    */

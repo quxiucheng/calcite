@@ -44,6 +44,7 @@ import java.util.List;
 
 /**
  * Table function that returns completion hints for a given SQL statement.
+ * 返回给定SQL语句的完成提示的表函数。
  */
 public class SqlAdvisorGetHintsFunction
     implements TableFunction, ImplementableFunction {
