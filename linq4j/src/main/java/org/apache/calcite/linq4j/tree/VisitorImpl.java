@@ -78,7 +78,8 @@ public class VisitorImpl<R> implements Visitor<R> {
 
   public R visit(FieldDeclaration fieldDeclaration) {
     R r0 = fieldDeclaration.parameter.accept(this);
-    return fieldDeclaration.initializer.accept(this);
+    return fieldDeclaration.initializer == null ? null
+        : fieldDeclaration.initializer.accept(this);
   }
 
   public R visit(ForStatement forStatement) {
@@ -86,6 +87,12 @@ public class VisitorImpl<R> implements Visitor<R> {
     R r1 = forStatement.condition.accept(this);
     R r2 = forStatement.post.accept(this);
     return forStatement.body.accept(this);
+  }
+
+  public R visit(ForEachStatement forEachStatement) {
+    R r0 = forEachStatement.parameter.accept(this);
+    R r1 = forEachStatement.iterable.accept(this);
+    return forEachStatement.body.accept(this);
   }
 
   public R visit(FunctionExpression functionExpression) {
@@ -96,7 +103,8 @@ public class VisitorImpl<R> implements Visitor<R> {
   }
 
   public R visit(GotoStatement gotoStatement) {
-    return gotoStatement.expression.accept(this);
+    return gotoStatement.expression == null ? null
+        : gotoStatement.expression.accept(this);
   }
 
   public R visit(IndexExpression indexExpression) {

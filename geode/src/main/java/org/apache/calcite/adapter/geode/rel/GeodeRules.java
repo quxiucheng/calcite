@@ -39,7 +39,6 @@ import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.validate.SqlValidatorUtil;
 
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -80,18 +79,7 @@ public class GeodeRules {
   }
 
   static List<String> geodeFieldNames(final RelDataType rowType) {
-
-    List<String> fieldNames = new AbstractList<String>() {
-      @Override public String get(int index) {
-        return rowType.getFieldList().get(index).getName();
-      }
-
-      @Override public int size() {
-        return rowType.getFieldCount();
-      }
-    };
-
-    return SqlValidatorUtil.uniquify(fieldNames, true);
+    return SqlValidatorUtil.uniquify(rowType.getFieldNames(), true);
   }
 
   /**
@@ -193,7 +181,6 @@ public class GeodeRules {
           aggregate.getCluster(),
           traitSet,
           convert(aggregate.getInput(), traitSet.simplify()),
-          aggregate.indicator,
           aggregate.getGroupSet(),
           aggregate.getGroupSets(),
           aggregate.getAggCallList());
@@ -275,6 +262,14 @@ public class GeodeRules {
      */
     private boolean isEqualityOnKey(RexNode node, List<String> fieldNames) {
 
+      if (isBooleanColumnReference(node, fieldNames)) {
+        return true;
+      }
+
+      if (!SqlKind.COMPARISON.contains(node.getKind())) {
+        return false;
+      }
+
       RexCall call = (RexCall) node;
       final RexNode left = call.operands.get(0);
       final RexNode right = call.operands.get(1);
@@ -284,6 +279,24 @@ public class GeodeRules {
       }
       return checkConditionContainsInputRefOrLiterals(right, left, fieldNames);
 
+    }
+
+    private boolean isBooleanColumnReference(RexNode node, List<String> fieldNames) {
+      // FIXME Ignore casts for rel and assume they aren't really necessary
+      if (node.isA(SqlKind.CAST)) {
+        node = ((RexCall) node).getOperands().get(0);
+      }
+      if (node.isA(SqlKind.NOT)) {
+        node = ((RexCall) node).getOperands().get(0);
+      }
+      if (node.isA(SqlKind.INPUT_REF)) {
+        if (node.getType().getSqlTypeName() == SqlTypeName.BOOLEAN) {
+          final RexInputRef left1 = (RexInputRef) node;
+          String name = fieldNames.get(left1.getIndex());
+          return name != null;
+        }
+      }
+      return false;
     }
 
     /**

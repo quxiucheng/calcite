@@ -59,7 +59,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * Table based on an Elasticsearch type.
+ * Table based on an Elasticsearch index.
  */
 public class ElasticsearchTable extends AbstractQueryableTable implements TranslatableTable {
 
@@ -72,9 +72,8 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
 
   private final ElasticsearchVersion version;
   private final String indexName;
-  private final String typeName;
   final ObjectMapper mapper;
-  private final ElasticsearchTransport transport;
+  final ElasticsearchTransport transport;
 
   /**
    * Creates an ElasticsearchTable.
@@ -84,7 +83,6 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
     this.transport = Objects.requireNonNull(transport, "transport");
     this.version = transport.version;
     this.indexName = transport.indexName;
-    this.typeName = transport.typeName;
     this.mapper = transport.mapper();
   }
 
@@ -105,11 +103,7 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
   }
 
   /**
-   * Executes a "find" operation on the underlying type.
-   *
-   * <p>For example,
-   * <code>client.prepareSearch(index).setTypes(type)
-   * .setSource("{\"fields\" : [\"state\"]}")</code></p>
+   * Executes a "find" operation on the underlying index.
    *
    * @param ops List of operations represented as Json strings.
    * @param fields List of fields to project; or null to return map
@@ -122,7 +116,7 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
       List<Map.Entry<String, RelFieldCollation.Direction>> sort,
       List<String> groupBy,
       List<Map.Entry<String, String>> aggregations,
-      List<Map.Entry<String, String>> mappings,
+      Map<String, String> mappings,
       Long offset, Long fetch) throws IOException {
 
     if (!aggregations.isEmpty() || !groupBy.isEmpty()) {
@@ -172,7 +166,7 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
       List<Map.Entry<String, RelFieldCollation.Direction>> sort,
       List<String> groupBy,
       List<Map.Entry<String, String>> aggregations,
-      List<Map.Entry<String, String>> mapping,
+      Map<String, String> mapping,
       Long offset, Long fetch) throws IOException {
 
     if (!groupBy.isEmpty() && offset != null) {
@@ -263,6 +257,13 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
     // cleanup query. remove empty AGGREGATIONS element (if empty)
     emptyAggRemover.accept(query);
 
+    // This must be set to true or else in 7.X and 6/7 mixed clusters
+    // will return lower bounded count values instead of an accurate count.
+    if (groupBy.isEmpty()
+        && version.elasticVersionMajor() >= ElasticsearchVersion.ES6.elasticVersionMajor()) {
+      query.put("track_total_hits", true);
+    }
+
     ElasticsearchJson.Result res = transport.search(Collections.emptyMap()).apply(query);
 
     final List<Map<String, Object>> result = new ArrayList<>();
@@ -283,7 +284,7 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
 
     // elastic exposes total number of documents matching a query in "/hits/total" path
     // this can be used for simple "select count(*) from table"
-    final long total = res.searchHits().total();
+    final long total = res.searchHits().total().value();
 
     if (groupBy.isEmpty()) {
       // put totals automatically for count(*) expression(s), unless they contain group by
@@ -296,7 +297,7 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
         ElasticsearchEnumerators.getter(fields, ImmutableMap.copyOf(mapping));
 
     ElasticsearchJson.SearchHits hits =
-        new ElasticsearchJson.SearchHits(total, result.stream()
+        new ElasticsearchJson.SearchHits(res.searchHits().total(), result.stream()
             .map(r -> new ElasticsearchJson.SearchHit("_id", r, null))
             .collect(Collectors.toList()));
 
@@ -313,7 +314,7 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
   }
 
   @Override public String toString() {
-    return "ElasticsearchTable{" + indexName + "/" + typeName + "}";
+    return "ElasticsearchTable{" + indexName + "}";
   }
 
   @Override public <T> Queryable<T> asQueryable(QueryProvider queryProvider, SchemaPlus schema,
@@ -359,7 +360,7 @@ public class ElasticsearchTable extends AbstractQueryableTable implements Transl
          List<Map.Entry<String, RelFieldCollation.Direction>> sort,
          List<String> groupBy,
          List<Map.Entry<String, String>> aggregations,
-         List<Map.Entry<String, String>> mappings,
+         Map<String, String> mappings,
          Long offset, Long fetch) {
       try {
         return getTable().find(ops, fields, sort, groupBy, aggregations, mappings, offset, fetch);

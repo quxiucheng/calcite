@@ -39,7 +39,7 @@ public class HepProgramBuilder {
   /**
    * Creates a new HepProgramBuilder with an initially empty program. The
    * program under construction has an initial match order of
-   * {@link HepMatchOrder#ARBITRARY}, and an initial match limit of
+   * {@link HepMatchOrder#DEPTH_FIRST}, and an initial match limit of
    * {@link HepProgram#MATCH_UNTIL_FIXPOINT}.
    *
    * 使用初始空程序创建一个新的HepProgramBuilder。正在构建的程序的初始匹配顺序为HepMatchOrder。任意的，并且是HepProgram.MATCH_UNTIL_FIXPOINT的初始匹配限制。

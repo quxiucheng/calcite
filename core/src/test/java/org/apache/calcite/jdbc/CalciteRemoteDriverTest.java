@@ -25,13 +25,16 @@ import org.apache.calcite.avatica.remote.Service;
 import org.apache.calcite.avatica.server.AvaticaJsonHandler;
 import org.apache.calcite.avatica.server.HttpServer;
 import org.apache.calcite.avatica.server.Main;
-import org.apache.calcite.prepare.CalcitePrepareImpl;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.test.CalciteAssert;
 import org.apache.calcite.test.JdbcFrontLinqBackTest;
 import org.apache.calcite.test.JdbcTest;
+import org.apache.calcite.util.TestUtil;
 import org.apache.calcite.util.Util;
 
 import com.google.common.collect.ImmutableList;
+
+import net.jcip.annotations.NotThreadSafe;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
@@ -81,12 +84,15 @@ import static org.junit.Assert.assertThat;
 
 /**
  * Test for Calcite's remote JDBC driver.
+ * Technically speaking, the test is thread safe, however Caclite/Avatica have thread-safety issues
+ * see https://issues.apache.org/jira/browse/CALCITE-2853.
  */
+@NotThreadSafe
 public class CalciteRemoteDriverTest {
   public static final String LJS = Factory2.class.getName();
 
   private final PrintWriter out =
-      CalcitePrepareImpl.DEBUG ? Util.printWriter(System.out)
+      CalciteSystemProperty.DEBUG.value() ? Util.printWriter(System.out)
           : new PrintWriter(new StringWriter());
 
   private static final CalciteAssert.ConnectionFactory REMOTE_CONNECTION_FACTORY =
@@ -101,7 +107,7 @@ public class CalciteRemoteDriverTest {
         try {
           return connection.getMetaData().getSchemas();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          throw TestUtil.rethrow(e);
         }
       };
 
@@ -110,7 +116,7 @@ public class CalciteRemoteDriverTest {
         try {
           return connection.getMetaData().getCatalogs();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          throw TestUtil.rethrow(e);
         }
       };
 
@@ -119,7 +125,7 @@ public class CalciteRemoteDriverTest {
         try {
           return connection.getMetaData().getColumns(null, null, null, null);
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          throw TestUtil.rethrow(e);
         }
       };
 
@@ -128,7 +134,7 @@ public class CalciteRemoteDriverTest {
         try {
           return connection.getMetaData().getTypeInfo();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          throw TestUtil.rethrow(e);
         }
       };
 
@@ -137,7 +143,7 @@ public class CalciteRemoteDriverTest {
         try {
           return connection.getMetaData().getTableTypes();
         } catch (SQLException e) {
-          throw new RuntimeException(e);
+          throw TestUtil.rethrow(e);
         }
       };
 
@@ -424,7 +430,7 @@ public class CalciteRemoteDriverTest {
         SqlType.SQLXML
     };
     final PrintWriter out =
-        CalcitePrepareImpl.DEBUG
+        CalciteSystemProperty.DEBUG.value()
             ? Util.printWriter(System.out)
             : new PrintWriter(new StringWriter());
     for (SqlType.Method row : SqlType.Method.values()) {
@@ -624,7 +630,7 @@ public class CalciteRemoteDriverTest {
             new CalciteMetaImpl(conn.unwrap(CalciteConnectionImpl.class));
         return new LocalService(meta);
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        throw TestUtil.rethrow(e);
       }
     }
   }
@@ -780,7 +786,7 @@ public class CalciteRemoteDriverTest {
         final Connection connection = CalciteAssert.hr().connect();
         return new CalciteMetaImpl((CalciteConnectionImpl) connection);
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        throw TestUtil.rethrow(e);
       }
     }
   }
@@ -794,7 +800,7 @@ public class CalciteRemoteDriverTest {
             .getMeta((CalciteConnectionImpl) localConnection);
         return new LocalJsonService(new LocalService(meta));
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        throw TestUtil.rethrow(e);
       }
     }
   }
@@ -809,7 +815,7 @@ public class CalciteRemoteDriverTest {
                 conn.unwrap(CalciteConnectionImpl.class));
         return new LocalService(meta);
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        throw TestUtil.rethrow(e);
       }
     }
   }

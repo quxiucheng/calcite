@@ -377,8 +377,8 @@ public abstract class SqlOperator {
     return name.equals(other.name) && kind == other.kind;
   }
 
-  public boolean isName(String testName) {
-    return name.equals(testName);
+  public boolean isName(String testName, boolean caseSensitive) {
+    return caseSensitive ? name.equals(testName) : name.equalsIgnoreCase(testName);
   }
 
   @Override public int hashCode() {
@@ -519,9 +519,12 @@ public abstract class SqlOperator {
     final List<RelDataType> argTypes = constructArgTypeList(validator, scope,
         call, args, false);
 
+    // Always disable type coercion for builtin operator operands,
+    // they are handled by the TypeCoercion specifically.
     final SqlOperator sqlOperator =
         SqlUtil.lookupRoutine(validator.getOperatorTable(), getNameAsId(),
-            argTypes, null, null, getSyntax(), getKind());
+            argTypes, null, null, getSyntax(), getKind(),
+            validator.getCatalogReader().nameMatcher(), false);
 
     ((SqlBasicCall) call).setOperator(sqlOperator);
     RelDataType type = call.getOperator().validateOperands(validator, scope, call);

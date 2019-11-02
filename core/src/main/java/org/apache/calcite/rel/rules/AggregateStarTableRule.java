@@ -17,6 +17,7 @@
 package org.apache.calcite.rel.rules;
 
 import org.apache.calcite.config.CalciteConnectionConfig;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.jdbc.CalciteSchema;
 import org.apache.calcite.materialize.Lattice;
 import org.apache.calcite.materialize.TileKey;
@@ -29,7 +30,6 @@ import org.apache.calcite.plan.RelOptRuleOperand;
 import org.apache.calcite.plan.RelOptTable;
 import org.apache.calcite.plan.SubstitutionVisitor;
 import org.apache.calcite.plan.ViewExpanders;
-import org.apache.calcite.prepare.CalcitePrepareImpl;
 import org.apache.calcite.prepare.RelOptTableImpl;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.Aggregate;
@@ -156,14 +156,14 @@ public class AggregateStarTableRule extends RelOptRule {
             rowCount);
     relBuilder.push(aggregateRelOptTable.toRel(ViewExpanders.simpleContext(cluster)));
     if (tileKey == null) {
-      if (CalcitePrepareImpl.DEBUG) {
+      if (CalciteSystemProperty.DEBUG.value()) {
         System.out.println("Using materialization "
             + aggregateRelOptTable.getQualifiedName()
             + " (exact match)");
       }
     } else if (!tileKey.dimensions.equals(aggregate.getGroupSet())) {
       // Aggregate has finer granularity than we need. Roll up.
-      if (CalcitePrepareImpl.DEBUG) {
+      if (CalciteSystemProperty.DEBUG.value()) {
         System.out.println("Using materialization "
             + aggregateRelOptTable.getQualifiedName()
             + ", rolling up " + tileKey.dimensions + " to "
@@ -184,10 +184,10 @@ public class AggregateStarTableRule extends RelOptRule {
         aggCalls.add(copy);
       }
       relBuilder.push(
-          aggregate.copy(aggregate.getTraitSet(), relBuilder.build(), false,
+          aggregate.copy(aggregate.getTraitSet(), relBuilder.build(),
               groupSet.build(), null, aggCalls));
     } else if (!tileKey.measures.equals(measures)) {
-      if (CalcitePrepareImpl.DEBUG) {
+      if (CalciteSystemProperty.DEBUG.value()) {
         System.out.println("Using materialization "
             + aggregateRelOptTable.getQualifiedName()
             + ", right granularity, but different measures "
@@ -199,7 +199,6 @@ public class AggregateStarTableRule extends RelOptRule {
                   tileKey.dimensions.cardinality() + tileKey.measures.size(),
                   aggregate.getRowType().getFieldCount()) {
                 public int getSourceOpt(int source) {
-                  assert aggregate.getIndicatorCount() == 0;
                   if (source < aggregate.getGroupCount()) {
                     int in = tileKey.dimensions.nth(source);
                     return aggregate.getGroupSet().indexOf(in);
@@ -240,8 +239,8 @@ public class AggregateStarTableRule extends RelOptRule {
       if (roll == null) {
         break tryRoll;
       }
-      return AggregateCall.create(roll, false,
-          aggregateCall.isApproximate(), ImmutableList.of(offset + i), -1,
+      return AggregateCall.create(roll, false, aggregateCall.isApproximate(),
+          aggregateCall.ignoreNulls(), ImmutableList.of(offset + i), -1,
           aggregateCall.collation,
           groupCount, relBuilder.peek(), null, aggregateCall.name);
     }
@@ -258,7 +257,8 @@ public class AggregateStarTableRule extends RelOptRule {
         newArgs.add(z);
       }
       return AggregateCall.create(aggregation, false,
-          aggregateCall.isApproximate(), newArgs, -1, aggregateCall.collation,
+          aggregateCall.isApproximate(), aggregateCall.ignoreNulls(),
+          newArgs, -1, aggregateCall.collation,
           groupCount, relBuilder.peek(), null, aggregateCall.name);
     }
 

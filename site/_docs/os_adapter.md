@@ -187,7 +187,7 @@ To find out what columns a table has, use `explain`:
 {% highlight bash %}
 $ sqlsh explain plan with type for select \* from du
 size_k BIGINT NOT NULL,
-path VARCHAR CHARACTER SET "ISO-8859-1" COLLATE "ISO-8859-1$en_US$primary" NOT NULL,
+path VARCHAR NOT NULL,
 size_b BIGINT NOT NULL
 {% endhighlight %}
 
@@ -238,6 +238,22 @@ $ ./sqlsh -o mysql select min\(size_k\), max\(size_k\) from du
 +--------+--------+
 |      0 |  94312 |
 +--------+--------+
+(1 row)
+
+{% endhighlight %}
+
+## Example: jps
+
+provides a display of all current java process pids In `sqlsh`:
+
+{% highlight bash %}
+$ ./sqlsh select distinct jps.\`pid\`, jps.\`info\` from jps
++--------+---------------------+
+| pid    |  info               |
++--------+---------------------+
+|  49457 | RemoteMavenServer   |
+|  48326 | KotlinCompileDaemon |
++--------+---------------------+
 (1 row)
 
 {% endhighlight %}

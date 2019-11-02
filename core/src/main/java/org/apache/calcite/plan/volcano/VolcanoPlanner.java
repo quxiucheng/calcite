@@ -18,6 +18,7 @@ package org.apache.calcite.plan.volcano;
 
 import org.apache.calcite.avatica.util.Spaces;
 import org.apache.calcite.config.CalciteConnectionConfig;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.linq4j.tree.Expressions;
 import org.apache.calcite.plan.AbstractRelOptPlanner;
 import org.apache.calcite.plan.Context;
@@ -39,31 +40,20 @@ import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.plan.RelTrait;
 import org.apache.calcite.plan.RelTraitDef;
 import org.apache.calcite.plan.RelTraitSet;
-import org.apache.calcite.prepare.CalcitePrepareImpl;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.RelVisitor;
 import org.apache.calcite.rel.convert.Converter;
 import org.apache.calcite.rel.convert.ConverterRule;
+import org.apache.calcite.rel.externalize.RelWriterImpl;
 import org.apache.calcite.rel.metadata.JaninoRelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataQuery;
-import org.apache.calcite.rel.rules.AggregateJoinTransposeRule;
-import org.apache.calcite.rel.rules.AggregateProjectMergeRule;
-import org.apache.calcite.rel.rules.AggregateRemoveRule;
-import org.apache.calcite.rel.rules.CalcRemoveRule;
-import org.apache.calcite.rel.rules.FilterJoinRule;
-import org.apache.calcite.rel.rules.JoinAssociateRule;
-import org.apache.calcite.rel.rules.JoinCommuteRule;
-import org.apache.calcite.rel.rules.ProjectRemoveRule;
-import org.apache.calcite.rel.rules.SemiJoinRule;
-import org.apache.calcite.rel.rules.SortRemoveRule;
-import org.apache.calcite.rel.rules.UnionToDistinctRule;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.runtime.Hook;
 import org.apache.calcite.sql.SqlExplainLevel;
 import org.apache.calcite.util.Litmus;
 import org.apache.calcite.util.Pair;
-import org.apache.calcite.util.SaffronProperties;
+import org.apache.calcite.util.PartiallyOrderedSet;
 import org.apache.calcite.util.Util;
 
 import com.google.common.collect.ImmutableList;
@@ -77,6 +67,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -99,8 +90,6 @@ import java.util.regex.Pattern;
  * VolcanoPlanner –是CBO(Cost Base Optimize)模式,基于成本的优化
  */
 public class VolcanoPlanner extends AbstractRelOptPlanner {
-  //~ Static fields/initializers ---------------------------------------------
-
   protected static final double COST_IMPROVEMENT = .5;
 
   //~ Instance fields --------------------------------------------------------
@@ -216,18 +205,17 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
    */
   RelOptListener listener;
 
-  /**
-   * Dump of the root relational expression, as it was before any rules were
-   * applied. For debugging.
-   */
-  private String originalRootString;
-
   private RelNode originalRoot;
 
   /**
    * Whether the planner can accept new rules.
    */
   private boolean locked;
+
+  /**
+   * Whether rels with Convention.NONE has infinite cost.
+   */
+  private boolean noneConventionHasInfiniteCost = true;
 
   private final List<RelOptMaterialization> materializations =
       new ArrayList<>();
@@ -238,9 +226,9 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
   private final Map<List<String>, RelOptLattice> latticeByName =
       new LinkedHashMap<>();
 
-  final Map<RelNode, Provenance> provenanceMap = new HashMap<>();
+  final Map<RelNode, Provenance> provenanceMap;
 
-  private final Deque<VolcanoRuleCall> ruleCallStack = new ArrayDeque<>();
+  final Deque<VolcanoRuleCall> ruleCallStack = new ArrayDeque<>();
 
   /** Zero cost, according to {@link #costFactory}. Not necessarily a
    * {@link org.apache.calcite.plan.volcano.VolcanoCost}. */
@@ -279,6 +267,9 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
     super(costFactory == null ? VolcanoCost.FACTORY : costFactory, //
         externalContext);
     this.zeroCost = this.costFactory.makeZeroCost();
+    // If LOGGER is debug enabled, enable provenance information to be captured
+    this.provenanceMap = LOGGER.isDebugEnabled() ? new HashMap<>()
+        : Util.blackholeMap();
   }
 
   //~ Methods ----------------------------------------------------------------
@@ -308,8 +299,6 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
     if (this.originalRoot == null) {
       this.originalRoot = rel;
     }
-    this.originalRootString =
-        RelOptUtil.toString(root, SqlExplainLevel.ALL_ATTRIBUTES);
 
     // Making a node the root changes its importance.
     this.ruleQueue.recompute(this.root);
@@ -337,7 +326,7 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
     return latticeByName.get(table.getQualifiedName());
   }
 
-  private void registerMaterializations() {
+  protected void registerMaterializations() {
     // Avoid using materializations while populating materializations!
     final CalciteConnectionConfig config =
         context.unwrap(CalciteConnectionConfig.class);
@@ -440,6 +429,7 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
     this.ruleNames.clear();
     this.materializations.clear();
     this.latticeByName.clear();
+    this.provenanceMap.clear();
   }
 
   public List<RelOptRule> getRules() {
@@ -661,7 +651,9 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
       LOGGER.debug(
           "Cheapest plan:\n{}", RelOptUtil.toString(cheapest, SqlExplainLevel.ALL_ATTRIBUTES));
 
-      LOGGER.debug("Provenance:\n{}", provenance(cheapest));
+      if (!provenanceMap.isEmpty()) {
+        LOGGER.debug("Provenance:\n{}", provenance(cheapest));
+      }
     }
     return cheapest;
   }
@@ -892,6 +884,13 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
           return litmus.fail("subset [{}] is in wrong set [{}]",
               subset.getDescription(), set);
         }
+
+        // Make sure best RelNode is valid
+        if (subset.best != null && !subset.set.rels.contains(subset.best)) {
+          return litmus.fail("RelSubset [{}] does not contain its best RelNode [{}]",
+                  subset.getDescription(), subset.best.getDescription());
+        }
+
         for (RelNode rel : subset.getRels()) {
           RelOptCost relCost = getCost(rel, rel.getCluster().getMetadataQuery());
           if (relCost.isLt(subset.bestCost)) {
@@ -905,24 +904,7 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
   }
 
   public void registerAbstractRelationalRules() {
-    addRule(FilterJoinRule.FILTER_ON_JOIN);
-    addRule(FilterJoinRule.JOIN);
-    addRule(AbstractConverter.ExpandConversionRule.INSTANCE);
-    addRule(JoinCommuteRule.INSTANCE);
-    addRule(SemiJoinRule.PROJECT);
-    addRule(SemiJoinRule.JOIN);
-    if (CalcitePrepareImpl.COMMUTE) {
-      addRule(JoinAssociateRule.INSTANCE);
-    }
-    addRule(AggregateRemoveRule.INSTANCE);
-    addRule(UnionToDistinctRule.INSTANCE);
-    addRule(ProjectRemoveRule.INSTANCE);
-    addRule(AggregateJoinTransposeRule.INSTANCE);
-    addRule(AggregateProjectMergeRule.INSTANCE);
-    addRule(CalcRemoveRule.INSTANCE);
-    addRule(SortRemoveRule.INSTANCE);
-
-    // todo: rule which makes Project({OrdinalRef}) disappear
+    RelOptUtil.registerAbstractRelationalRules(this);
   }
 
   public void registerSchema(RelOptSchema schema) {
@@ -935,13 +917,22 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
     }
   }
 
+  /**
+   * Sets whether this planner should consider rel nodes with Convention.NONE
+   * to have inifinte cost or not.
+   * @param infinite Whether to make none convention rel nodes inifite cost
+   */
+  public void setNoneConventionHasInfiniteCost(boolean infinite) {
+    this.noneConventionHasInfiniteCost = infinite;
+  }
+
   public RelOptCost getCost(RelNode rel, RelMetadataQuery mq) {
     assert rel != null : "pre-condition: rel != null";
     if (rel instanceof RelSubset) {
       return ((RelSubset) rel).bestCost;
     }
-    if (rel.getTraitSet().getTrait(ConventionTraitDef.INSTANCE)
-        == Convention.NONE) {
+    if (noneConventionHasInfiniteCost
+        && rel.getTraitSet().getTrait(ConventionTraitDef.INSTANCE) == Convention.NONE) {
       return costFactory.makeInfiniteCost();
     }
     RelOptCost cost = mq.getNonCumulativeCost(rel);
@@ -1002,7 +993,7 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
     assert fromTraits.size() >= toTraits.size();
 
     final boolean allowInfiniteCostConverters =
-        SaffronProperties.INSTANCE.allowInfiniteCostConverters().get();
+        CalciteSystemProperty.ALLOW_INFINITE_COST_CONVERTERS.value();
 
     // Traits may build on top of another...for example a collation trait
     // would typically come after a distribution trait since distribution
@@ -1160,8 +1151,37 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
   public void dump(PrintWriter pw) {
     pw.println("Root: " + root.getDescription());
     pw.println("Original rel:");
-    pw.println(originalRootString);
-    pw.println("Sets:");
+
+    if (originalRoot != null) {
+      originalRoot.explain(
+          new RelWriterImpl(pw, SqlExplainLevel.ALL_ATTRIBUTES, false));
+    }
+    if (CalciteSystemProperty.DUMP_SETS.value()) {
+      pw.println();
+      pw.println("Sets:");
+      dumpSets(pw);
+    }
+    if (CalciteSystemProperty.DUMP_GRAPHVIZ.value()) {
+      pw.println();
+      pw.println("Graphviz:");
+      dumpGraphviz(pw);
+    }
+  }
+
+  /** Computes the key for {@link #mapDigestToRel}. */
+  private static Pair<String, RelDataType> key(RelNode rel) {
+    return Pair.of(rel.getDigest(), rel.getRowType());
+  }
+
+  public String toDot() {
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    dumpGraphviz(pw);
+    pw.flush();
+    return sw.toString();
+  }
+
+  private void dumpSets(PrintWriter pw) {
     Ordering<RelSet> ordering = Ordering.from(Comparator.comparingInt(o -> o.id));
     for (RelSet set : ordering.immutableSortedCopy(allSets)) {
       pw.println("Set#" + set.id
@@ -1209,12 +1229,178 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
         }
       }
     }
-    pw.println();
   }
 
-  /** Computes the key for {@link #mapDigestToRel}. */
-  private static Pair<String, RelDataType> key(RelNode rel) {
-    return Pair.of(rel.getDigest(), rel.getRowType());
+  private void dumpGraphviz(PrintWriter pw) {
+    Ordering<RelSet> ordering = Ordering.from(Comparator.comparingInt(o -> o.id));
+    Set<RelNode> activeRels = new HashSet<>();
+    for (VolcanoRuleCall volcanoRuleCall : ruleCallStack) {
+      activeRels.addAll(Arrays.asList(volcanoRuleCall.rels));
+    }
+    pw.println("digraph G {");
+    pw.println("\troot [style=filled,label=\"Root\"];");
+    PartiallyOrderedSet<RelSubset> subsetPoset = new PartiallyOrderedSet<>(
+        (e1, e2) -> e1.getTraitSet().satisfies(e2.getTraitSet()));
+    Set<RelSubset> nonEmptySubsets = new HashSet<>();
+    for (RelSet set : ordering.immutableSortedCopy(allSets)) {
+      pw.print("\tsubgraph cluster");
+      pw.print(set.id);
+      pw.println("{");
+      pw.print("\t\tlabel=");
+      Util.printJavaString(pw, "Set " + set.id + " " + set.subsets.get(0).getRowType(), false);
+      pw.print(";\n");
+      for (RelNode rel : set.rels) {
+        pw.print("\t\trel");
+        pw.print(rel.getId());
+        pw.print(" [label=");
+        RelMetadataQuery mq = rel.getCluster().getMetadataQuery();
+
+        // Note: rel traitset could be different from its subset.traitset
+        // It can happen due to RelTraitset#simplify
+        // If the traits are different, we want to keep them on a graph
+        String traits = "." + getSubset(rel).getTraitSet().toString();
+        String title = rel.getDescription().replace(traits, "");
+        if (title.endsWith(")")) {
+          int openParen = title.indexOf('(');
+          if (openParen != -1) {
+            // Title is like rel#12:LogicalJoin(left=RelSubset#4,right=RelSubset#3,
+            // condition==($2, $0),joinType=inner)
+            // so we remove the parenthesis, and wrap parameters to the second line
+            // This avoids "too wide" Graphiz boxes, and makes the graph easier to follow
+            title = title.substring(0, openParen) + '\n'
+                + title.substring(openParen + 1, title.length() - 1);
+          }
+        }
+        Util.printJavaString(pw,
+            title
+                + "\nrows=" + mq.getRowCount(rel) + ", cost=" + getCost(rel, mq), false);
+        RelSubset relSubset = getSubset(rel);
+        if (!(rel instanceof AbstractConverter)) {
+          nonEmptySubsets.add(relSubset);
+        }
+        if (relSubset.best == rel) {
+          pw.print(",color=blue");
+        }
+        if (activeRels.contains(rel)) {
+          pw.print(",style=dashed");
+        }
+        pw.print(",shape=box");
+        pw.println("]");
+      }
+
+      subsetPoset.clear();
+      for (RelSubset subset : set.subsets) {
+        subsetPoset.add(subset);
+        pw.print("\t\tsubset");
+        pw.print(subset.getId());
+        pw.print(" [label=");
+        Util.printJavaString(pw, subset.getDescription(), false);
+        boolean empty = !nonEmptySubsets.contains(subset);
+        if (empty) {
+          // We don't want to iterate over rels when we know the set is not empty
+          for (RelNode rel : subset.getRels()) {
+            if (!(rel instanceof AbstractConverter)) {
+              empty = false;
+              break;
+            }
+          }
+          if (empty) {
+            pw.print(",color=red");
+          }
+        }
+        if (activeRels.contains(subset)) {
+          pw.print(",style=dashed");
+        }
+        pw.print("]\n");
+      }
+
+      for (RelSubset subset : subsetPoset) {
+        for (RelSubset parent : subsetPoset.getChildren(subset)) {
+          pw.print("\t\tsubset");
+          pw.print(subset.getId());
+          pw.print(" -> subset");
+          pw.print(parent.getId());
+          pw.print(";");
+        }
+      }
+
+      pw.print("\t}\n");
+    }
+    // Note: it is important that all the links are declared AFTER declaration of the nodes
+    // Otherwise Graphviz creates nodes implicitly, and puts them into a wrong cluster
+    pw.print("\troot -> subset");
+    pw.print(root.getId());
+    pw.println(";");
+    for (RelSet set : ordering.immutableSortedCopy(allSets)) {
+      for (RelNode rel : set.rels) {
+        RelSubset relSubset = getSubset(rel);
+        pw.print("\tsubset");
+        pw.print(relSubset.getId());
+        pw.print(" -> rel");
+        pw.print(rel.getId());
+        if (relSubset.best == rel) {
+          pw.print("[color=blue]");
+        }
+        pw.print(";");
+        List<RelNode> inputs = rel.getInputs();
+        for (int i = 0; i < inputs.size(); i++) {
+          RelNode input = inputs.get(i);
+          pw.print(" rel");
+          pw.print(rel.getId());
+          pw.print(" -> ");
+          pw.print(input instanceof RelSubset ? "subset" : "rel");
+          pw.print(input.getId());
+          if (relSubset.best == rel || inputs.size() > 1) {
+            char sep = '[';
+            if (relSubset.best == rel) {
+              pw.print(sep);
+              pw.print("color=blue");
+              sep = ',';
+            }
+            if (inputs.size() > 1) {
+              pw.print(sep);
+              pw.print("label=\"");
+              pw.print(i);
+              pw.print("\"");
+              // sep = ',';
+            }
+            pw.print(']');
+          }
+          pw.print(";");
+        }
+        pw.println();
+      }
+    }
+
+    // Draw lines for current rules
+    for (VolcanoRuleCall ruleCall : ruleCallStack) {
+      pw.print("rule");
+      pw.print(ruleCall.id);
+      pw.print(" [style=dashed,label=");
+      Util.printJavaString(pw, ruleCall.rule.toString(), false);
+      pw.print("]");
+
+      RelNode[] rels = ruleCall.rels;
+      for (int i = 0; i < rels.length; i++) {
+        RelNode rel = rels[i];
+        pw.print(" rule");
+        pw.print(ruleCall.id);
+        pw.print(" -> ");
+        pw.print(rel instanceof RelSubset ? "subset" : "rel");
+        pw.print(rel.getId());
+        pw.print(" [style=dashed");
+        if (rels.length > 1) {
+          pw.print(",label=\"");
+          pw.print(i);
+          pw.print("\"");
+        }
+        pw.print("]");
+        pw.print(";");
+      }
+      pw.println();
+    }
+
+    pw.print("}");
   }
 
   /**
@@ -1244,6 +1430,7 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
         // just knocked it out. Put it back, and forget about 'rel'.
         LOGGER.trace("After renaming rel#{} it is now equivalent to rel#{}",
             rel.getId(), equivRel.getId());
+
         mapDigestToRel.put(key, equivRel);
 
         RelSubset equivRelSubset = getSubset(equivRel);
@@ -1262,6 +1449,11 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
         boolean existed = subset.set.rels.remove(rel);
         assert existed : "rel was not known to its set";
         final RelSubset equivSubset = getSubset(equivRel);
+        if (subset.best == rel) {
+          subset.best = equivRel;
+          subset.bestCost = getCost(equivRel);
+        }
+
         if (equivSubset != subset) {
           // The equivalent relational expression is in a different
           // subset, therefore the sets are equivalent.
@@ -1533,6 +1725,7 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
           key = key(rel);
           RelNode equivRel = mapDigestToRel.get(key);
           if ((equivRel != rel) && (equivRel != null)) {
+
             // make sure this bad rel didn't get into the
             // set in any way (fixupInputs will do this but it
             // doesn't know if it should so it does it anyway)
@@ -1745,9 +1938,7 @@ public class VolcanoPlanner extends AbstractRelOptPlanner {
       RelNode rel,
       RelNode equivRel,
       VolcanoRuleCall ruleCall) {
-    ruleCallStack.push(ruleCall);
     ensureRegistered(rel, equivRel);
-    ruleCallStack.pop();
   }
 
   //~ Inner Classes ----------------------------------------------------------

@@ -18,16 +18,16 @@ package org.apache.calcite.rel.metadata;
 
 import org.apache.calcite.adapter.enumerable.EnumerableAggregate;
 import org.apache.calcite.adapter.enumerable.EnumerableFilter;
-import org.apache.calcite.adapter.enumerable.EnumerableJoin;
+import org.apache.calcite.adapter.enumerable.EnumerableHashJoin;
 import org.apache.calcite.adapter.enumerable.EnumerableProject;
 import org.apache.calcite.adapter.enumerable.EnumerableTableScan;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.interpreter.JaninoRexCompiler;
 import org.apache.calcite.linq4j.Ord;
 import org.apache.calcite.linq4j.tree.Primitive;
 import org.apache.calcite.plan.hep.HepRelVertex;
 import org.apache.calcite.plan.volcano.AbstractConverter;
 import org.apache.calcite.plan.volcano.RelSubset;
-import org.apache.calcite.prepare.CalcitePrepareImpl;
 import org.apache.calcite.rel.AbstractRelNode;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.convert.ConverterImpl;
@@ -52,7 +52,6 @@ import org.apache.calcite.rel.stream.LogicalDelta;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.util.ControlFlowException;
 import org.apache.calcite.util.Pair;
-import org.apache.calcite.util.SaffronProperties;
 import org.apache.calcite.util.Util;
 
 import com.google.common.cache.CacheBuilder;
@@ -104,7 +103,7 @@ public class JaninoRelMetadataProvider implements RelMetadataProvider {
   @SuppressWarnings("unchecked")
   private static final LoadingCache<Key, MetadataHandler> HANDLERS =
       maxSize(CacheBuilder.newBuilder(),
-          SaffronProperties.INSTANCE.metadataHandlerCacheMaximumSize().get())
+          CalciteSystemProperty.METADATA_HANDLER_CACHE_MAXIMUM_SIZE.value())
           .build(
               CacheLoader.from(key ->
                   load3(key.def, key.provider.handlers(key.def),
@@ -143,7 +142,7 @@ public class JaninoRelMetadataProvider implements RelMetadataProvider {
             EnumerableAggregate.class,
             EnumerableFilter.class,
             EnumerableProject.class,
-            EnumerableJoin.class,
+            EnumerableHashJoin.class,
             EnumerableTableScan.class));
   }
 
@@ -445,7 +444,7 @@ public class JaninoRelMetadataProvider implements RelMetadataProvider {
         + "\n"
         + "}";
 
-    if (CalcitePrepareImpl.DEBUG) {
+    if (CalciteSystemProperty.DEBUG.value()) {
       // Add line numbers to the generated janino class
       compiler.setDebuggingInformation(true, true, true);
       System.out.println(s);

@@ -58,6 +58,7 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -75,6 +76,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
@@ -2395,6 +2397,40 @@ public class UtilTest {
         isIterable(Arrays.asList("John", "Paul", "Ringo")));
   }
 
+  /** Tests {@link Util#select(List, List)}. */
+  @Test public void testSelect() {
+    final List<String> beatles =
+        Arrays.asList("John", "Paul", "George", "Ringo");
+    final List<String> nullBeatles =
+        Arrays.asList("John", "Paul", null, "Ringo");
+
+    final List<Integer> emptyOrdinals = Collections.emptyList();
+    assertThat(Util.select(beatles, emptyOrdinals).isEmpty(), is(true));
+    assertThat(Util.select(beatles, emptyOrdinals).toString(), is("[]"));
+
+    final List<Integer> ordinal0 = Collections.singletonList(0);
+    assertThat(Util.select(beatles, ordinal0).isEmpty(), is(false));
+    assertThat(Util.select(beatles, ordinal0).toString(), is("[John]"));
+
+    final List<Integer> ordinal20 = Arrays.asList(2, 0);
+    assertThat(Util.select(beatles, ordinal20).isEmpty(), is(false));
+    assertThat(Util.select(beatles, ordinal20).toString(),
+        is("[George, John]"));
+
+    final List<Integer> ordinal232 = Arrays.asList(2, 3, 2);
+    assertThat(Util.select(beatles, ordinal232).isEmpty(), is(false));
+    assertThat(Util.select(beatles, ordinal232).toString(),
+        is("[George, Ringo, George]"));
+    assertThat(Util.select(beatles, ordinal232),
+        isIterable(Arrays.asList("George", "Ringo", "George")));
+
+    assertThat(Util.select(nullBeatles, ordinal232).isEmpty(), is(false));
+    assertThat(Util.select(nullBeatles, ordinal232).toString(),
+        is("[null, Ringo, null]"));
+    assertThat(Util.select(nullBeatles, ordinal232),
+        isIterable(Arrays.asList(null, "Ringo", null)));
+  }
+
   @Test public void testEquivalenceSet() {
     final EquivalenceSet<String> c = new EquivalenceSet<>();
     assertThat(c.size(), is(0));
@@ -2433,6 +2469,25 @@ public class UtilTest {
     assertThat(c.classCount(), is(0));
   }
 
+  @Test public void testBlackHoleMap() {
+    final Map<Integer, Integer> map = BlackholeMap.of();
+
+    for (int i = 0; i < 100; i++) {
+      assertThat(map.put(i, i * i), is(nullValue()));
+      assertThat(map.size(), is(0));
+      assertThat(map.entrySet().add(new SimpleEntry<>(i, i * i)), is(true));
+      assertThat(map.entrySet().size(), is(0));
+      assertThat(map.keySet().size(), is(0));
+      assertThat(map.values().size(), is(0));
+      assertThat(map.entrySet().iterator().hasNext(), is(false));
+      try {
+        map.entrySet().iterator().next();
+        fail();
+      } catch (NoSuchElementException e) {
+        // Success
+      }
+    }
+  }
   private static <E> Matcher<Iterable<E>> isIterable(final Iterable<E> iterable) {
     final List<E> list = toList(iterable);
     return new TypeSafeMatcher<Iterable<E>>() {

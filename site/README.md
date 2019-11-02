@@ -31,7 +31,7 @@ You can build the site manually using your environment or use the docker compose
 Site generation currently works best with ruby-2.5.1.
 
 1. `cd site`
-2. `svn co https://svn.apache.org/repos/asf/calcite/site target`
+2. `git clone https://gitbox.apache.org/repos/asf/calcite-site.git target`
 3. `sudo apt-get install rubygems ruby2.5-dev zlib1g-dev` (linux)
    `Use RubyInstaller to install rubygems as recommended at https://www.ruby-lang.org/en/downloads/` (Windows)
 4. `sudo gem install bundler`
@@ -63,14 +63,17 @@ running from within the directory:
 2. Install [docker-compose](https://docs.docker.com/compose/install/)
 
 ### Build site
+
 1. `cd site`
 2. `docker-compose run build-site`
 
 ### Generate javadoc
+
 1. `cd site`
 2. `docker-compose run generate-javadoc`
 
 ### Running development mode locally
+
 You can preview your work while working on the site.
 
 1. `cd site`
@@ -82,14 +85,28 @@ As you make changes to the site, the site will automatically rebuild.
 
 ## Pushing to site
 
-1. `cd site`
-2. `svn co https://svn.apache.org/repos/asf/calcite/site target`
-3. `cd target`
-4. `svn status`
-5. You'll need to `svn add` any new files
-6. `svn ci`
+1. `cd site/target`
+2. `git init`
+3. `git remote add origin https://github.com/apache/calcite-site`
+4. `git reset origin/master --soft`
 
-Within a few minutes, svnpubsub should kick in and you'll be able to
+If you have not regenerated the javadoc and they are missing, restore them:
+
+6. `git reset -- apidocs/`
+7. `git reset -- testapidocs/`
+8. `git checkout -- apidocs/`
+9. `git checkout -- testapidocs/`
+
+Restore the avatica site
+
+10. `git reset -- avatica/`
+11. `git checkout -- avatica/`
+
+10. `git add .`
+11. Commit: `git commit -m "Your commit message goes here"`
+12. Push the site: `git push origin master`
+
+Within a few minutes, gitpubsub should kick in and you'll be able to
 see the results at
 [calcite.apache.org](https://calcite.apache.org/).
 
@@ -113,7 +130,7 @@ sync with "master". Immediately after a release, the release manager
 will publish the site, including all of the features that have just
 been released. When making an edit to the site, a Calcite committer
 must commit the change to the git "master" branch (as well as
-subversion, to publish the site, of course). If the edit is to appear
+git, to publish the site, of course). If the edit is to appear
 on the site immediately, the committer should then cherry-pick the
 change into the "site" branch.  If there have been no feature-related
 changes on the site since the release, then "site" should be a

@@ -73,7 +73,7 @@ final class ElasticsearchJson {
         rows.computeIfAbsent(r, ignore -> new ArrayList<>()).add(v);
     aggregations.forEach(a -> visitValueNodes(a, new ArrayList<>(), cons));
     rows.forEach((k, v) -> {
-      if (v.stream().anyMatch(val -> val instanceof GroupValue)) {
+      if (v.stream().allMatch(val -> val instanceof GroupValue)) {
         v.forEach(tuple -> {
           Map<String, Object> groupRow = new LinkedHashMap<>(k.keys);
           groupRow.put(tuple.getName(), tuple.value());
@@ -251,11 +251,11 @@ final class ElasticsearchJson {
   @JsonIgnoreProperties(ignoreUnknown = true)
   static class SearchHits {
 
-    private final long total;
+    private final SearchTotal total;
     private final List<SearchHit> hits;
 
     @JsonCreator
-    SearchHits(@JsonProperty("total")final long total,
+    SearchHits(@JsonProperty("total")final SearchTotal total,
                @JsonProperty("hits") final List<SearchHit> hits) {
       this.total = total;
       this.hits = Objects.requireNonNull(hits, "hits");
@@ -265,8 +265,57 @@ final class ElasticsearchJson {
       return this.hits;
     }
 
-    public long total() {
+    public SearchTotal total() {
       return total;
+    }
+
+  }
+
+  /**
+   * Container for total hits
+   */
+  @JsonDeserialize(using = SearchTotalDeserializer.class)
+  static class SearchTotal {
+
+    private final long value;
+
+    SearchTotal(final long value) {
+      this.value = value;
+    }
+
+    public long value() {
+      return value;
+    }
+
+  }
+
+  /**
+   * Allows to de-serialize total hits structures.
+   */
+  static class SearchTotalDeserializer extends StdDeserializer<SearchTotal> {
+
+    SearchTotalDeserializer() {
+      super(SearchTotal.class);
+    }
+
+    @Override public SearchTotal deserialize(final JsonParser parser,
+                                             final DeserializationContext ctxt)
+        throws IOException  {
+
+      JsonNode node = parser.getCodec().readTree(parser);
+      return parseSearchTotal(node);
+    }
+
+    private static SearchTotal parseSearchTotal(JsonNode node) {
+
+      final Number value;
+      if (node.isNumber()) {
+        value = node.numberValue();
+      } else {
+        value = node.get("value").numberValue();
+      }
+
+      return new SearchTotal(value.longValue());
     }
 
   }
@@ -318,6 +367,12 @@ final class ElasticsearchJson {
 
     Object valueOrNull(String name) {
       Objects.requireNonNull(name, "name");
+
+      // for "select *" return whole document
+      if (ElasticsearchConstants.isSelectAll(name)) {
+        return sourceOrFields();
+      }
+
       if (fields != null && fields.containsKey(name)) {
         Object field = fields.get(name);
         if (field instanceof Iterable) {

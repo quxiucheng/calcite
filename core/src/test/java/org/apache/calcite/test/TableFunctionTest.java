@@ -26,6 +26,7 @@ import org.apache.calcite.schema.impl.AbstractSchema;
 import org.apache.calcite.schema.impl.TableFunctionImpl;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
 import org.apache.calcite.util.Smalls;
+import org.apache.calcite.util.TestUtil;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -244,8 +245,7 @@ public class TableFunctionTest {
     }
   }
 
-  private Connection getConnectionWithMultiplyFunction()
-      throws ClassNotFoundException, SQLException {
+  private Connection getConnectionWithMultiplyFunction() throws SQLException {
     Connection connection =
         DriverManager.getConnection("jdbc:calcite:");
     CalciteConnection calciteConnection =
@@ -362,8 +362,12 @@ public class TableFunctionTest {
     final String q = "select *\n"
         + "from table(\"s\".\"multiplication\"('2', 3, 100))\n"
         + "where c1 + 2 < c2";
-    final String e = "No match found for function signature "
-        + "multiplication(<CHARACTER>, <NUMERIC>, <NUMERIC>)";
+    // With type coercion, a cast node with null as argument would be
+    // passed to the function to infer the table row type, we use
+    // SqlUserDefinedTableMacro#convertArguments to decide the type.
+    // For this table function: multiplication,
+    // it will just throw IllegalArgumentException.
+    final String e = "java.lang.IllegalArgumentException";
     with().query(q).throws_(e);
   }
 
@@ -389,7 +393,7 @@ public class TableFunctionTest {
             assertThat(numbers.toString(),
                 is("[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233]"));
           } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw TestUtil.rethrow(e);
           }
         });
   }
@@ -428,6 +432,20 @@ public class TableFunctionTest {
               "C=5; N=3",
               "C=5; N=5");
     }
+  }
+
+  /** Test case for
+   * <a href="https://issues.apache.org/jira/browse/CALCITE-2004">[CALCITE-2004]
+   * Wrong plan generated for left outer apply with table function</a>. */
+  @Test public void testLeftOuterApply() {
+    final String sql = "select *\n"
+        + "from (values 4) as t (c)\n"
+        + "left join lateral table(\"s\".\"fibonacci2\"(c)) as R(n) on c=n";
+    with()
+        .with(CalciteConnectionProperty.CONFORMANCE,
+            SqlConformanceEnum.LENIENT)
+        .query(sql)
+        .returnsUnordered("C=4; N=null");
   }
 
   /** Test case for

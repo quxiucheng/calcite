@@ -16,6 +16,8 @@
  */
 package org.apache.calcite.adapter.elasticsearch;
 
+import org.apache.calcite.util.TestUtil;
+
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 
@@ -35,6 +37,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+
+import static java.util.Collections.emptyMap;
 
 /**
  * Represents a single elastic search node which can run embedded in a java application.
@@ -96,7 +100,7 @@ class EmbeddedElasticsearchNode implements AutoCloseable {
       node.start();
       this.isStarted = true;
     } catch (NodeValidationException e) {
-      throw new RuntimeException(e);
+      throw TestUtil.rethrow(e);
     }
   }
 
@@ -152,8 +156,11 @@ class EmbeddedElasticsearchNode implements AutoCloseable {
   private static class LocalNode extends Node {
 
     private LocalNode(Settings settings, Collection<Class<? extends Plugin>> classpathPlugins) {
-      super(InternalSettingsPreparer.prepareEnvironment(settings, null),
-          classpathPlugins);
+      super(
+        InternalSettingsPreparer.prepareEnvironment(settings, emptyMap(),
+          null, () -> "default_node_name"),
+        classpathPlugins,
+        false);
     }
   }
 }

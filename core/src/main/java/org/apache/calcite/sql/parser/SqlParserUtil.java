@@ -18,6 +18,7 @@ package org.apache.calcite.sql.parser;
 
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.avatica.util.DateTimeUtils;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
 import org.apache.calcite.runtime.CalciteContextException;
 import org.apache.calcite.sql.SqlBinaryOperator;
@@ -39,7 +40,6 @@ import org.apache.calcite.sql.SqlUtil;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.util.DateString;
 import org.apache.calcite.util.PrecedenceClimbingParser;
-import org.apache.calcite.util.SaffronProperties;
 import org.apache.calcite.util.TimeString;
 import org.apache.calcite.util.TimestampString;
 import org.apache.calcite.util.Util;
@@ -89,7 +89,7 @@ public final class SqlParserUtil {
       return null;
     }
     if (Character.toUpperCase(s.charAt(0)) == 'N') {
-      return SaffronProperties.INSTANCE.defaultNationalCharset().get();
+      return CalciteSystemProperty.DEFAULT_NATIONAL_CHARSET.value();
     }
     int i = s.indexOf("'");
     return s.substring(1, i); // skip prefixed '_'
@@ -172,9 +172,18 @@ public final class SqlParserUtil {
   public static SqlTimestampLiteral parseTimestampLiteral(String s,
       SqlParserPos pos) {
     final String dateStr = parseString(s);
-    final DateTimeUtils.PrecisionTime pt =
-        DateTimeUtils.parsePrecisionDateTimeLiteral(dateStr,
-            Format.PER_THREAD.get().timestamp, DateTimeUtils.UTC_ZONE, -1);
+    final Format format = Format.PER_THREAD.get();
+    DateTimeUtils.PrecisionTime pt = null;
+    // Allow timestamp literals with and without time fields (as does
+    // PostgreSQL); TODO: require time fields except in Babel's lenient mode
+    final DateFormat[] dateFormats = {format.timestamp, format.date};
+    for (DateFormat dateFormat : dateFormats) {
+      pt = DateTimeUtils.parsePrecisionDateTimeLiteral(dateStr,
+          dateFormat, DateTimeUtils.UTC_ZONE, -1);
+      if (pt != null) {
+        break;
+      }
+    }
     if (pt == null) {
       throw SqlUtil.newContextException(pos,
           RESOURCE.illegalLiteral("TIMESTAMP", s,
@@ -552,7 +561,7 @@ public final class SqlParserUtil {
       strength = st.nextToken();
     } else {
       strength =
-          SaffronProperties.INSTANCE.defaultCollationStrength().get();
+          CalciteSystemProperty.DEFAULT_COLLATION_STRENGTH.value();
     }
 
     Charset charset = Charset.forName(charsetStr);

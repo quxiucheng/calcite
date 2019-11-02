@@ -19,6 +19,7 @@ package org.apache.calcite.adapter.enumerable;
 import org.apache.calcite.adapter.enumerable.impl.AggAddContextImpl;
 import org.apache.calcite.adapter.enumerable.impl.AggResultContextImpl;
 import org.apache.calcite.adapter.java.JavaTypeFactory;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.jdbc.JavaTypeFactoryImpl;
 import org.apache.calcite.linq4j.Ord;
 import org.apache.calcite.linq4j.function.Function0;
@@ -31,7 +32,6 @@ import org.apache.calcite.linq4j.tree.ParameterExpression;
 import org.apache.calcite.linq4j.tree.Types;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelTraitSet;
-import org.apache.calcite.prepare.CalcitePrepareImpl;
 import org.apache.calcite.rel.InvalidRelException;
 import org.apache.calcite.rel.RelCollations;
 import org.apache.calcite.rel.RelNode;
@@ -47,7 +47,6 @@ import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Type;
@@ -62,15 +61,12 @@ public class EnumerableAggregate extends Aggregate implements EnumerableRel {
   public EnumerableAggregate(
       RelOptCluster cluster,
       RelTraitSet traitSet,
-      RelNode child,
-      boolean indicator,
+      RelNode input,
       ImmutableBitSet groupSet,
       List<ImmutableBitSet> groupSets,
       List<AggregateCall> aggCalls)
       throws InvalidRelException {
-    super(cluster, traitSet, child, indicator, groupSet, groupSets, aggCalls);
-    Preconditions.checkArgument(!indicator,
-        "EnumerableAggregate no longer supports indicator fields");
+    super(cluster, traitSet, input, groupSet, groupSets, aggCalls);
     assert getConvention() instanceof EnumerableConvention;
 
     for (AggregateCall aggCall : aggCalls) {
@@ -87,11 +83,20 @@ public class EnumerableAggregate extends Aggregate implements EnumerableRel {
     }
   }
 
+  @Deprecated // to be removed before 2.0
+  public EnumerableAggregate(RelOptCluster cluster, RelTraitSet traitSet,
+      RelNode input, boolean indicator, ImmutableBitSet groupSet,
+      List<ImmutableBitSet> groupSets, List<AggregateCall> aggCalls)
+      throws InvalidRelException {
+    this(cluster, traitSet, input, groupSet, groupSets, aggCalls);
+    checkIndicator(indicator);
+  }
+
   @Override public EnumerableAggregate copy(RelTraitSet traitSet, RelNode input,
-      boolean indicator, ImmutableBitSet groupSet,
+      ImmutableBitSet groupSet,
       List<ImmutableBitSet> groupSets, List<AggregateCall> aggCalls) {
     try {
-      return new EnumerableAggregate(getCluster(), traitSet, input, indicator,
+      return new EnumerableAggregate(getCluster(), traitSet, input,
           groupSet, groupSets, aggCalls);
     } catch (InvalidRelException e) {
       // Semantic error not possible. Must be a bug. Convert to
@@ -212,7 +217,7 @@ public class EnumerableAggregate extends Aggregate implements EnumerableRel {
       final List<Expression> decls = new ArrayList<>(state.size());
       for (int i = 0; i < state.size(); i++) {
         String aggName = "a" + agg.aggIdx;
-        if (CalcitePrepareImpl.DEBUG) {
+        if (CalciteSystemProperty.DEBUG.value()) {
           aggName = Util.toJavaId(agg.call.getAggregation().getName(), 0)
               .substring("ID$0$".length()) + aggName;
         }
@@ -406,7 +411,7 @@ public class EnumerableAggregate extends Aggregate implements EnumerableRel {
           Expressions.return_(
               null,
               Expressions.call(
-                  inputPhysType.convertTo(childExp, physType),
+                  inputPhysType.convertTo(childExp, physType.getFormat()),
                   BuiltInMethod.DISTINCT.method,
                   Expressions.<Expression>list()
                       .appendIfNotNull(physType.comparer()))));
@@ -485,11 +490,11 @@ public class EnumerableAggregate extends Aggregate implements EnumerableRel {
    * <ul>
    *
    * <li>{@code hasOrderedCall == true} means there is at least one aggregate
-   * call including sort spec. We use {@link OrderedAggregateLambdaFactory}
+   * call including sort spec. We use {@link LazyAggregateLambdaFactory}
    * implementation to implement sorted aggregates for that.
    *
    * <li>{@code hasOrderedCall == false} indicates to use
-   * {@link SequencedAdderAggregateLambdaFactory} to implement a non-sort
+   * {@link BasicAggregateLambdaFactory} to implement a non-sort
    * aggregate.
    *
    * </ul>
@@ -502,12 +507,20 @@ public class EnumerableAggregate extends Aggregate implements EnumerableRel {
       ParameterExpression lambdaFactory) {
     if (hasOrderedCall) {
       ParameterExpression pe = Expressions.parameter(List.class,
-          builder.newName("sourceSorters"));
+          builder.newName("lazyAccumulators"));
       builder.add(
           Expressions.declare(0, pe, Expressions.new_(LinkedList.class)));
 
       for (AggImpState agg : aggs) {
         if (agg.call.collation.equals(RelCollations.EMPTY)) {
+          // if the call does not require ordering, fallback to
+          // use a non-sorted lazy accumulator.
+          builder.add(
+              Expressions.statement(
+                  Expressions.call(pe,
+                      BuiltInMethod.COLLECTION_ADD.method,
+                      Expressions.new_(BuiltInMethod.BASIC_LAZY_ACCUMULATOR.constructor,
+                          agg.accumulatorAdder))));
           continue;
         }
         final Pair<Expression, Expression> pair =
@@ -523,7 +536,7 @@ public class EnumerableAggregate extends Aggregate implements EnumerableRel {
       builder.add(
           Expressions.declare(0, lambdaFactory,
               Expressions.new_(
-                  BuiltInMethod.ORDERED_AGGREGATE_LAMBDA_FACTORY.constructor,
+                  BuiltInMethod.LAZY_AGGREGATE_LAMBDA_FACTORY.constructor,
                   accumulatorInitializer, pe)));
     } else {
       // when hasOrderedCall == false
@@ -541,7 +554,7 @@ public class EnumerableAggregate extends Aggregate implements EnumerableRel {
       builder.add(
           Expressions.declare(0, lambdaFactory,
               Expressions.new_(
-                  BuiltInMethod.SEQUENCED_ADDER_AGGREGATE_LAMBDA_FACTORY.constructor,
+                  BuiltInMethod.BASIC_AGGREGATE_LAMBDA_FACTORY.constructor,
                   accumulatorInitializer, pe)));
     }
   }

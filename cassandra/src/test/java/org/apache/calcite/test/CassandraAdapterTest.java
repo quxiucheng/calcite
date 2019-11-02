@@ -16,10 +16,10 @@
  */
 package org.apache.calcite.test;
 
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.util.Bug;
 import org.apache.calcite.util.Sources;
 import org.apache.calcite.util.TestUtil;
-import org.apache.calcite.util.Util;
 
 import org.apache.cassandra.config.DatabaseDescriptor;
 
@@ -46,7 +46,7 @@ import static org.junit.Assume.assumeTrue;
  * <p>Will start embedded cassandra cluster and populate it from local {@code twissandra.cql} file.
  * All configuration files are located in test classpath.
  *
- * <p>Note that tests will be skipped if running on JDK11 and JDK12
+ * <p>Note that tests will be skipped if running on JDK11+
  * (which is not yet supported by cassandra) see
  * <a href="https://issues.apache.org/jira/browse/CASSANDRA-9608">CASSANDRA-9608</a>.
  *
@@ -74,19 +74,17 @@ public class CassandraAdapterTest {
    * version (see below).
    *
    * <p>As of this wiring Cassandra 4.x is not yet released and we're using 3.x
-   * (which fails on JDK11 and JDK12). All cassandra tests will be skipped if
-   * running on JDK11 and JDK12.
+   * (which fails on JDK11+). All cassandra tests will be skipped if
+   * running on JDK11+.
    *
    * @see <a href="https://issues.apache.org/jira/browse/CASSANDRA-9608">CASSANDRA-9608</a>
    * @return {@code true} if test is compatible with current environment,
    *         {@code false} otherwise
    */
   private static boolean enabled() {
-    final boolean enabled =
-        Util.getBooleanProperty("calcite.test.cassandra", true);
+    final boolean enabled = CalciteSystemProperty.TEST_CASSANDRA.value();
     Bug.upgrade("remove JDK version check once current adapter supports Cassandra 4.x");
-    final boolean compatibleJdk = TestUtil.getJavaMajorVersion() != 11
-                                      && TestUtil.getJavaMajorVersion() != 12;
+    final boolean compatibleJdk = TestUtil.getJavaMajorVersion() < 11;
     return enabled && compatibleJdk;
   }
 
@@ -154,7 +152,7 @@ public class CassandraAdapterTest {
         .returns("tweet_id=f3cd759c-d05b-11e5-b58b-90e2ba530b12; "
             + "body=Lacus augue pede posuere.; username=JmuhsAaMdw\n")
         .explainContains("PLAN=CassandraToEnumerableConverter\n"
-           + "  CassandraFilter(condition=[=(CAST($0):CHAR(36) CHARACTER SET \"ISO-8859-1\" COLLATE \"ISO-8859-1$en_US$primary\", 'f3cd759c-d05b-11e5-b58b-90e2ba530b12')])\n"
+           + "  CassandraFilter(condition=[=(CAST($0):CHAR(36), 'f3cd759c-d05b-11e5-b58b-90e2ba530b12')])\n"
            + "    CassandraTableScan(table=[[twissandra, tweets]]");
   }
 
@@ -226,7 +224,7 @@ public class CassandraAdapterTest {
         .with(TWISSANDRA)
         .query("select \"tweet_id\" from \"tweets\" where \"username\"='JmuhsAaMdw'")
         .enableMaterializations(true)
-        .explainContains("CassandraTableScan(table=[[twissandra, tweets_by_user]])");
+        .explainContains("CassandraTableScan(table=[[twissandra, Tweets_By_User]])");
   }
 }
 

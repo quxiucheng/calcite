@@ -21,6 +21,8 @@ import org.apache.calcite.schema.SchemaPlus;
 import org.apache.calcite.schema.impl.ViewTable;
 import org.apache.calcite.schema.impl.ViewTableMacro;
 import org.apache.calcite.test.CalciteAssert;
+import org.apache.calcite.test.ElasticsearchChecker;
+import org.apache.calcite.util.TestUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
@@ -109,6 +111,21 @@ public class Projection2Test {
             .returns("EXPR$0=1; EXPR$1=2; EXPR$2=3; EXPR$3=foo; EXPR$4=null; EXPR$5=null\n");
   }
 
+  @Test
+  public void projection3() {
+    CalciteAssert.that()
+        .with(newConnectionFactory())
+        .query(
+            String.format(Locale.ROOT, "select * from \"elastic\".\"%s\"", NAME))
+        .returns("_MAP={a=1, b={a=2, b=3, c={a=foo}}}\n");
+
+    CalciteAssert.that()
+        .with(newConnectionFactory())
+        .query(
+            String.format(Locale.ROOT, "select *, _MAP['a'] from \"elastic\".\"%s\"", NAME))
+        .returns("_MAP={a=1, b={a=2, b=3, c={a=foo}}}; EXPR$1=1\n");
+  }
+
   /**
    * Test that {@code _id} field is available when queried explicitly.
    * @see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-id-field.html">ID Field</a>
@@ -163,10 +180,39 @@ public class Projection2Test {
         .returns(regexMatch("_id=\\p{Graph}+"));
 
     // _id field not available implicitly
-    final String sql5 = String.format(Locale.ROOT, "select * from \"elastic\".\"%s\"", NAME);
     factory
-        .query(sql5)
+        .query(
+            String.format(Locale.ROOT, "select * from \"elastic\".\"%s\"",
+                NAME))
         .returns(regexMatch("_MAP={a=1, b={a=2, b=3, c={a=foo}}}"));
+
+    factory
+        .query(
+            String.format(Locale.ROOT,
+                "select *, _MAP['_id'] from \"elastic\".\"%s\"", NAME))
+        .returns(regexMatch("_MAP={a=1, b={a=2, b=3, c={a=foo}}}; EXPR$1=\\p{Graph}+"));
+  }
+
+  /**
+   * Avoid using scripting for simple projections
+   *
+   * <p> When projecting simple fields (without expression) no
+   * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html">scripting</a>
+   * should be used just
+   * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-source-filtering.html">_source</a>
+   */
+  @Test
+  public void simpleProjectionNoScripting() {
+    CalciteAssert.that()
+        .with(newConnectionFactory())
+        .query(
+            String.format(Locale.ROOT, "select _MAP['_id'], _MAP['a'], _MAP['b.a'] from "
+                + " \"elastic\".\"%s\" where _MAP['b.a'] = 2", NAME))
+        .queryContains(
+            ElasticsearchChecker.elasticsearchChecker("'query.constant_score.filter.term.b.a':2",
+            "_source:['a', 'b.a']", "size:5196"))
+        .returns(regexMatch("EXPR$0=\\p{Graph}+; EXPR$1=1; EXPR$2=2"));
+
   }
 
   /**
@@ -234,7 +280,7 @@ public class Projection2Test {
           fail("Should have failed on previous line, but for some reason didn't");
         }
       } catch (SQLException e) {
-        throw new RuntimeException(e);
+        throw TestUtil.rethrow(e);
       }
     };
   }

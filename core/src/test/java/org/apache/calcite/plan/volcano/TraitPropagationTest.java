@@ -18,6 +18,7 @@ package org.apache.calcite.plan.volcano;
 
 import org.apache.calcite.adapter.enumerable.EnumerableTableScan;
 import org.apache.calcite.adapter.java.JavaTypeFactory;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.jdbc.CalcitePrepare;
 import org.apache.calcite.plan.Convention;
 import org.apache.calcite.plan.ConventionTraitDef;
@@ -34,7 +35,6 @@ import org.apache.calcite.plan.RelTrait;
 import org.apache.calcite.plan.RelTraitSet;
 import org.apache.calcite.plan.volcano.AbstractConverter.ExpandConversionRule;
 import org.apache.calcite.prepare.CalciteCatalogReader;
-import org.apache.calcite.prepare.CalcitePrepareImpl;
 import org.apache.calcite.rel.AbstractRelNode;
 import org.apache.calcite.rel.RelCollation;
 import org.apache.calcite.rel.RelCollationTraitDef;
@@ -105,7 +105,7 @@ public class TraitPropagationTest {
 
   @Test public void testOne() throws Exception {
     RelNode planned = run(new PropAction(), RULES);
-    if (CalcitePrepareImpl.DEBUG) {
+    if (CalciteSystemProperty.DEBUG.value()) {
       System.out.println(
           RelOptUtil.dumpPlan("LOGICAL PLAN", planned, SqlExplainFormat.TEXT,
               SqlExplainLevel.ALL_ATTRIBUTES));
@@ -165,10 +165,10 @@ public class TraitPropagationTest {
 
       // aggregate on s, count
       AggregateCall aggCall = AggregateCall.create(SqlStdOperatorTable.COUNT,
-          false, false, Collections.singletonList(1), -1, RelCollations.EMPTY,
+          false, false, false, Collections.singletonList(1), -1, RelCollations.EMPTY,
           sqlBigInt, "cnt");
       RelNode agg = new LogicalAggregate(cluster,
-          cluster.traitSetOf(Convention.NONE), project, false,
+          cluster.traitSetOf(Convention.NONE), project,
           ImmutableBitSet.of(0), null, Collections.singletonList(aggCall));
 
       final RelNode rootRel = agg;
@@ -206,7 +206,7 @@ public class TraitPropagationTest {
       RelNode convertedInput = convert(rel.getInput(), desiredTraits);
       call.transformTo(
           new PhysAgg(rel.getCluster(), empty.replace(PHYSICAL),
-              convertedInput, rel.indicator, rel.getGroupSet(),
+              convertedInput, rel.getGroupSet(),
               rel.getGroupSets(), rel.getAggCallList()));
     }
   }
@@ -294,17 +294,16 @@ public class TraitPropagationTest {
 
   /** Physical Aggregate RelNode */
   private static class PhysAgg extends Aggregate implements Phys {
-    PhysAgg(RelOptCluster cluster, RelTraitSet traits, RelNode child,
-        boolean indicator, ImmutableBitSet groupSet,
+    PhysAgg(RelOptCluster cluster, RelTraitSet traitSet, RelNode input,
+        ImmutableBitSet groupSet,
         List<ImmutableBitSet> groupSets, List<AggregateCall> aggCalls) {
-      super(cluster, traits, child, indicator, groupSet, groupSets, aggCalls);
-
+      super(cluster, traitSet, input, groupSet, groupSets, aggCalls);
     }
 
     public Aggregate copy(RelTraitSet traitSet, RelNode input,
-        boolean indicator, ImmutableBitSet groupSet,
+        ImmutableBitSet groupSet,
         List<ImmutableBitSet> groupSets, List<AggregateCall> aggCalls) {
-      return new PhysAgg(getCluster(), traitSet, input, indicator, groupSet,
+      return new PhysAgg(getCluster(), traitSet, input, groupSet,
           groupSets, aggCalls);
     }
 

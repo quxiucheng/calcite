@@ -18,9 +18,9 @@ package org.apache.calcite.tools;
 
 import org.apache.calcite.config.CalciteConnectionProperty;
 import org.apache.calcite.jdbc.CalciteSchema;
-import org.apache.calcite.materialize.MapSqlStatisticProvider;
 import org.apache.calcite.materialize.SqlStatisticProvider;
 import org.apache.calcite.plan.Context;
+import org.apache.calcite.plan.Contexts;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptCostFactory;
 import org.apache.calcite.plan.RelOptSchema;
@@ -38,6 +38,7 @@ import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.calcite.sql2rel.SqlRexConvertletTable;
 import org.apache.calcite.sql2rel.SqlToRelConverter;
 import org.apache.calcite.sql2rel.StandardConvertletTable;
+import org.apache.calcite.statistic.QuerySqlStatisticProvider;
 import org.apache.calcite.util.Util;
 
 import com.google.common.collect.ImmutableList;
@@ -72,6 +73,7 @@ public class Frameworks {
    * 一段代码要在计划器可用的上下文中运行。规划器可以从集群参数访问，其他几个有用的对象也可以。
    *
    * @param <R> result type */
+  @FunctionalInterface
   public interface PlannerAction<R> {
     R apply(RelOptCluster cluster, RelOptSchema relOptSchema,
         SchemaPlus rootSchema);
@@ -84,10 +86,22 @@ public class Frameworks {
    * statement.
    * 在计划器和语句可用的上下文中运行的一段代码。规划器可以从集群参数访问，其他几个有用的对象也可以。可以从语句中访问连接和DataContext。
    * @param <R> result type */
-  public abstract static class PrepareAction<R> {
+  @FunctionalInterface
+  public interface BasePrepareAction<R> {
+    R apply(RelOptCluster cluster, RelOptSchema relOptSchema,
+        SchemaPlus rootSchema, CalciteServerStatement statement);
+  }
+
+  /** As {@link BasePrepareAction} but with a {@link FrameworkConfig} included.
+   * Deprecated because a functional interface is more convenient.
+   *
+   * @param <R> result type */
+  @Deprecated // to be removed before 2.0
+  public abstract static class PrepareAction<R>
+      implements BasePrepareAction<R> {
     private final FrameworkConfig config;
     public PrepareAction() {
-      this.config = newConfigBuilder() //
+      this.config = newConfigBuilder()
           .defaultSchema(Frameworks.createRootSchema(true)).build();
     }
 
@@ -98,9 +112,6 @@ public class Frameworks {
     public FrameworkConfig getConfig() {
       return config;
     }
-
-    public abstract R apply(RelOptCluster cluster, RelOptSchema relOptSchema,
-        SchemaPlus rootSchema, CalciteServerStatement statement);
   }
 
   /**
@@ -110,17 +121,14 @@ public class Frameworks {
    * @param config FrameworkConfig to use for planner action.
    * @return Return value from action
    */
-  public static <R> R withPlanner(final PlannerAction<R> action, //
+  public static <R> R withPlanner(final PlannerAction<R> action,
       final FrameworkConfig config) {
-    return withPrepare(
-        new Frameworks.PrepareAction<R>(config) {
-          public R apply(RelOptCluster cluster, RelOptSchema relOptSchema,
-              SchemaPlus rootSchema, CalciteServerStatement statement) {
-            final CalciteSchema schema =
-                CalciteSchema.from(
-                    Util.first(config.getDefaultSchema(), rootSchema));
-            return action.apply(cluster, relOptSchema, schema.root().plus());
-          }
+    return withPrepare(config,
+        (cluster, relOptSchema, rootSchema, statement) -> {
+          final CalciteSchema schema =
+              CalciteSchema.from(
+                  Util.first(config.getDefaultSchema(), rootSchema));
+          return action.apply(cluster, relOptSchema, schema.root().plus());
         });
   }
 
@@ -136,6 +144,19 @@ public class Frameworks {
     return withPlanner(action, config);
   }
 
+  @Deprecated // to be removed before 2.0
+  public static <R> R withPrepare(PrepareAction<R> action) {
+    return withPrepare(action.getConfig(), action);
+  }
+
+  /** As {@link #withPrepare(FrameworkConfig, BasePrepareAction)} but using a
+   * default configuration. */
+  public static <R> R withPrepare(BasePrepareAction<R> action) {
+    final FrameworkConfig config = newConfigBuilder()
+        .defaultSchema(Frameworks.createRootSchema(true)).build();
+    return withPrepare(config, action);
+  }
+
   /**
    * Initializes a container then calls user-specified code with a planner
    * and statement.
@@ -143,19 +164,20 @@ public class Frameworks {
    * @param action Callback containing user-specified code
    * @return Return value from action
    */
-  public static <R> R withPrepare(PrepareAction<R> action) {
+  public static <R> R withPrepare(FrameworkConfig config,
+      BasePrepareAction<R> action) {
     try {
       final Properties info = new Properties();
-      if (action.config.getTypeSystem() != RelDataTypeSystem.DEFAULT) {
+      if (config.getTypeSystem() != RelDataTypeSystem.DEFAULT) {
         info.setProperty(CalciteConnectionProperty.TYPE_SYSTEM.camelName(),
-            action.config.getTypeSystem().getClass().getName());
+            config.getTypeSystem().getClass().getName());
       }
       Connection connection =
           DriverManager.getConnection("jdbc:calcite:", info);
       final CalciteServerStatement statement =
           connection.createStatement()
               .unwrap(CalciteServerStatement.class);
-      return new CalcitePrepareImpl().perform(statement, action);
+      return new CalcitePrepareImpl().perform(statement, config, action);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -211,11 +233,12 @@ public class Frameworks {
       convertletTable = StandardConvertletTable.INSTANCE;
       operatorTable = SqlStdOperatorTable.instance();
       programs = ImmutableList.of();
+      context = Contexts.empty();
       parserConfig = SqlParser.Config.DEFAULT;
       sqlToRelConverterConfig = SqlToRelConverter.Config.DEFAULT;
       typeSystem = RelDataTypeSystem.DEFAULT;
       evolveLattice = false;
-      statisticProvider = MapSqlStatisticProvider.INSTANCE;
+      statisticProvider = QuerySqlStatisticProvider.SILENT_CACHING_INSTANCE;
     }
 
     /** Creates a ConfigBuilder, initializing from an existing config. */

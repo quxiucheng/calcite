@@ -19,6 +19,7 @@ package org.apache.calcite.tools;
 import org.apache.calcite.DataContext;
 import org.apache.calcite.adapter.enumerable.EnumerableConvention;
 import org.apache.calcite.adapter.enumerable.EnumerableTableScan;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.linq4j.Enumerable;
 import org.apache.calcite.linq4j.QueryProvider;
 import org.apache.calcite.linq4j.Queryable;
@@ -27,19 +28,18 @@ import org.apache.calcite.plan.ConventionTraitDef;
 import org.apache.calcite.plan.RelOptAbstractTable;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptPlanner;
-import org.apache.calcite.plan.RelOptSchema;
 import org.apache.calcite.plan.RelOptTable;
 import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.plan.RelTraitDef;
 import org.apache.calcite.plan.RelTraitSet;
 import org.apache.calcite.plan.volcano.AbstractConverter;
-import org.apache.calcite.prepare.CalcitePrepareImpl;
 import org.apache.calcite.prepare.Prepare;
 import org.apache.calcite.rel.RelDistributionTraitDef;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.TableModify;
 import org.apache.calcite.rel.logical.LogicalFilter;
 import org.apache.calcite.rel.logical.LogicalTableModify;
+import org.apache.calcite.rel.rules.ProjectTableScanRule;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
@@ -57,7 +57,6 @@ import org.apache.calcite.schema.Statistics;
 import org.apache.calcite.schema.Table;
 import org.apache.calcite.schema.impl.AbstractSchema;
 import org.apache.calcite.schema.impl.AbstractTable;
-import org.apache.calcite.server.CalciteServerStatement;
 import org.apache.calcite.sql.SqlExplainFormat;
 import org.apache.calcite.sql.SqlExplainLevel;
 import org.apache.calcite.sql.SqlNode;
@@ -68,6 +67,7 @@ import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.test.CalciteAssert;
 import org.apache.calcite.util.ImmutableBitSet;
+import org.apache.calcite.util.TestUtil;
 import org.apache.calcite.util.Util;
 
 import com.google.common.collect.ImmutableList;
@@ -172,23 +172,19 @@ public class FrameworksTest {
   }
 
   private void checkTypeSystem(final int expected, FrameworkConfig config) {
-    Frameworks.withPrepare(
-        new Frameworks.PrepareAction<Void>(config) {
-          @Override public Void apply(RelOptCluster cluster,
-              RelOptSchema relOptSchema, SchemaPlus rootSchema,
-              CalciteServerStatement statement) {
-            final RelDataType type =
-                cluster.getTypeFactory()
-                    .createSqlType(SqlTypeName.DECIMAL, 30, 2);
-            final RexLiteral literal =
-                cluster.getRexBuilder().makeExactLiteral(BigDecimal.ONE, type);
-            final RexNode call =
-                cluster.getRexBuilder().makeCall(SqlStdOperatorTable.PLUS,
-                    literal,
-                    literal);
-            assertEquals(expected, call.getType().getPrecision());
-            return null;
-          }
+    Frameworks.withPrepare(config,
+        (cluster, relOptSchema, rootSchema, statement) -> {
+          final RelDataType type =
+              cluster.getTypeFactory()
+                  .createSqlType(SqlTypeName.DECIMAL, 30, 2);
+          final RexLiteral literal =
+              cluster.getRexBuilder().makeExactLiteral(BigDecimal.ONE, type);
+          final RexNode call =
+              cluster.getRexBuilder().makeCall(SqlStdOperatorTable.PLUS,
+                  literal,
+                  literal);
+          assertEquals(expected, call.getType().getPrecision());
+          return null;
         });
   }
 
@@ -292,9 +288,46 @@ public class FrameworksTest {
             RelRunner runner2 = connection.unwrap(RelRunner.class);
             runner2.prepare(values).executeQuery();
           } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw TestUtil.rethrow(e);
           }
         });
+  }
+
+  /** Test case for
+   * <a href="https://issues.apache.org/jira/browse/CALCITE-3228">[CALCITE-3228]
+   * Error while applying rule ProjectScanRule:interpreter</a>
+   *
+   * <p>This bug appears under the following conditions:
+   * 1) have an aggregate with group by and multi aggregate calls.
+   * 2) the aggregate can be removed during optimization.
+   * 3) all aggregate calls are simplified to the same reference.
+   * */
+  @Test public void testPushProjectToScan() throws Exception {
+    Table table = new TableImpl();
+    final SchemaPlus rootSchema = Frameworks.createRootSchema(true);
+    SchemaPlus schema = rootSchema.add("x", new AbstractSchema());
+    schema.add("MYTABLE", table);
+    List<RelTraitDef> traitDefs = new ArrayList<>();
+    traitDefs.add(ConventionTraitDef.INSTANCE);
+    traitDefs.add(RelDistributionTraitDef.INSTANCE);
+    SqlParser.Config parserConfig =
+            SqlParser.configBuilder(SqlParser.Config.DEFAULT)
+                    .setCaseSensitive(false)
+                    .build();
+
+    final FrameworkConfig config = Frameworks.newConfigBuilder()
+            .parserConfig(parserConfig)
+            .defaultSchema(schema)
+            .traitDefs(traitDefs)
+            // define the rules you want to apply
+            .ruleSets(
+                    RuleSets.ofList(AbstractConverter.ExpandConversionRule.INSTANCE,
+                            ProjectTableScanRule.INSTANCE))
+            .programs(Programs.ofRules(Programs.RULE_SET))
+            .build();
+
+    executeQuery(config, "select min(id) as mi, max(id) as ma from mytable where id=1 group by id",
+            CalciteSystemProperty.DEBUG.value());
   }
 
   /** Test case for
@@ -324,7 +357,7 @@ public class FrameworksTest {
         .programs(Programs.ofRules(Programs.RULE_SET))
         .build();
     executeQuery(config, " UPDATE MYTABLE set id=7 where id=1",
-        CalcitePrepareImpl.DEBUG);
+        CalciteSystemProperty.DEBUG.value());
   }
 
   private void executeQuery(FrameworkConfig config,

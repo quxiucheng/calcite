@@ -16,6 +16,8 @@
  */
 package org.apache.calcite.sql;
 
+import org.apache.calcite.sql.validate.SqlNameMatcher;
+
 import java.util.List;
 
 /**
@@ -39,11 +41,13 @@ public interface SqlOperatorTable {
    * @param operatorList mutable list to which to append matches
    *
    * 检索具有给定名称和语法的操作符列表。例如，通过传递SqlSyntax。函数时，返回的列表被缩小为只匹配SqlFunction对象。
+   * @param nameMatcher Name matcher
    */
   void lookupOperatorOverloads(SqlIdentifier opName,
       SqlFunctionCategory category,
       SqlSyntax syntax,
-      List<SqlOperator> operatorList);
+      List<SqlOperator> operatorList,
+      SqlNameMatcher nameMatcher);
 
   /**
    * Retrieves a list of all functions and operators in this table. Used for

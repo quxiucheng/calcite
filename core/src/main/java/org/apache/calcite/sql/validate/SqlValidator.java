@@ -42,10 +42,12 @@ import org.apache.calcite.sql.SqlUpdate;
 import org.apache.calcite.sql.SqlWindow;
 import org.apache.calcite.sql.SqlWith;
 import org.apache.calcite.sql.SqlWithItem;
+import org.apache.calcite.sql.validate.implicit.TypeCoercion;
 import org.apache.calcite.util.Util;
 
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * Validates the parse tree of a SQL statement, and provides semantic
@@ -126,11 +128,7 @@ import java.util.Map;
  * getJoinScope(org.apache.calcite.sql.SqlNode)获得正确的作用域来解析SQL语句特定子句中的名称
  */
 public interface SqlValidator {
-  /**
-   * Whether to follow the SQL standard strictly.
-   * 是否严格遵循SQL标准
-   **/
-  boolean STRICT = Util.getBooleanProperty("calcite.strict.sql");
+
 
   //~ Methods ----------------------------------------------------------------
 
@@ -358,6 +356,13 @@ public interface SqlValidator {
       SqlFunction function,
       List<RelDataType> argTypes,
       List<SqlNode> operands);
+
+  /**
+   * If an identifier is a legitimate call to a function that has no
+   * arguments and requires no parentheses (for example "CURRENT_USER"),
+   * returns a call to that function, otherwise returns null.
+   */
+  @Nullable SqlCall makeNullaryCall(SqlIdentifier id);
 
   /**
    * Derives the type of a node in a given scope. If the type has already been inferred,
@@ -839,6 +844,27 @@ public interface SqlValidator {
   void validateSequenceValue(SqlValidatorScope scope, SqlIdentifier id);
 
   SqlValidatorScope getWithScope(SqlNode withItem);
+
+  /**
+   * Set if implicit type coercion is allowed when the validator does validation.
+   * See {@link org.apache.calcite.sql.validate.implicit.TypeCoercionImpl} for the details.
+   * @param enabled default as true.
+   */
+  SqlValidator setEnableTypeCoercion(boolean enabled);
+
+  /** Get if this validator supports implicit type coercion. */
+  boolean isTypeCoercionEnabled();
+
+  /**
+   * Set an instance of type coercion, you can customize the coercion rules to
+   * override the default ones
+   * in {@link org.apache.calcite.sql.validate.implicit.TypeCoercionImpl}.
+   * @param typeCoercion instance of {@link TypeCoercion}.
+   */
+  void setTypeCoercion(TypeCoercion typeCoercion);
+
+  /** Get the type coercion instance. */
+  TypeCoercion getTypeCoercion();
 }
 
 // End SqlValidator.java

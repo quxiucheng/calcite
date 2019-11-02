@@ -17,11 +17,11 @@
 package org.apache.calcite.adapter.spark;
 
 import org.apache.calcite.adapter.enumerable.EnumerableRules;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.jdbc.CalcitePrepare;
 import org.apache.calcite.linq4j.tree.ClassDeclaration;
 import org.apache.calcite.plan.RelOptPlanner;
 import org.apache.calcite.plan.RelOptRule;
-import org.apache.calcite.prepare.CalcitePrepareImpl;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.runtime.ArrayBindable;
 import org.apache.calcite.util.Util;
@@ -47,7 +47,11 @@ public class SparkHandlerImpl implements CalcitePrepare.SparkHandler {
   private final JavaSparkContext sparkContext =
       new JavaSparkContext("local[1]", "calcite");
 
-  private static SparkHandlerImpl instance;
+  /** Thread-safe holder */
+  private static class Holder {
+    private static final SparkHandlerImpl INSTANCE = new SparkHandlerImpl();
+  }
+
   private static final File CLASS_DIR = new File("target/classes");
 
   /** Creates a SparkHandlerImpl. */
@@ -73,10 +77,7 @@ public class SparkHandlerImpl implements CalcitePrepare.SparkHandler {
    * this via reflection. */
   @SuppressWarnings("UnusedDeclaration")
   public static CalcitePrepare.SparkHandler instance() {
-    if (instance == null) {
-      instance = new SparkHandlerImpl();
-    }
-    return instance;
+    return Holder.INSTANCE;
   }
 
   public RelNode flattenTypes(RelOptPlanner planner, RelNode rootRel,
@@ -112,7 +113,7 @@ public class SparkHandlerImpl implements CalcitePrepare.SparkHandler {
         + s + "\n"
         + "}\n";
 
-    if (CalcitePrepareImpl.DEBUG) {
+    if (CalciteSystemProperty.DEBUG.value()) {
       Util.debugCode(System.out, source);
     }
 

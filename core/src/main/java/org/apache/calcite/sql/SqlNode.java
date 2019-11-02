@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nonnull;
 
 /**
  * A <code>SqlNode</code> is a SQL parse tree.
@@ -91,7 +92,7 @@ public abstract class SqlNode implements Cloneable {
    * @return a {@link SqlKind} value, never null
    * @see #isA
    */
-  public SqlKind getKind() {
+  public @Nonnull SqlKind getKind() {
     return SqlKind.OTHER;
   }
 
@@ -144,6 +145,18 @@ public abstract class SqlNode implements Cloneable {
    *                    </ul>
    *
    *  返回此SqlNode为根节点的树的SQL文本。
+   * <p>Typical return values are:
+   *
+   * <ul>
+   * <li>'It''s a bird!'
+   * <li>NULL
+   * <li>12.3
+   * <li>DATE '1969-04-29'
+   * </ul>
+   *
+   * @param dialect     Dialect (null for ANSI SQL)
+   * @param forceParens Whether to wrap all expressions in parentheses;
+   *                    useful for parse test, but false by default
    */
   public SqlString toSqlString(SqlDialect dialect, boolean forceParens) {
     if (dialect == null) {

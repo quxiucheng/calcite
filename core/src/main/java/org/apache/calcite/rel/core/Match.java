@@ -28,13 +28,14 @@ import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.rex.RexPatternFieldRef;
 import org.apache.calcite.rex.RexVisitorImpl;
 import org.apache.calcite.sql.SqlAggFunction;
+import org.apache.calcite.sql.fun.SqlBitOpAggFunction;
 import org.apache.calcite.sql.fun.SqlMinMaxAggFunction;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.fun.SqlSumAggFunction;
 import org.apache.calcite.sql.fun.SqlSumEmptyIsZeroAggFunction;
+import org.apache.calcite.util.ImmutableBitSet;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -69,7 +70,7 @@ public abstract class Match extends SingleRel {
   protected final Set<RexMRAggCall> aggregateCalls;
   protected final Map<String, SortedSet<RexMRAggCall>> aggregateCallsPreVar;
   protected final ImmutableMap<String, SortedSet<String>> subsets;
-  protected final List<RexNode> partitionKeys;
+  protected final ImmutableBitSet partitionKeys;
   protected final RelCollation orderKeys;
   protected final RexNode interval;
 
@@ -99,7 +100,7 @@ public abstract class Match extends SingleRel {
       boolean strictStart, boolean strictEnd,
       Map<String, RexNode> patternDefinitions, Map<String, RexNode> measures,
       RexNode after, Map<String, ? extends SortedSet<String>> subsets,
-      boolean allRows, List<RexNode> partitionKeys, RelCollation orderKeys,
+      boolean allRows, ImmutableBitSet partitionKeys, RelCollation orderKeys,
       RexNode interval) {
     super(cluster, traitSet, input);
     this.rowType = Objects.requireNonNull(rowType);
@@ -112,7 +113,7 @@ public abstract class Match extends SingleRel {
     this.after = Objects.requireNonNull(after);
     this.subsets = copyMap(subsets);
     this.allRows = allRows;
-    this.partitionKeys = ImmutableList.copyOf(partitionKeys);
+    this.partitionKeys = Objects.requireNonNull(partitionKeys);
     this.orderKeys = Objects.requireNonNull(orderKeys);
     this.interval = interval;
 
@@ -180,7 +181,7 @@ public abstract class Match extends SingleRel {
     return subsets;
   }
 
-  public List<RexNode> getPartitionKeys() {
+  public ImmutableBitSet getPartitionKeys() {
     return partitionKeys;
   }
 
@@ -192,27 +193,9 @@ public abstract class Match extends SingleRel {
     return interval;
   }
 
-  public abstract Match copy(RelNode input, RelDataType rowType,
-      RexNode pattern, boolean strictStart, boolean strictEnd,
-      Map<String, RexNode> patternDefinitions, Map<String, RexNode> measures,
-      RexNode after, Map<String, ? extends SortedSet<String>> subsets,
-      boolean allRows, List<RexNode> partitionKeys, RelCollation orderKeys,
-      RexNode interval);
-
-  @Override public RelNode copy(RelTraitSet traitSet, List<RelNode> inputs) {
-    if (getInputs().equals(inputs)
-        && traitSet == getTraitSet()) {
-      return this;
-    }
-
-    return copy(inputs.get(0), rowType, pattern, strictStart, strictEnd,
-        patternDefinitions, measures, after, subsets, allRows,
-        partitionKeys, orderKeys, interval);
-  }
-
   @Override public RelWriter explainTerms(RelWriter pw) {
     return super.explainTerms(pw)
-        .item("partition", getPartitionKeys())
+        .item("partition", getPartitionKeys().asList())
         .item("order", getOrderKeys())
         .item("outputFields", getRowType().getFieldNames())
         .item("allRows", isAllRows())
@@ -256,6 +239,10 @@ public abstract class Match extends SingleRel {
         break;
       case ANY_VALUE:
         aggFunction = SqlStdOperatorTable.ANY_VALUE;
+        break;
+      case BIT_AND:
+      case BIT_OR:
+        aggFunction = new SqlBitOpAggFunction(call.getKind());
         break;
       default:
         for (RexNode rex : call.getOperands()) {

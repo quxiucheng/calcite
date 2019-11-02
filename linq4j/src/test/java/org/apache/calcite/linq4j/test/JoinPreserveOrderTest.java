@@ -16,9 +16,9 @@
  */
 package org.apache.calcite.linq4j.test;
 
-import org.apache.calcite.linq4j.CorrelateJoinType;
 import org.apache.calcite.linq4j.Enumerable;
 import org.apache.calcite.linq4j.EnumerableDefaults;
+import org.apache.calcite.linq4j.JoinType;
 import org.apache.calcite.linq4j.Linq4j;
 import org.apache.calcite.linq4j.function.Function1;
 import org.apache.calcite.linq4j.function.Function2;
@@ -38,26 +38,25 @@ import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
-
 /**
  * Test validating the order preserving properties of join algorithms in
- * {@link org.apache.calcite.linq4j.ExtendedEnumerable}. The correctness of the join algorithm is
- * not examined by this set of tests.
+ * {@link org.apache.calcite.linq4j.ExtendedEnumerable}. The correctness of the
+ * join algorithm is not examined by this set of tests.
  *
- * To verify that the order of left/right/both input(s) is preserved they must be all ordered by at
- * least one column. The inputs are either sorted on the join or some other column. For the tests to
- * be meaningful the result of the join must not be empty.
+ * <p>To verify that the order of left/right/both input(s) is preserved they
+ * must be all ordered by at least one column. The inputs are either sorted on
+ * the join or some other column. For the tests to be meaningful the result of
+ * the join must not be empty.
  *
- * Interesting variants that may affect the join output and thus destroy the order of one or both
- * inputs is when the join column or the sorted column (when join column != sort column)
- * contain nulls or duplicate values.
+ * <p>Interesting variants that may affect the join output and thus destroy the
+ * order of one or both inputs is when the join column or the sorted column
+ * (when join column != sort column) contain nulls or duplicate values.
  *
- * In addition, the way that nulls are sorted before the join can also play an important role
- * regarding the order preserving semantics of the join.
+ * <p>In addition, the way that nulls are sorted before the join can also play
+ * an important role regarding the order preserving semantics of the join.
  *
- * Last but not least, the type of the join (left/right/full/inner/semi/anti) has a major impact on
- * the preservation of order for the various joins.
+ * <p>Last but not least, the type of the join (left/right/full/inner/semi/anti)
+ * has a major impact on the preservation of order for the various joins.
  */
 @RunWith(Parameterized.class)
 public final class JoinPreserveOrderTest {
@@ -143,8 +142,7 @@ public final class JoinPreserveOrderTest {
                     deptOrderColNames.get(j),
                     deptOrderColSelectors.get(j),
                     ascendingR,
-                    nullsFirstR
-                );
+                    nullsFirstR);
                 data.add(params);
               }
             }
@@ -173,43 +171,54 @@ public final class JoinPreserveOrderTest {
     testJoin(hashJoin(false, false), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
-  @Test public void testLeftThetaJoinPreservesOrderOfLeftInput() {
-    testJoin(thetaJoin(false, true), AssertOrder.PRESERVED, AssertOrder.IGNORED);
+  @Test public void testLeftNestedLoopJoinPreservesOrderOfLeftInput() {
+    testJoin(nestedLoopJoin(JoinType.LEFT), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
-  @Test public void testRightThetaJoinPreservesOrderOfLeftInput() {
+  @Test public void testRightNestedLoopJoinPreservesOrderOfLeftInput() {
     Assume.assumeFalse(leftColumn.isNullsFirst);
-    testJoin(thetaJoin(true, false), AssertOrder.PRESERVED, AssertOrder.IGNORED);
+    testJoin(nestedLoopJoin(JoinType.RIGHT), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
-  @Test public void testFullThetaJoinPreservesOrderOfLeftInput() {
+  @Test public void testFullNestedLoopJoinPreservesOrderOfLeftInput() {
     Assume.assumeFalse(leftColumn.isNullsFirst);
-    testJoin(thetaJoin(true, true), AssertOrder.PRESERVED, AssertOrder.IGNORED);
+    testJoin(nestedLoopJoin(JoinType.FULL), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
-  @Test public void testInnerThetaJoinPreservesOrderOfLeftInput() {
-    testJoin(thetaJoin(false, false), AssertOrder.PRESERVED, AssertOrder.IGNORED);
+  @Test public void testInnerNestedLoopJoinPreservesOrderOfLeftInput() {
+    testJoin(nestedLoopJoin(JoinType.INNER), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
 
   @Test public void testLeftCorrelateJoinPreservesOrderOfLeftInput() {
-    testJoin(correlateJoin(CorrelateJoinType.LEFT), AssertOrder.PRESERVED, AssertOrder.IGNORED);
+    testJoin(correlateJoin(JoinType.LEFT), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
   @Test public void testInnerCorrelateJoinPreservesOrderOfLeftInput() {
-    testJoin(correlateJoin(CorrelateJoinType.INNER), AssertOrder.PRESERVED, AssertOrder.IGNORED);
+    testJoin(correlateJoin(JoinType.INNER), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
   @Test public void testAntiCorrelateJoinPreservesOrderOfLeftInput() {
-    testJoin(correlateJoin(CorrelateJoinType.ANTI), AssertOrder.PRESERVED, AssertOrder.IGNORED);
+    testJoin(correlateJoin(JoinType.ANTI), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
   @Test public void testSemiCorrelateJoinPreservesOrderOfLeftInput() {
-    testJoin(correlateJoin(CorrelateJoinType.SEMI), AssertOrder.PRESERVED, AssertOrder.IGNORED);
+    testJoin(correlateJoin(JoinType.SEMI), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
   @Test public void testSemiDefaultJoinPreservesOrderOfLeftInput() {
     testJoin(semiJoin(), AssertOrder.PRESERVED, AssertOrder.IGNORED);
+  }
+
+  @Test public void testCorrelateBatchJoin() {
+    testJoin(
+        correlateBatchJoin(JoinType.INNER),
+        AssertOrder.PRESERVED,
+        AssertOrder.IGNORED);
+  }
+
+  @Test public void testAntiDefaultJoinPreservesOrderOfLeftInput() {
+    testJoin(antiJoin(), AssertOrder.PRESERVED, AssertOrder.IGNORED);
   }
 
   private void testJoin(
@@ -234,13 +243,14 @@ public final class JoinPreserveOrderTest {
   }
 
   private JoinAlgorithm<Employee, Department, List<Integer>> correlateJoin(
-      CorrelateJoinType joinType) {
+      JoinType joinType) {
     return (left, right) ->
         left.correlateJoin(
             joinType,
             emp -> right.where(dept ->
-                emp.deptno != null && dept.deptno != null && emp.deptno.equals(dept.deptno)
-            ),
+                emp.deptno != null
+                    && dept.deptno != null
+                    && emp.deptno.equals(dept.deptno)),
             RESULT_SELECTOR);
   }
 
@@ -248,7 +258,7 @@ public final class JoinPreserveOrderTest {
       boolean generateNullsOnLeft,
       boolean generateNullsOnRight) {
     return (left, right) ->
-        left.join(right,
+        left.hashJoin(right,
             e -> e.deptno,
             d -> d.deptno,
             RESULT_SELECTOR,
@@ -257,18 +267,15 @@ public final class JoinPreserveOrderTest {
             generateNullsOnRight);
   }
 
-  private JoinAlgorithm<Employee, Department, List<Integer>> thetaJoin(
-      boolean generateNullsOnLeft,
-      boolean generateNullsOnRight) {
+  private JoinAlgorithm<Employee, Department, List<Integer>> nestedLoopJoin(JoinType joinType) {
     return (left, right) ->
-        EnumerableDefaults.thetaJoin(
+        EnumerableDefaults.nestedLoopJoin(
             left,
             right,
             (emp, dept) ->
                 emp.deptno != null && dept.deptno != null && emp.deptno.equals(dept.deptno),
             RESULT_SELECTOR,
-            generateNullsOnLeft,
-            generateNullsOnRight);
+            joinType);
   }
 
   private JoinAlgorithm<Employee, Department, List<Integer>> semiJoin() {
@@ -277,8 +284,32 @@ public final class JoinPreserveOrderTest {
             left,
             right,
             emp -> emp.deptno,
-            dept -> dept.deptno).select(emp -> Arrays.asList(emp.eid, null)
-        );
+            dept -> dept.deptno).select(emp -> Arrays.asList(emp.eid, null));
+  }
+
+  private JoinAlgorithm<Employee, Department, List<Integer>> antiJoin() {
+    return (left, right) ->
+        EnumerableDefaults.antiJoin(
+            left,
+            right,
+            emp -> emp.deptno,
+            dept -> dept.deptno).select(emp -> Arrays.asList(emp.eid, null));
+  }
+
+  private JoinAlgorithm<Employee, Department, List<Integer>> correlateBatchJoin(
+      JoinType joinType) {
+    return (left, right) ->
+        EnumerableDefaults.correlateBatchJoin(
+            joinType,
+            left,
+            emp -> right.where(dept ->
+                    dept.deptno != null
+                        && (dept.deptno.equals(emp.get(0).deptno)
+                        || dept.deptno.equals(emp.get(1).deptno)
+                        || dept.deptno.equals(emp.get(2).deptno))),
+            RESULT_SELECTOR,
+            (emp, dept) -> dept.deptno.equals(emp.deptno),
+             3);
   }
 
   /**
@@ -384,6 +415,7 @@ public final class JoinPreserveOrderTest {
       new Employee(120, "Ilias", 30),
       new Employee(130, "Ruben", 40),
       new Employee(140, "Tanguy", 50),
+      new Employee(145, "Khawla", 40),
       new Employee(150, "Andrew", -10),
       // Nulls on name
       new Employee(160, null, 60),

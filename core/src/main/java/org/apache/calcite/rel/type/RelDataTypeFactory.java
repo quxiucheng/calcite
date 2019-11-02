@@ -32,7 +32,7 @@ import java.util.Objects;
 /**
  *
  * RelDataTypeFactory is a factory for datatype descriptors. It defines methods
- * for instantiating and combining SQL, Java, and collection types. The factory
+ * for instantiating and combining SQL, Jaarchers.jsonva, and collection types. The factory
  * also provides methods for return type inference for arithmetic in cases where
  * SQL 2003 is implementation defined or impractical.
  *
@@ -280,7 +280,10 @@ public interface RelDataTypeFactory {
    * @param type2 type of the second operand
    * @return the result type for a decimal multiplication, or null if decimal
    * multiplication should not be applied to the operands.
+   * @deprecated Use
+   * {@link RelDataTypeSystem#deriveDecimalMultiplyType(RelDataTypeFactory, RelDataType, RelDataType)}
    */
+  @Deprecated // to be removed before 2.0
   RelDataType createDecimalProduct(
       RelDataType type1,
       RelDataType type2);
@@ -290,7 +293,11 @@ public interface RelDataTypeFactory {
    * arguments to double values.
    *
    * <p>Pre-condition: <code>createDecimalProduct(type1, type2) != null</code>
+   *
+   * @deprecated Use
+   * {@link RelDataTypeSystem#shouldUseDoubleMultiplication(RelDataTypeFactory, RelDataType, RelDataType)}
    */
+  @Deprecated // to be removed before 2.0
   boolean useDoubleMultiplication(
       RelDataType type1,
       RelDataType type2);
@@ -304,10 +311,24 @@ public interface RelDataTypeFactory {
    * @param type2 type of the second operand
    * @return the result type for a decimal division, or null if decimal
    * division should not be applied to the operands.
+   *
+   * @deprecated Use
+   * {@link RelDataTypeSystem#deriveDecimalDivideType(RelDataTypeFactory, RelDataType, RelDataType)}
    */
+  @Deprecated // to be removed before 2.0
   RelDataType createDecimalQuotient(
       RelDataType type1,
       RelDataType type2);
+
+  /**
+   * Create a decimal type equivalent to the numeric {@code type},
+   * this is related to specific system implementation,
+   * you can override this logic if it is required.
+   *
+   * @param type the numeric type to create decimal type with
+   * @return decimal equivalence of the numeric type.
+   */
+  RelDataType decimalOf(RelDataType type);
 
   /**
    * Creates a

@@ -295,6 +295,21 @@ public class RexUtil {
     return node;
   }
 
+  /** Removes any casts.
+   *
+   * <p>For example, {@code CAST('1' AS INTEGER)} becomes {@code '1'}. */
+  public static RexNode removeCast(RexNode e) {
+    for (;;) {
+      switch (e.getKind()) {
+      case CAST:
+        e = ((RexCall) e).operands.get(0);
+        break;
+      default:
+        return e;
+      }
+    }
+  }
+
   /** Creates a map containing each (e, constant) pair that occurs within
    * a predicate list.
    *
@@ -1220,7 +1235,7 @@ public class RexUtil {
     if (target < 0) {
       return null;
     }
-    return fieldCollation.copy(target);
+    return fieldCollation.withFieldIndex(target);
   }
 
   /**
@@ -1843,14 +1858,15 @@ public class RexUtil {
   @Deprecated // to be removed before 2.0
   public static RexNode simplifyOr(RexBuilder rexBuilder, RexCall call) {
     return new RexSimplify(rexBuilder, RelOptPredicateList.EMPTY, EXECUTOR)
-        .simplifyOr(call);
+        .simplifyUnknownAs(call, RexUnknownAs.UNKNOWN);
   }
 
   @Deprecated // to be removed before 2.0
   public static RexNode simplifyOrs(RexBuilder rexBuilder,
       List<RexNode> terms) {
     return new RexSimplify(rexBuilder, RelOptPredicateList.EMPTY, EXECUTOR)
-        .simplifyOrs(terms);
+        .simplifyUnknownAs(rexBuilder.makeCall(SqlStdOperatorTable.OR, terms),
+            RexUnknownAs.UNKNOWN);
   }
 
   /**

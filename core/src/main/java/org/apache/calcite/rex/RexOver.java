@@ -38,6 +38,7 @@ public class RexOver extends RexCall {
 
   private final RexWindow window;
   private final boolean distinct;
+  private final boolean ignoreNulls;
 
   //~ Constructors -----------------------------------------------------------
 
@@ -65,11 +66,13 @@ public class RexOver extends RexCall {
       SqlAggFunction op,
       List<RexNode> operands,
       RexWindow window,
-      boolean distinct) {
+      boolean distinct,
+      boolean ignoreNulls) {
     super(type, op, operands);
     Preconditions.checkArgument(op.isAggregator());
     this.window = Objects.requireNonNull(window);
     this.distinct = distinct;
+    this.ignoreNulls = ignoreNulls;
   }
 
   //~ Methods ----------------------------------------------------------------
@@ -89,19 +92,21 @@ public class RexOver extends RexCall {
     return distinct;
   }
 
+  public boolean ignoreNulls() {
+    return ignoreNulls;
+  }
+
   @Override protected @Nonnull String computeDigest(boolean withType) {
     final StringBuilder sb = new StringBuilder(op.getName());
     sb.append("(");
     if (distinct) {
       sb.append("DISTINCT ");
     }
-    for (int i = 0; i < operands.size(); i++) {
-      if (i > 0) {
-        sb.append(", ");
-      }
-      sb.append(operands.get(i));
-    }
+    appendOperands(sb);
     sb.append(")");
+    if (ignoreNulls) {
+      sb.append(" IGNORE NULLS");
+    }
     if (withType) {
       sb.append(":");
       sb.append(type.getFullTypeString());

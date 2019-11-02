@@ -66,6 +66,8 @@ public abstract class Join extends BiRel {
    */
   protected final JoinRelType joinType;
 
+  protected final JoinInfo joinInfo;
+
   //~ Constructors -----------------------------------------------------------
 
   // Next time we need to change the constructor of Join, let's change the
@@ -106,6 +108,7 @@ public abstract class Join extends BiRel {
     this.condition = Objects.requireNonNull(condition);
     this.variablesSet = ImmutableSet.copyOf(variablesSet);
     this.joinType = Objects.requireNonNull(joinType);
+    this.joinInfo = JoinInfo.of(left, right, condition);
   }
 
   @Deprecated // to be removed before 2.0
@@ -150,7 +153,7 @@ public abstract class Join extends BiRel {
     if (getRowType().getFieldCount()
         != getSystemFieldList().size()
         + left.getRowType().getFieldCount()
-        + (this instanceof SemiJoin ? 0 : right.getRowType().getFieldCount())) {
+        + (joinType.projectsRight() ? right.getRowType().getFieldCount() : 0)) {
       return litmus.fail("field count mismatch");
     }
     if (condition != null) {
@@ -181,7 +184,11 @@ public abstract class Join extends BiRel {
 
   @Override public RelOptCost computeSelfCost(RelOptPlanner planner,
       RelMetadataQuery mq) {
-    // REVIEW jvs 9-Apr-2006:  Just for now...
+    // Maybe we should remove this for semi-join?
+    if (isSemiJoin()) {
+      // REVIEW jvs 9-Apr-2006:  Just for now...
+      return planner.getCostFactory().makeTinyCost();
+    }
     double rowCount = mq.getRowCount(this);
     return planner.getCostFactory().makeCost(rowCount, 0, 0);
   }
@@ -221,7 +228,7 @@ public abstract class Join extends BiRel {
 
   /**
    * Returns whether this LogicalJoin has already spawned a
-   * {@link SemiJoin} via
+   * {@code SemiJoin} via
    * {@link org.apache.calcite.rel.rules.JoinAddRedundantSemiJoinRule}.
    *
    * <p>The base implementation returns false.</p>
@@ -230,6 +237,15 @@ public abstract class Join extends BiRel {
    */
   public boolean isSemiJoinDone() {
     return false;
+  }
+
+  /**
+   * Returns whether this Join is a semijoin.
+   *
+   * @return true if this Join's join type is semi.
+   */
+  public boolean isSemiJoin() {
+    return joinType == JoinRelType.SEMI;
   }
 
   /**
@@ -296,7 +312,7 @@ public abstract class Join extends BiRel {
    * @return Analyzed join condition
    */
   public JoinInfo analyzeCondition() {
-    return JoinInfo.of(left, right, condition);
+    return joinInfo;
   }
 }
 

@@ -17,6 +17,7 @@
 package org.apache.calcite.prepare;
 
 import org.apache.calcite.adapter.enumerable.EnumerableRel;
+import org.apache.calcite.config.CalciteSystemProperty;
 import org.apache.calcite.interpreter.BindableConvention;
 import org.apache.calcite.jdbc.CalcitePrepare;
 import org.apache.calcite.jdbc.CalciteSchema;
@@ -25,6 +26,7 @@ import org.apache.calcite.plan.RelOptPlanner;
 import org.apache.calcite.plan.RelOptTable;
 import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.rel.RelNode;
+import org.apache.calcite.rel.RelRoot;
 import org.apache.calcite.rel.RelShuttle;
 import org.apache.calcite.rel.core.TableFunctionScan;
 import org.apache.calcite.rel.core.TableScan;
@@ -83,8 +85,8 @@ class CalciteMaterializer extends CalcitePrepareImpl.CalcitePreparingStmt {
     SqlToRelConverter sqlToRelConverter2 =
         getSqlToRelConverter(getSqlValidator(), catalogReader, config);
 
-    materialization.queryRel =
-        sqlToRelConverter2.convertQuery(node, true, true).rel;
+    RelRoot root = sqlToRelConverter2.convertQuery(node, true, true);
+    materialization.queryRel = trimUnusedFields(root).rel;
 
     // Identify and substitute a StarTable in queryRel.
     //
@@ -107,7 +109,7 @@ class CalciteMaterializer extends CalcitePrepareImpl.CalcitePreparingStmt {
     for (Callback x : useStar(schema, materialization.queryRel)) {
       // Success -- we found a star table that matches.
       materialization.materialize(x.rel, x.starRelOptTable);
-      if (CalcitePrepareImpl.DEBUG) {
+      if (CalciteSystemProperty.DEBUG.value()) {
         System.out.println("Materialization "
             + materialization.materializedTable + " matched star table "
             + x.starTable + "; query after re-write: "

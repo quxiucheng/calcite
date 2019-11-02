@@ -33,9 +33,11 @@ import org.apache.calcite.schema.Statistics;
 import org.apache.calcite.schema.StreamableTable;
 import org.apache.calcite.schema.Table;
 import org.apache.calcite.schema.TableFactory;
+import org.apache.calcite.schema.TemporalTable;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.type.SqlTypeName;
+import org.apache.calcite.util.TestUtil;
 
 import com.google.common.collect.ImmutableList;
 
@@ -277,13 +279,13 @@ public class StreamTest {
         .convertContains("LogicalDelta\n"
             + "  LogicalProject(ROWTIME=[$0], ORDERID=[$1], SUPPLIERID=[$6])\n"
             + "    LogicalJoin(condition=[=($4, $5)], joinType=[inner])\n"
-            + "      LogicalProject(ROWTIME=[$0], ID=[$1], PRODUCT=[$2], UNITS=[$3], PRODUCT0=[CAST($2):VARCHAR(32) CHARACTER SET \"ISO-8859-1\" COLLATE \"ISO-8859-1$en_US$primary\" NOT NULL])\n"
+            + "      LogicalProject(ROWTIME=[$0], ID=[$1], PRODUCT=[$2], UNITS=[$3], PRODUCT0=[CAST($2):VARCHAR(32) NOT NULL])\n"
             + "        LogicalTableScan(table=[[STREAM_JOINS, ORDERS]])\n"
             + "      LogicalTableScan(table=[[STREAM_JOINS, PRODUCTS]])\n")
         .explainContains(""
             + "EnumerableCalc(expr#0..6=[{inputs}], proj#0..1=[{exprs}], SUPPLIERID=[$t6])\n"
-            + "  EnumerableJoin(condition=[=($4, $5)], joinType=[inner])\n"
-            + "    EnumerableCalc(expr#0..3=[{inputs}], expr#4=[CAST($t2):VARCHAR(32) CHARACTER SET \"ISO-8859-1\" COLLATE \"ISO-8859-1$en_US$primary\" NOT NULL], proj#0..4=[{exprs}])\n"
+            + "  EnumerableHashJoin(condition=[=($4, $5)], joinType=[inner])\n"
+            + "    EnumerableCalc(expr#0..3=[{inputs}], expr#4=[CAST($t2):VARCHAR(32) NOT NULL], proj#0..4=[{exprs}])\n"
             + "      EnumerableInterpreter\n"
             + "        BindableTableScan(table=[[STREAM_JOINS, ORDERS, (STREAM)]])\n"
             + "    EnumerableInterpreter\n"
@@ -337,7 +339,7 @@ public class StreamTest {
           assertThat(actualRow, equalTo(expectedRow));
         }
       } catch (SQLException e) {
-        throw new RuntimeException(e);
+        throw TestUtil.rethrow(e);
       }
     };
   }
@@ -534,6 +536,48 @@ public class StreamTest {
     }
 
     public Schema.TableType getJdbcTableType() {
+      return Schema.TableType.TABLE;
+    }
+
+    @Override public boolean isRolledUp(String column) {
+      return false;
+    }
+
+    @Override public boolean rolledUpColumnValidInsideAgg(String column,
+        SqlCall call, SqlNode parent, CalciteConnectionConfig config) {
+      return false;
+    }
+  }
+
+  /**
+   * Table representing the PRODUCTS_TEMPORAL temporal table.
+   */
+  public static class ProductsTemporalTable implements TemporalTable {
+
+    private final RelProtoDataType protoRowType = a0 -> a0.builder()
+        .add("ID", SqlTypeName.VARCHAR, 32)
+        .add("SUPPLIER", SqlTypeName.INTEGER)
+        .add("SYS_START", SqlTypeName.TIMESTAMP)
+        .add("SYS_END", SqlTypeName.TIMESTAMP)
+        .build();
+
+    @Override public String getSysStartFieldName() {
+      return "SYS_START";
+    }
+
+    @Override public String getSysEndFieldName() {
+      return "SYS_END";
+    }
+
+    @Override public RelDataType getRowType(RelDataTypeFactory typeFactory) {
+      return protoRowType.apply(typeFactory);
+    }
+
+    @Override public Statistic getStatistic() {
+      return Statistics.of(200d, ImmutableList.of());
+    }
+
+    @Override public Schema.TableType getJdbcTableType() {
       return Schema.TableType.TABLE;
     }
 

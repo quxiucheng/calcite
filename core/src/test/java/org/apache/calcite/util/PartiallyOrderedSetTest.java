@@ -16,10 +16,12 @@
  */
 package org.apache.calcite.util;
 
-import org.apache.calcite.test.CalciteAssert;
+import org.apache.calcite.config.CalciteSystemProperty;
+import org.apache.calcite.test.SlowTests;
 
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -41,11 +43,12 @@ import static org.junit.Assert.assertTrue;
 /**
  * Unit test for {@link PartiallyOrderedSet}.
  */
+@Category(SlowTests.class)
 public class PartiallyOrderedSetTest {
   private static final boolean DEBUG = false;
 
   // 100, 250, 1000, 3000 are reasonable
-  private static final int SCALE = CalciteAssert.ENABLE_SLOW ? 250 : 50;
+  private static final int SCALE = CalciteSystemProperty.TEST_SLOW.value() ? 250 : 50;
 
   final long seed = new Random().nextLong();
   final Random random = new Random(seed);
@@ -213,14 +216,14 @@ public class PartiallyOrderedSetTest {
   @Test public void testPosetBitsLarge() {
     Assume.assumeTrue(
         "it takes 80 seconds, and the computations are exactly the same every time",
-        CalciteAssert.ENABLE_SLOW);
+        CalciteSystemProperty.TEST_SLOW.value());
     final PartiallyOrderedSet<Integer> poset =
         new PartiallyOrderedSet<>(PartiallyOrderedSetTest::isBitSuperset);
     checkPosetBitsLarge(poset, 30000, 2921, 164782);
   }
 
   @Test public void testPosetBitsLarge2() {
-    Assume.assumeTrue("too slow to run every day", CalciteAssert.ENABLE_SLOW);
+    Assume.assumeTrue("too slow to run every day", CalciteSystemProperty.TEST_SLOW.value());
     final int n = 30000;
     final PartiallyOrderedSet<Integer> poset =
         new PartiallyOrderedSet<>(PartiallyOrderedSetTest::isBitSuperset,

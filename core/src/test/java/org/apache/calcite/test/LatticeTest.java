@@ -20,7 +20,10 @@ import org.apache.calcite.jdbc.CalciteSchema;
 import org.apache.calcite.materialize.Lattice;
 import org.apache.calcite.materialize.Lattices;
 import org.apache.calcite.materialize.MaterializationService;
+import org.apache.calcite.plan.RelOptPlanner;
+import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.plan.RelOptUtil;
+import org.apache.calcite.rel.rules.AbstractMaterializedViewRule;
 import org.apache.calcite.runtime.Hook;
 import org.apache.calcite.schema.SchemaPlus;
 import org.apache.calcite.util.ImmutableBitSet;
@@ -32,6 +35,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -58,6 +62,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Unit test for lattices.
  */
+@Category(SlowTests.class)
 public class LatticeTest {
   private static final String SALES_LATTICE = "{\n"
       + "  name: 'star',\n"
@@ -307,7 +312,7 @@ public class LatticeTest {
         "select 1 from \"foodmart\".\"sales_fact_1997\" as s\n"
         + "join \"foodmart\".\"product\" as p using (\"product_id\")\n"
         + "left join \"foodmart\".\"time_by_day\" as t on s.\"product_id\" = p.\"product_id\"")
-        .connectThrows("only inner join allowed, but got LEFT");
+        .connectThrows("only non nulls-generating join allowed, but got LEFT");
   }
 
   /** Each lattice table must have a parent. */
@@ -332,7 +337,7 @@ public class LatticeTest {
                   + "  LogicalProject(DUMMY=[0])\n"
                   + "    StarTableScan(table=[[adhoc, star]])\n",
                   counter));
-    } catch (RuntimeException e) {
+    } catch (Throwable e) {
       assertThat(Throwables.getStackTraceAsString(e),
           containsString("CannotPlanException"));
     }
@@ -497,6 +502,14 @@ public class LatticeTest {
 
   private void checkTileAlgorithm(String statisticProvider,
       String expectedExplain) {
+    final RelOptRule[] rules = {
+        AbstractMaterializedViewRule.INSTANCE_PROJECT_FILTER,
+        AbstractMaterializedViewRule.INSTANCE_FILTER,
+        AbstractMaterializedViewRule.INSTANCE_PROJECT_JOIN,
+        AbstractMaterializedViewRule.INSTANCE_JOIN,
+        AbstractMaterializedViewRule.INSTANCE_PROJECT_AGGREGATE,
+        AbstractMaterializedViewRule.INSTANCE_AGGREGATE
+    };
     MaterializationService.setThreadLocal();
     MaterializationService.instance().clear();
     foodmartLatticeModel(statisticProvider)
@@ -504,8 +517,17 @@ public class LatticeTest {
             + "from \"foodmart\".\"sales_fact_1997\" as s\n"
             + "join \"foodmart\".\"time_by_day\" as t using (\"time_id\")\n")
         .enableMaterializations(true)
-        // disable for MySQL; times out running star-join query
-        // disable for H2; it thinks our generated SQL has invalid syntax
+
+    // Disable materialization rules from this test. For some reason, there is
+    // a weird interaction between these rules and the lattice rewriting that
+    // produces non-deterministic rewriting (even when only lattices are present).
+    // For more context, see
+    // <a href="https://issues.apache.org/jira/browse/CALCITE-2953">[CALCITE-2953]</a>.
+        .withHook(Hook.PLANNER, (Consumer<RelOptPlanner>) planner ->
+            Arrays.asList(rules).forEach(planner::removeRule))
+
+    // disable for MySQL; times out running star-join query
+    // disable for H2; it thinks our generated SQL has invalid syntax
         .enable(CalciteAssert.DB != CalciteAssert.DatabaseInstance.MYSQL
             && CalciteAssert.DB != CalciteAssert.DatabaseInstance.H2)
         .explainContains(expectedExplain)
