@@ -141,7 +141,6 @@ import static org.apache.calcite.util.Static.RESOURCE;
  */
 public class SqlValidatorImpl implements SqlValidatorWithHints {
   //~ Static fields/initializers ---------------------------------------------
-
   public static final Logger TRACER = CalciteTrace.PARSER_LOGGER;
 
   /**
@@ -228,6 +227,9 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
    * Set of select expressions used as cursor definitions. In standard SQL,
    * only the top-level SELECT is a cursor; Calcite extends this with
    * cursors as inputs to table functions.
+   * 选择表达式集，用作光标定义。
+   * 在标准SQL中，只有顶级SELECT是游标；
+   * calcite通过使用游标将其扩展为表函数的输入
    */
   private final Set<SqlNode> cursorSet = Sets.newIdentityHashSet();
 
@@ -641,6 +643,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
 
   public List<SqlMoniker> lookupHints(SqlNode topNode, SqlParserPos pos) {
     SqlValidatorScope scope = new EmptyScope(this);
+    // 标注话
     SqlNode outermostNode = performUnconditionalRewrites(topNode, false);
     cursorSet.add(outermostNode);
     if (outermostNode.isA(SqlKind.TOP_LEVEL)) {

@@ -28,6 +28,7 @@ import java.util.List;
  * used in the SQL statement (dubbed as hints)
  *
  * 扩展SqlValidator，以允许发现有用的数据，如sql对象的完全限定名、可在sql语句中使用的其他有效sql对象(称为提示)
+ *
  */
 public interface SqlValidatorWithHints extends SqlValidator {
   //~ Methods ----------------------------------------------------------------
@@ -36,6 +37,8 @@ public interface SqlValidatorWithHints extends SqlValidator {
    * Looks up completion hints for a syntactically correct SQL statement that
    * has been parsed into an expression tree. (Note this should be called
    * after {@link #validate(org.apache.calcite.sql.SqlNode)}.
+   * 查找已语法分析为表达式树的语法正确的SQL语句的完成提示。
+   * （请注意，这应在SqlValidator.validate（org.apache.calcite.sql.SqlNode）之后调用。
    *
    * @param topNode top of expression tree in which to lookup completion hints
    * @param pos     indicates the position in the sql statement we want to get
@@ -45,10 +48,16 @@ public interface SqlValidatorWithHints extends SqlValidator {
    *                all the possible column names that can be selected from
    *                sales.dept table setting pos to 'Line 1, Column 31' returns
    *                all the possible table names in 'sales' schema
+   *                表示要获取其完成提示的sql语句中的位置。
+   * 例如，“从sales.emp中选择a.ename，b.deptno，在a.deptno = b.deptno上，在empno = 1上加入join sales.dept b”；将pos设置为“第1行，第17列”会返回所有
+   * 可以从sales.dept表设置pos设置为“第1行，第31列”的可能的列名，返回“ sales”模式中的所有可能的表名
+   *
    * @return an array of {@link SqlMoniker} (sql identifiers) that can fill in
    * at the indicated position
+   * 可以在指定位置填充的SqlMoniker（SQL标识符）数组
    *
-   * 查找已解析为表达式树的语法正确的SQL语句的完成提示。(注意，这应该在SqlValidator.validate(org.apache.calcite.sql.SqlNode)之后调用。
+   * 查找已解析为表达式树的语法正确的SQL语句的完成提示。
+   * (注意，这应该在SqlValidator.validate(org.apache.calcite.sql.SqlNode)之后调用。
    *
    */
   List<SqlMoniker> lookupHints(SqlNode topNode, SqlParserPos pos);
@@ -57,17 +66,23 @@ public interface SqlValidatorWithHints extends SqlValidator {
    * Looks up the fully qualified name for a {@link SqlIdentifier} at a given
    * Parser Position in a parsed expression tree Note: call this only after
    * {@link #validate} has been called.
+   * 在已解析的表达式树中给定的解析器位置处查找SqlIdentifier的全限定名注意：
+   * 仅在调用SqlValidator.validate（org.apache.calcite.sql.SqlNode）之后才调用此名称
    *
    * @param topNode top of expression tree in which to lookup the qualified
    *                name for the SqlIdentifier
+   *                在其中查找SqlIdentifier的限定名称的表达式树的顶部
    * @param pos indicates the position of the {@link SqlIdentifier} in
    *                the SQL statement we want to get the qualified
    *                name for
+   *                指示SqlIdentifier在我们要获取其限定名称的SQL语句中的位置
    * @return a string of the fully qualified name of the {@link SqlIdentifier}
    * if the Parser position represents a valid {@link SqlIdentifier}. Else
    * return an empty string
    *
    * 注意:只有在调用SqlValidator.validate(org.apache.calcite.sql.SqlNode)之后才调用它。
+   * 如果解析器位置表示有效的SqlIdentifier，则为SqlIdentifier的全限定名的字符串。
+   * 否则返回一个空字符串
    */
   SqlMoniker lookupQualifiedName(SqlNode topNode, SqlParserPos pos);
 }

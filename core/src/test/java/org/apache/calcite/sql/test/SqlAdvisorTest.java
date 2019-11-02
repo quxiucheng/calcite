@@ -425,6 +425,7 @@ public class SqlAdvisorTest extends SqlValidatorTestCase {
   /**
    * Checks that a given SQL statement yields the expected set of completion
    * hints.
+   * 检查给定的SQL语句是否产生预期的完成提示集。
    *
    * @param sql             SQL statement
    * @param expectedResults Expected list of hints
@@ -447,10 +448,13 @@ public class SqlAdvisorTest extends SqlValidatorTestCase {
 
   /**
    * Tests that a given SQL statement simplifies to the salesTables result.
+   * 将给定的SQL语句简化为salles结果的测试。
    *
    * @param sql      SQL statement to simplify. The SQL statement must contain
    *                 precisely one caret '^', which marks the location where
    *                 completion is to occur.
+   *                 SQL语句简化。
+   * SQL语句必须恰好包含一个脱字符'^'，该脱字符标记了将要完成的位置。
    * @param expected Expected result after simplification.
    */
   protected void assertSimplify(String sql, String expected) {
@@ -486,6 +490,9 @@ public class SqlAdvisorTest extends SqlValidatorTestCase {
    * Tests that a given SQL which may be invalid or incomplete simplifies
    * itself and yields the salesTables set of completion hints. This is an
    * integration test of {@link #assertHint} and {@link #assertSimplify}.
+   * 测试给定的SQL可能无效或不完整，以简化自身并产生salesTables组完成提示。
+   * 这是assertHint（java.lang.String，java.util.List <java.lang.String> ...）
+   * 和assertSimplify（java.lang.String，java.lang.String）的集成测试。
    *
    * @param sql             SQL statement
    * @param expectedResults Expected list of hints
@@ -603,8 +610,8 @@ public class SqlAdvisorTest extends SqlValidatorTestCase {
   @Test public void testFrom() throws Exception {
     String sql;
 
-    sql = "select a.empno, b.deptno from ^dummy a, sales.dummy b";
-    assertHint(sql, SCHEMAS, getSalesTables(), getFromKeywords()); // join
+     sql = "select a.empno, b.deptno from ^dummy a, sales.dummy b";
+     assertHint(sql, SCHEMAS, getSalesTables(), getFromKeywords()); // join
 
     sql = "select a.empno, b.deptno from ^";
     assertComplete(sql, SCHEMAS, getSalesTables(), getFromKeywords());
