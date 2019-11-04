@@ -848,9 +848,11 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
     } else {
       // No prefix; use the children of the current scope (that is,
       // the aliases in the FROM clause)
+      // 无前缀；使用当前作用域的子代（即FROM子句中的别名）
       scope.findAliases(hintList);
 
       // If there's only one alias, add all child columns
+      // 如果只有一个别名，请添加所有子列
       SelectScope selectScope =
           SqlValidatorUtil.getEnclosingSelectScope(scope);
       if ((selectScope != null)

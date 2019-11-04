@@ -644,6 +644,11 @@ public class SqlValidatorUtil {
     }
   }
 
+  /**
+   * 获取最顶层scope
+   * @param scope
+   * @return
+   */
   public static SelectScope getEnclosingSelectScope(SqlValidatorScope scope) {
     while (scope instanceof DelegatingScope) {
       if (scope instanceof SelectScope) {
