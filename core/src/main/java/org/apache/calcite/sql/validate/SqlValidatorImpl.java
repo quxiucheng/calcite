@@ -658,7 +658,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
 
   public List<SqlMoniker> lookupHints(SqlNode topNode, SqlParserPos pos) {
     SqlValidatorScope scope = new EmptyScope(this);
-    // 标注话
+    // 标准化
     SqlNode outermostNode = performUnconditionalRewrites(topNode, false);
     cursorSet.add(outermostNode);
     if (outermostNode.isA(SqlKind.TOP_LEVEL)) {
@@ -2426,6 +2426,7 @@ public class SqlValidatorImpl implements SqlValidatorWithHints {
 
   /**
    * Registers a query in a parent scope.
+   * 在父范围内注册查询
    *
    * @param parentScope Parent scope which this scope turns to in order to
    *                    resolve objects
